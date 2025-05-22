@@ -1,0 +1,9 @@
+@import 'bootstrap';
+@import 'animate.css/animate.min.css';
+@import 'font-awesome/css/font-awesome.min.css';
+/* @import 'themify-icons/themify-icons.css'; */
+@import 'owl.carousel/dist/assets/owl.carousel.min.css';
+@import 'owl.carousel/dist/assets/owl.theme.default.min.css';
+@import 'magnific-popup/dist/magnific-popup.css';
+@import 'slicknav/dist/slicknav.min.css';
+@import './style.css';
