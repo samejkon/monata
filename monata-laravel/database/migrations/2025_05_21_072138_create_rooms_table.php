@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('thumbnail', 255)->nullable();
             $table->text('description')->nullable();
             $table->tinyInteger('status')->default(1);
-            $table->integer('creator_id');
+            $table->integer('creator_id')->nullable();
             $table->integer('last_modifierId')->nullable();
             $table->integer('deleter_id')->nullable();
             $table->softDeletes('deletion_time')->nullable();

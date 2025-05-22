@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('properties', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->integer('creator_id');
+            $table->integer('creator_id')->nullable();
             $table->integer('last_modifierId')->nullable();
             $table->integer('deleter_id')->nullable();
             $table->softDeletes('deletion_time')->nullable();

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('message');
             $table->tinyInteger('status')->default(1);
+            $table->integer('creator_id')->nullable();
             $table->integer('last_modifierId')->nullable();
             $table->integer('deleter_id')->nullable();
             $table->softDeletes('deletion_time')->nullable();
