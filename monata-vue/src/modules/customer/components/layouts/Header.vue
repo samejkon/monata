@@ -1,71 +1,52 @@
 <template>
   <header>
-    <div class="header-area ">
-      <div id="sticky-header" class="main-header-area">
-        <div class="container-fluid p-0">
-          <div class="row align-items-center no-gutters">
-            <div class="col-xl-5 col-lg-6">
-              <div class="main-menu  d-none d-lg-block">
-                <nav>
-                  <ul id="navigation">
-                    <li><a class="active" href="index.html">home</a></li>
-                    <li><a href="rooms.html">rooms</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="#">blog <i class="ti-angle-down"></i></a>
-                      <ul class="submenu">
-                        <li><a href="blog.html">blog</a></li>
-                        <li><a href="single-blog.html">single-blog</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="#">pages <i class="ti-angle-down"></i></a>
-                      <ul class="submenu">
-                        <li><a href="elements.html">elements</a></li>
-                      </ul>
-                    </li>
-                    <li><a href="contact.html">Contact</a></li>
-                  </ul>
-                </nav>
-              </div>
-            </div>
-            <div class="col-xl-2 col-lg-2">
-              <div class="logo-img">
-                <a href="index.html">
-                  <img src="../../assets/img/logo.png" alt="">
-                </a>
-              </div>
-            </div>
-            <div class="col-xl-5 col-lg-4 d-none d-lg-block">
-              <div class="book_room">
-                <div class="socail_links">
-                  <ul>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-facebook-square"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-twitter"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <i class="fa fa-instagram"></i>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <div class="book_btn d-none d-lg-block">
-                  <a class="popup-with-form" href="#test-form">Book A Room</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-12">
-              <div class="mobile_menu d-block d-lg-none"></div>
-            </div>
+    <section class="section-header">
+      <div class="menu-toogle-display d-none" id="menu-toogle">
+        <i class="icon fa fa-menu" id="close-menu-icon" onclick="toggleMenu()"></i>
+        <ul class="menu-toogle-list">
+          <li class="menu-toogle-item">Home</li>
+          <li class="menu-toogle-item">Rooms</li>
+          <li class="menu-toogle-item">About</li>
+          <li class="menu-toogle-item">Blog</li>
+          <li class="menu-toogle-item">Pages</li>
+          <li class="menu-toogle-item">Contact</li>
+          <li class="menu-toogle-item">
+            <a href="#" class="menu-toogle-item-link text-decor-none" onclick="toggleModal()">Book A Room</a>
+          </li>
+        </ul>
+      </div>
+      <nav class="nav-bar">
+        <div class="nav-start">
+          <a href="#" class="nav-item text-decor-none active-under">Home</a>
+          <a href="#" class="nav-item text-decor-none">Rooms</a>
+          <a href="#" class="nav-item text-decor-none">About</a>
+          <a href="#" class="nav-item text-decor-none">Blog</a>
+          <a href="#" class="nav-item text-decor-none">Pages</a>
+          <a href="#" class="nav-item text-decor-none">Contact</a>
+        </div>
+        <div class="logo">
+          <img src="@/modules/customer/assets/img/logo.png" alt="motana logo" />
+        </div>
+        <div class="menu-icon-display" id="menu-icon" onclick="toggleMenu()">
+          <img src="../assets/icon/buttonmenu.svg" alt="menu icon" />
+        </div>
+        <div class="nav-end">
+          <div class="group-icon">
+            <i class="fa fa-facebook"></i>
+            <i class="fa fa-instagram"></i>
+            <i class="fa fa-twitter"></i>
           </div>
+          <button class="nav-booking" onclick="toggleModal()">
+            Book A Room
+          </button>
+        </div>
+      </nav>
+      <div class="text-overlay">
+        <div>
+          <h3 class="text-overlay-heading">Montana Resort</h3>
+          <p class="text-overlay-p">Unlock to enjoy the view of Martine</p>
         </div>
       </div>
-    </div>
+    </section>
   </header>
 </template>
