@@ -13,4 +13,9 @@ class Property extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function roomTypes()
+    {
+        return $this->belongsToMany(RoomType::class, 'room_properties');
+    }
 }

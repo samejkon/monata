@@ -16,10 +16,7 @@ return new class extends Migration
             $table->integer('booking_id');
             $table->integer('service_id');
             $table->integer('quantity');
-            $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

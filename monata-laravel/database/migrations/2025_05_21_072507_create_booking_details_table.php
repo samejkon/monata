@@ -18,10 +18,7 @@ return new class extends Migration
             $table->decimal('price_per_day', 10, 2);
             $table->date('checkin_date');
             $table->date('checkout_date');
-             $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
