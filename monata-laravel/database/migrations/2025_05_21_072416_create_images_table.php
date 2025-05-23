@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer('room_id');
             $table->string('image_path', 255);
-            $table->softDeletes();
             $table->timestamps();
         });
     }

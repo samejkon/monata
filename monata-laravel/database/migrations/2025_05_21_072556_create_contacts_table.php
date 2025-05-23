@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('guest_name');
             $table->string('guest_email');
             $table->string('title');
-            $table->text('message');
+            $table->text('content');
             $table->tinyInteger('status')->default(1);
             $table->softDeletes();
             $table->timestamps();

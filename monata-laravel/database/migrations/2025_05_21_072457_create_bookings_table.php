@@ -15,9 +15,12 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id')->nullable();
             $table->date('guest_name');
-            $table->date('guest_phone');
-            $table->date('guest_id');
-            $table->decimal('total_price', 10, 2);
+            $table->string('guest_email');
+            $table->string('guest_phone');
+            $table->date('check_in');
+            $table->date('check_out');
+            $table->decimal('deposit', 10, 2);
+            $table->decimal('total_payment', 10, 2);
             $table->tinyInteger('status')->default(1);
             $table->softDeletes();
             $table->timestamps();

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->decimal('price', 10, 2);
-            $table->string('type', 50);
             $table->tinyInteger('status')->default(1);
             $table->softDeletes();
             $table->timestamps();
