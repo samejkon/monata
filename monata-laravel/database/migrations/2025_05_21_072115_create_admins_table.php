@@ -19,10 +19,8 @@ return new class extends Migration
             $table->string('email', 125)->unique();
             $table->string('password', 255);
             $table->string('phone', 20)->nullable();
-            $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
+            $table->string('role', 20)->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 

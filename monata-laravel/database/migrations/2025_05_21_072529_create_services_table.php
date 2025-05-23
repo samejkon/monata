@@ -15,12 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name', 255);
             $table->decimal('price', 10, 2);
-            $table->string('type', 50);
             $table->tinyInteger('status')->default(1);
-            $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

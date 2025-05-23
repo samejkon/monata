@@ -15,10 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer('room_id');
             $table->string('image_path', 255);
-            $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
             $table->timestamps();
         });
     }

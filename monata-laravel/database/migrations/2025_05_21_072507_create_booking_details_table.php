@@ -16,12 +16,9 @@ return new class extends Migration
             $table->integer('room_id');
             $table->integer('booking_id');
             $table->decimal('price_per_day', 10, 2);
-            $table->date('checkin_date');
-            $table->date('checkout_date');
-             $table->integer('creator_id')->nullable();
-            $table->integer('last_modifierId')->nullable();
-            $table->integer('deleter_id')->nullable();
-            $table->softDeletes('deletion_time')->nullable();
+            $table->date('checkin_at');
+            $table->date('checkout_at');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
