@@ -1,0 +1,29 @@
+.section-featured {
+  .section-featured-head {
+    .section-featured-title {
+      font-size: $fs-14;
+      line-height: $lh-21;
+      text-align: center;
+    }
+
+    .section-featured-heading {
+      margin-top: 0;
+      font-size: $fs-46;
+      line-height: $lh-56;
+      font-weight: $fw-400;
+      vertical-align: middle;
+      text-align: center;
+      color: $text-color-black;
+    }
+  }
+
+  .section-featured-offers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+
+    .section-featured-offer {
+      width: 100%;
+    }
+  }
+}
