@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('guest_id');
             $table->decimal('total_price', 10, 2);
             $table->tinyInteger('status')->default(1);
-            $table->integer('creator_id');
+            $table->integer('creator_id')->nullable();
             $table->integer('last_modifierId')->nullable();
             $table->integer('deleter_id')->nullable();
             $table->softDeletes('deletion_time')->nullable();
