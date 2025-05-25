@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Services;
+
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use App\Services\Utils\FileService;
 use App\Models\Room;
 
@@ -39,25 +41,91 @@ class RoomService
         return $rooms;
     }
 
-    public function findById(int $room_id): Room
+    public function findById(int $id): Room
     {
-        return $this->model->finOrFail($room_id);
+        return $this->model->findOrFail($id);
     }
     
     public function insert(array $data): Room
     {
-        $room = new Room;
-        $room->name = $data['name'];
-        $room->room_type_id = $data['room_type_id'];
-        $room->price = $data['price'];
-        $room->description = $data['description'];
-        $room->status = $data['status'];
+        $thumbnailPath = $this->fileService->store($data['thumbnail'], 'room/thumbnails');
 
-        if (isset($data['thumbnail'])) {
-            $room->thumbnail_path = $this->fileService->store($data['thumbnail'], 'images/thumbnails');
+        $imagePaths = [];
+        if (isset($data['images']) && is_array($data['images'])) {
+            foreach ($data['images'] as $image) {
+                $imagePaths[] = $this->fileService->store($image, 'room/images');
+            }
         }
 
-        $room->save();
+        return DB::transaction(function () use ($data, $thumbnailPath, $imagePaths) {
+            $room = new Room;
+            $room->name = $data['name'];
+            $room->room_type_id = $data['room_type_id'];
+            $room->price = $data['price'];
+            $room->description = $data['description'];
+            $room->status = $data['status'];
+            $room->thumbnail_path = $thumbnailPath;
+            $room->save();
+
+            foreach ($imagePaths as $imagePath) {
+                $room->images()->create(['image_path' => $imagePath]);
+            }
+
+            return $room;
+        });
+    }
+
+    public function update(array $data, Room $room): Room
+    {
+        if (isset($data['thumbnail'])) {
+            $thumbnailPath = $this->fileService->store($data['thumbnail'], 'room/thumbnails');
+            $room->thumbnail_path = $thumbnailPath;
+        }
+
+        $newImagePaths = [];
+        if (!empty($data['images']) && is_array($data['images'])) {
+            foreach ($data['images'] as $image) {
+                $newImagePaths[] = $this->fileService->store($image, 'room/images');
+            }
+        }
+
+        return DB::transaction(function () use ($room, $data, $newImagePaths) {
+            $room->name = $data['name'];
+            $room->room_type_id = $data['room_type_id'];
+            $room->price = $data['price'];
+            $room->description = $data['description'];
+            $room->status = $data['status'];
+            $room->save();
+
+            if (!empty($data['images_to_remove']) && is_array($data['images_to_remove'])) {
+                $imagesToDelete = $room->images()->whereIn('id', $data['images_to_remove'])->get();
+
+                foreach ($imagesToDelete as $image) {
+                    $this->fileService->delete($image->image_path);
+                    $image->delete();
+                }
+            }
+
+            foreach ($newImagePaths as $imagePath) {
+                $room->images()->create(['image_path' => $imagePath]);
+            }
+
+            return $room;
+        });
+    }
+
+    public function delete(int $id): null
+    {
+        $room = Room::findOrFail($id);
+        $room->delete();
+
+        return null;
+    }
+
+    public function restore(int $id): Room
+    {
+        $room = Room::withTrashed()->findOrFail($id);
+        $room->restore();
 
         return $room;
     }

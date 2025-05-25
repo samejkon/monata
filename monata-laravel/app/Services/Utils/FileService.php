@@ -5,6 +5,7 @@ namespace App\Services\Utils;
 use App\Models\Image;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
@@ -15,5 +16,12 @@ class FileService
         $path = $file->storeAs($directory , $fileName, 'public');
 
         return $path;
+    }
+
+    public function delete(string $path): void
+    {
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 }

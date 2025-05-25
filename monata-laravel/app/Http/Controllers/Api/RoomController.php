@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\Room\SearchRoomRequest;
 use App\Http\Requests\Room\StoreRoomRequest;
+use App\Http\Requests\Room\UpdateRoomRequest;
 use App\Http\Resources\RoomResource;
 use App\Services\RoomService;
+use App\Models\Room;
 
 class RoomController extends Controller
 {
@@ -38,24 +40,41 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id): RoomResource
     {
-        //
+        $room = $this->roomService->findById($id);
+
+        return new RoomResource($room);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRoomRequest $request, int $id): RoomResource
     {
-        //
+        $room = $this->roomService->findById($id);
+        $roomAfterUpdate = $this->roomService->update($request->validated(), $room);
+
+        return new RoomResource($roomAfterUpdate);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        //
+        $this->roomService->delete($id);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Restore the specified resource from storage.
+     */
+    public function restore(int $id): RoomResource
+    {
+        $room = $this->roomService->restore($id);
+
+        return new RoomResource($room);
     }
 }
