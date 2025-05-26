@@ -17,31 +17,11 @@ class SearchRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-            'room_type_id' => [
-                'nullable',
-                'integer',
-                'exists:room_types,id',
-            ],
-            'status' => [
-                'nullable',
-                'integer',
-                Rule::enum(RoomStatus::class),
-            ],
-            'per_page' => [
-                'nullable',
-                'integer',
-                'min:3',
-            ],
-            'page' => [
-                'nullable',
-                'integer',
-                'min:1',
-            ],
+            'name' => ['nullable', 'string', 'max:255'],
+            'room_type_id' => ['nullable', 'integer', 'exists:room_types,id'],
+            'status' => ['nullable', 'integer', Rule::enum(RoomStatus::class)],
+            'per_page' => ['nullable', 'integer', 'min:3'],
+            'page' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }
