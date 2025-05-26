@@ -1,5 +1,5 @@
 // import Index from './views/Index.vue'
-import Index from '../admin/views/DashBoard.vue'
+import Index from '../customer/views/Index.vue'
  
 export default [
   {
