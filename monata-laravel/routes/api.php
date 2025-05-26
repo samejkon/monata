@@ -13,7 +13,6 @@ Route::prefix('admin')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
-
         Route::apiResource('properties', PropertyController::class);
         Route::apiResource('room-types', RoomTypeController::class);
         Route::apiResource('bookings', AdminBookingController::class);

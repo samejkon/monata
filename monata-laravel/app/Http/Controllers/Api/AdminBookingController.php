@@ -12,7 +12,6 @@ use App\Services\BookingService;
 
 class AdminBookingController extends Controller
 {
-
     public function __construct(
         protected BookingService $service
     ) {}

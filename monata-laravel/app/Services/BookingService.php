@@ -284,7 +284,19 @@ class BookingService
         }
     }
 
-    public function delete($id)
+    /**
+     * Delete a booking.
+     *
+     * This method deletes a booking with the specified ID, given that the booking status
+     * is either CHECK_OUT, CANCELLED, NO_SHOW, or EXPIRED. If the booking status is not
+     * any of these, an exception is thrown.
+     *
+     * @param  int  $id  The ID of the booking to be deleted.
+     * @return bool  True if the booking was deleted successfully, false otherwise.
+     *
+     * @throws \Exception  If the booking status is not any of CHECK_OUT, CANCELLED, NO_SHOW, or EXPIRED.
+     */
+    public function delete($id): bool
     {
         $booking = $this->model->where('id', $id)
             ->whereIn('status', [
