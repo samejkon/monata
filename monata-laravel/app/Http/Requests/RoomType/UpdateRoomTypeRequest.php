@@ -12,7 +12,7 @@ class UpdateRoomTypeRequest extends FormRequest
             'name' => ['required', 'string', 'sometimes', 'max:255',],
 
             'properties' => ['nullable', 'array'],
-            'properties.*.property_id' => ['required', 'exists:properties,id'],
+            'properties.*.property_id' => ['required', 'exists:properties,id', 'distinct'],
             'properties.*.value' => ['required', 'string', 'max:255'],
         ];
     }
