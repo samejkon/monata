@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Services\AuthService;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class UserController extends Controller
 {
     public function __construct(
-        protected AuthService $service
+        protected UserService $service
     ) {}
 
     /**
@@ -21,19 +21,26 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $user = $this->service->login($request->validated());
+        $user = $this->service->login($request->all());
 
         if (! $user) {
             return response()->json(['message' => 'Error'], 401);
         }
 
-        $token = $user->createToken('admin-token', ['admin'])->plainTextToken;
+        $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
             'token' => $token,
         ]);
     }
 
+    /**
+     * Logout user and delete all tokens of the user.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

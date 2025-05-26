@@ -9,12 +9,7 @@ class CreatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-                'string',
-                'unique:properties,name',
-                'max:255',
-            ],
+            'name' => ['required', 'string', 'unique:properties,name', 'max:255'],
         ];
     }
 }

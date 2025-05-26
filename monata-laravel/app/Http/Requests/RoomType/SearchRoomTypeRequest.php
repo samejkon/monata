@@ -9,11 +9,7 @@ class SearchRoomTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'keyword' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
+            'keyword' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

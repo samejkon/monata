@@ -26,7 +26,7 @@ class AuthService
             return false;
         }
 
-        if (! $admin && Hash::check($data['password'], $admin->password)) {
+        if (! $admin || ! Hash::check($data['password'], $admin->password)) {
             return false;
         }
 
