@@ -31,7 +31,7 @@ class CreateRoomTypeRequest extends FormRequest
     public function messages()
     {
         return [
-            'properties.*.id.exists' => 'Property does not exist.',
+            'properties.*.property_id.exists' => 'Property does not exist.',
         ];
     }
 }
