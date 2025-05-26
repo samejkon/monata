@@ -20,7 +20,7 @@ class RoomTypeService
      * @param  array  $keyword
      * @return \Illuminate\Support\Collection
      */
-    public function get($keyword)
+    public function get($keyword): \Illuminate\Support\Collection
     {
         $query  = $this->model->query();
         $query->where('name', 'like', '%' . Arr::get($keyword, 'keyword') . '%');
@@ -34,10 +34,15 @@ class RoomTypeService
      * @param  array  $data
      * @return \App\Models\RoomType
      */
-    public function create($data)
+    public function create($data): RoomType
     {
         return DB::transaction(function () use ($data) {
-            $record = $this->model->create(['name' => $data['name']]);
+            $roomType = [
+                'name' => $data['name'],
+                'price' => $data['price'],
+            ];
+
+            $record = $this->model->create($roomType);
 
             $record->roomProperties()->createMany($data['properties']);
 
@@ -52,11 +57,15 @@ class RoomTypeService
      * @param  int  $id
      * @return \App\Models\RoomType
      */
-    public function update($data, $id)
+    public function update($data, $id): RoomType
     {
         return DB::transaction(function () use ($data, $id) {
             $record = $this->model->findOrFail($id);
-            $record->update(['name' => $data['name']]);
+            $roomType = [
+                'name' => $data['name'],
+                'price' => $data['price'],
+            ];
+            $record->update($roomType);
 
             $record->properties()->sync($data['properties']);
 

@@ -63,7 +63,7 @@ class PropertyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id)
+    public function destroy(int $id): Response
     {
         $this->service->delete($id);
 

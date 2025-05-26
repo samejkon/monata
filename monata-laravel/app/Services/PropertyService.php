@@ -17,7 +17,7 @@ class PropertyService
      * @param  array  $keyword
      * @return \Illuminate\Support\Collection
      */
-    public function get($keyword)
+    public function get($keyword): \Illuminate\Support\Collection
     {
         $query  = $this->model->query();
         $query->where('name', 'like', '%' . Arr::get($keyword, 'keyword') . '%');
@@ -59,7 +59,7 @@ class PropertyService
      * @return \App\Models\Property
      * @throws \Exception
      */
-    public function delete($id)
+    public function delete($id): Property
     {
         $record = $this->model->findOrFail($id);
 
