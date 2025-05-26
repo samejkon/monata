@@ -13,8 +13,18 @@ class Room extends Model
 {
     use SoftDeletes;
 
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'rooms';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'name',
         'room_type_id',
@@ -23,6 +33,11 @@ class Room extends Model
         'status',
     ];
 
+    /**
+     * The attributes that should be cast to native types or value objects.
+     *
+     * @var array
+     */
     protected $casts = [
         'status' => RoomStatus::class,
     ];
