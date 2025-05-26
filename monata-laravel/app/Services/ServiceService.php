@@ -12,12 +12,12 @@ class ServiceService
     ) {}
 
     /**
-     * Search services.
+     * Get services.
      *
      * @param  array  $data
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get(array $data): \Illuminate\Pagination\LengthAwarePaginator
+    public function get(array $data): \Illuminate\Database\Eloquent\Collection
     {
         $query  = $this->model->query();
 
@@ -29,7 +29,7 @@ class ServiceService
             $q->where('status', '=', $data['status']);
         });
 
-        $services = $query->paginate(10);
+        $services = $query->get();
 
         return $services;
     }
@@ -69,15 +69,30 @@ class ServiceService
      * @return \App\Models\Service
      * @throws \Exception
      */
-    public function delete($id): Service
+    public function delete($id): ?Service
     {
-        $record = Service::findOrFail($id);
+        $record = $this->model->findOrFail($id);
 
-        // check relationships before deleting
-        if ($record->rooms()->exists()) {
-            throw new \Exception("Service is exists.");
+        $record->delete();
+
+        return $record;
+    }
+
+    /**
+     * Restore a service.
+     *
+     * @param  int  $id
+     * @return \App\Models\Service
+     */
+    public function restore($id): ?Service
+    {
+        $service = $this->model->withTrashed()->find($id);
+
+        if (!$service) {
+            return null;
         }
+        $service->restore();
 
-        return $record->delete();;
+        return $service;
     }
 }

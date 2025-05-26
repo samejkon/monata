@@ -9,6 +9,8 @@ use App\Http\Requests\Service\UpdateServiceRequest;
 use App\Http\Resources\ServiceResource;
 use App\Services\ServiceService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class ServiceController extends Controller
 {
@@ -73,5 +75,22 @@ class ServiceController extends Controller
         $this->service->delete($id);
 
         return response()->noContent();
+    }
+
+    /**
+     * Restore a service.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function restore($id): JsonResponse
+    {
+        $service = $this->service->restore($id);
+
+        if ($service) {
+            return response()->json(['message' => 'Restored successfully!', 'data' => $service]);
+        }
+
+        return response()->json(['message' => 'No records found!'], 404);
     }
 }
