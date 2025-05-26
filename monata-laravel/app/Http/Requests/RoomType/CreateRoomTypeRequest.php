@@ -18,7 +18,7 @@ class CreateRoomTypeRequest extends FormRequest
             'name' => ['required', 'string', 'unique:room_types,name', 'max:255'],
 
             'properties' => ['required', 'array'],
-            'properties.*.property_id' => ['required', 'exists:properties,id'],
+            'properties.*.property_id' => ['required', 'exists:properties,id', 'distinct'],
             'properties.*.value' => ['required', 'string', 'max:255'],
         ];
     }
@@ -31,7 +31,7 @@ class CreateRoomTypeRequest extends FormRequest
     public function messages()
     {
         return [
-            'properties.*.id.exists' => 'Property does not exist.',
+            'properties.*.property_id.exists' => 'Property does not exist.',
         ];
     }
 }

@@ -15,14 +15,15 @@ class PropertyService
      * Search properties by keyword
      *
      * @param  array  $keyword
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($keyword)
+    public function get($payload): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
-        $query  = $this->model->query();
-        $query->where('name', 'like', '%' . Arr::get($keyword, 'keyword') . '%');
+        $query  = $this->model->where('name', 'like', '%' . Arr::get($payload, 'keyword') . '%')->orderBy('id', 'desc');
 
-        return $query->get();
+        $per_page = Arr::get($payload, 'per_page', 10);
+
+        return $query->paginate($per_page);
     }
 
     /**
@@ -59,7 +60,7 @@ class PropertyService
      * @return \App\Models\Property
      * @throws \Exception
      */
-    public function delete($id)
+    public function delete($id): bool
     {
         $record = $this->model->findOrFail($id);
 

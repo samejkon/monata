@@ -17,6 +17,7 @@ class RoomTypeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'price' => $this->price,
             'properties' => RoomPropertyResource::collection($this->roomProperties),
         ];
     }

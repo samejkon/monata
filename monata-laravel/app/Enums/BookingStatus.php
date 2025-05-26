@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Enums;
+namespace App\Enums;
 
 enum BookingStatus
 {
@@ -9,4 +9,6 @@ enum BookingStatus
     const CHECK_IN = 3;
     const CHECK_OUT = 4;
     const CANCELLED = 5;
+    const NO_SHOW = 6;
+    const EXPIRED = 7;
 }

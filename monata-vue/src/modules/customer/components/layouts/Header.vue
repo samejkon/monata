@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import { useAuthStore } from '@/modules/customer/stores/auth'
+import { api } from '@/modules/customer/lib/axios'
+const authStore = useAuthStore()
+
+async function logout() {
+  try {
+    await api.post(`/logout`)
+    authStore.logout()
+    alert('Logout successful!')
+  } catch (error: any) {
+    console.error('Logout failed:', error.message)
+    alert('Logout failed!')
+  }
+}
+</script>
+
 <template>
   <header>
     <section class="section-header">
@@ -31,11 +48,12 @@
           <img src="../assets/icon/buttonmenu.svg" alt="menu icon" />
         </div>
         <div class="nav-end">
-          <div class="group-icon">
-            <i class="fa fa-facebook"></i>
-            <i class="fa fa-instagram"></i>
-            <i class="fa fa-twitter"></i>
-          </div>
+          <router-link to="/login" class="nav-item text-decor-none text-light" v-if="!authStore.authenticated">
+            Sign in to your account
+          </router-link>
+          <form @submit.prevent="logout()" v-if="authStore.authenticated">
+            <button type="submit" class="btn btn-danger">Logout</button>
+          </form>
           <button class="nav-booking" onclick="toggleModal()">
             Book A Room
           </button>
