@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer('room_type_id');
             $table->string('name', 255);
-            $table->decimal('price', 10, 2);
             $table->string('thumbnail_path', 255)->nullable();
             $table->text('description')->nullable();
             $table->tinyInteger('status')->default(1);

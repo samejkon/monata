@@ -10,7 +10,10 @@ class RoomType extends Model
     use SoftDeletes;
 
     protected $table = 'room_types';
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'price'
+    ];
 
     /**
      * The room properties that belong to the RoomType

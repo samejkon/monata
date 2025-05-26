@@ -54,10 +54,11 @@ class BookingService
 
         $total = 0;
 
+
         $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total) {
-            $room = $this->room->where('id', $item['room_id'])->first();
-            dd($room);
-            $price = $room?->price ?? 0;
+            $query = $this->room->query();
+            $query->where('id', $item['room_id']);
+            
 
             $duration = 1;
             $unitHours = 12;
