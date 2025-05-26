@@ -22,10 +22,6 @@ class AuthService
             ->where('email', $data['email'])
             ->first();
 
-        if (! $admin) {
-            return false;
-        }
-
         if (! $admin || ! Hash::check($data['password'], $admin->password)) {
             return false;
         }

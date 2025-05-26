@@ -20,11 +20,12 @@ class BookingResource extends JsonResource
             'guest_name' => $this->guest_name,
             'guest_email' => $this->guest_email,
             'guest_phone' => $this->guest_phone,
-            'checkin' => $this->checkin,
-            'checkout' => $this->checkout,
+            'check_in' => $this->check_in,
+            'check_out' => $this->check_out,
+            'note' => $this->note,
             'deposit' => $this->deposit,
             'total_payment' => $this->total_payment,
-            'stauts' => $this->stauts,
+            'status' => $this->status,
             'booking_details' => BookingDetailResource::collection($this->bookingDetails),
         ];
     }

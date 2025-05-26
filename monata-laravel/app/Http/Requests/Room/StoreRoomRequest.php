@@ -17,16 +17,13 @@ class StoreRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            [
-                'name' => ['required', 'string', 'max:255'],
-                'room_type_id' => ['required', 'integer', 'exists:room_types,id'],
-                'thumbnail' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-                'images' => ['nullable', 'array', 'max:10'],
-                'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-                'description' => ['nullable', 'string'],
-                'status' => ['nullable', 'integer', Rule::enum(RoomStatus::class)],
-            ]
-
+            'name' => ['required', 'string', 'max:255'],
+            'room_type_id' => ['required', 'integer', 'exists:room_types,id'],
+            'thumbnail' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'images' => ['nullable', 'array', 'max:10'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
+            'description' => ['nullable', 'string'],
+            'status' => ['nullable', 'integer', Rule::enum(RoomStatus::class)],
         ];
     }
 }
