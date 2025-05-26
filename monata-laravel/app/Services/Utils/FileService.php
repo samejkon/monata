@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Storage;
 
 class FileService
 {
+    /**
+     * Store a file in the given directory.
+     *
+     * @param \Illuminate\Http\UploadedFile $file
+     * @param string $directory
+     * @return string
+     */
     public function store(UploadedFile $file, string $directory): string
     {
         $extension = $file->getClientOriginalExtension();
@@ -18,6 +25,11 @@ class FileService
         return $path;
     }
 
+    /**
+     * Delete a file from the storage.
+     *
+     * @param string $path The path to the file
+     */
     public function delete(string $path): void
     {
         if (Storage::disk('public')->exists($path)) {

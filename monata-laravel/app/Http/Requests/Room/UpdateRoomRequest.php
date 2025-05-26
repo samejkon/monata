@@ -26,11 +26,6 @@ class UpdateRoomRequest extends FormRequest
                 'integer',
                 'exists:room_types,id',
             ],
-            'price' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
             'thumbnail' => [
                 'nullable',
                 'image',

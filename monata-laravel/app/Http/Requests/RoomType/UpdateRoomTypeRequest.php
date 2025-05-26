@@ -15,6 +15,11 @@ class UpdateRoomTypeRequest extends FormRequest
                 'sometimes',
                 'max:255',
             ],
+            'price' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
             'properties' => [
                 'nullable',
                 'array',

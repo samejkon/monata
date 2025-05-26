@@ -3,19 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Http\Requests\Room\SearchRoomRequest;
 use App\Http\Requests\Room\StoreRoomRequest;
 use App\Http\Requests\Room\UpdateRoomRequest;
 use App\Http\Resources\RoomResource;
 use App\Services\RoomService;
-use App\Models\Room;
 
 class RoomController extends Controller
 {
+    /**
+     * Create a new RoomController instance.
+     *
+     * @param \App\Services\RoomService $roomService
+     */
     public function __construct(
         protected RoomService $roomService
-    ){}
+    ) {}
 
     /**
      * Display a listing of the resource.

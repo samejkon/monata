@@ -15,6 +15,11 @@ class CreateRoomTypeRequest extends FormRequest
                 'unique:room_types,name',
                 'max:255',
             ],
+            'price' => [
+                'required',
+                'numeric',
+                'min:0',
+            ],
             'properties' => [
                 'required',
                 'array',

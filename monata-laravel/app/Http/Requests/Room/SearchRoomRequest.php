@@ -4,6 +4,7 @@ namespace App\Http\Requests\Room;
 
 use Illuminate\Validation\Rule;
 use App\Base\FormRequest;
+use App\Enums\RoomStatus;
 
 class SearchRoomRequest extends FormRequest
 {
@@ -25,18 +26,6 @@ class SearchRoomRequest extends FormRequest
                 'nullable',
                 'integer',
                 'exists:room_types,id',
-            ],
-            'price_from' => [
-                'nullable',
-                'numeric',
-                'min:0',
-                'lte:price_to'
-            ],
-            'price_to' => [
-                'nullable',
-                'numeric',
-                'min:0',
-                'gte:price_from'
             ],
             'status' => [
                 'nullable',

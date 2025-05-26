@@ -9,11 +9,28 @@ use App\Models\Room;
 
 class RoomService
 {
+    /**
+     * Create a new RoomService instance.
+     *
+     * @param  \App\Models\Room  $model
+     * @param  \App\Services\Utils\FileService  $fileService
+     * @return void
+     */
     public function __construct(
         protected Room $model,
         protected FileService $fileService,
     ) {}
 
+    /**
+     * Get rooms by search.
+     *
+     * @param array $search
+     *            name: string
+     *            room_type_id: int
+     *            status: \App\Enums\RoomStatus
+     *            per_page: int (default is 10)
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
     public function get(array $search): LengthAwarePaginator
     {
         $query  = $this->model->query();
@@ -25,12 +42,6 @@ class RoomService
             ->when(isset($search['room_type_id']), function ($q) use ($search) {
                 $q->where('room_type_id', 'like', '%' . $search['room_type_id'] . '%');
             })
-            ->when(isset($search['price_from']), function ($q) use ($search) {
-                $q->where('price', '>=', $search['price_from']);
-            })
-            ->when(isset($search['price_to']), function ($q) use ($search) {
-                $q->where('price', '<=', $search['price_to']);
-            })
             ->when(isset($search['status']), function ($q) use ($search) {
                 $q->where('status', $search['status']);
             });
@@ -41,11 +52,25 @@ class RoomService
         return $rooms;
     }
 
+    /**
+     * Find a room by ID.
+     *
+     * @param  int  $id  The room ID.
+     * @return \App\Models\Room
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
     public function findById(int $id): Room
     {
         return $this->model->findOrFail($id);
     }
-    
+
+    /**
+     * Insert a room.
+     *
+     * @param  array  $data  The form data.
+     * @return \App\Models\Room
+     */
     public function insert(array $data): Room
     {
         $thumbnailPath = $this->fileService->store($data['thumbnail'], 'room/thumbnails');
@@ -61,7 +86,6 @@ class RoomService
             $room = new Room;
             $room->name = $data['name'];
             $room->room_type_id = $data['room_type_id'];
-            $room->price = $data['price'];
             $room->description = $data['description'];
             $room->status = $data['status'];
             $room->thumbnail_path = $thumbnailPath;
@@ -75,6 +99,13 @@ class RoomService
         });
     }
 
+    /**
+     * Update a room.
+     *
+     * @param  array  $data
+     * @param  \App\Models\Room  $room
+     * @return \App\Models\Room
+     */
     public function update(array $data, Room $room): Room
     {
         if (isset($data['thumbnail'])) {
@@ -92,7 +123,6 @@ class RoomService
         return DB::transaction(function () use ($room, $data, $newImagePaths) {
             $room->name = $data['name'];
             $room->room_type_id = $data['room_type_id'];
-            $room->price = $data['price'];
             $room->description = $data['description'];
             $room->status = $data['status'];
             $room->save();
@@ -114,6 +144,13 @@ class RoomService
         });
     }
 
+    /**
+     * Delete a room.
+     *
+     * @param  int  $id
+     * @return null
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
     public function delete(int $id): null
     {
         $room = Room::findOrFail($id);
@@ -122,6 +159,13 @@ class RoomService
         return null;
     }
 
+    /**
+     * Restore a soft-deleted room.
+     *
+     * @param  int  $id  The ID of the room to restore.
+     * @return \App\Models\Room  The restored room instance.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If no room with the given ID is found.
+     */
     public function restore(int $id): Room
     {
         $room = Room::withTrashed()->findOrFail($id);
