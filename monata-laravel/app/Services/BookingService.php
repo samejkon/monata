@@ -69,18 +69,12 @@ class BookingService
             $rooms = $this->getRoomsByBookingDetails($data['booking_details']);
 
             $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total, $rooms) {
-
                 $price = $this->getPriceRoomType($rooms, $item['room_id']);
 
-                $duration = 1;
-                $unitHours = 12; //type price of room.
+                $duration = config('room.duration');
+                $unitHours = config('room.unit_hours');
 
-                if (!empty($item['checkin_at']) && !empty($item['checkout_at'])) {
-                    $checkin = Carbon::parse($item['checkin_at']);
-                    $checkout = Carbon::parse($item['checkout_at']);
-                    $diffInHours = $checkin->diffInHours($checkout, false);
-                    $duration = $diffInHours > 0 ? max(1, ceil($diffInHours / $unitHours)) : 1;
-                }
+                $duration = $this->calculateDuration($item['checkin_at'], $item['checkout_at'], $unitHours);
 
                 $itemTotal = $duration * $price;
                 $total += $itemTotal;
@@ -96,7 +90,7 @@ class BookingService
 
             $recordBooking->bookingDetails()->createMany($bookingDetails);
 
-            return $recordBooking->pagination();
+            return $recordBooking;
         });
     }
 
@@ -149,7 +143,7 @@ class BookingService
                 'check_in'       => Arr::get($data, 'check_in'),
                 'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status' => Arr::get($data, 'status', BookingStatus::PENDING),
+                'status'         => Arr::get($data, 'status', BookingStatus::PENDING),
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -164,18 +158,12 @@ class BookingService
             $total = 0;
 
             $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total, $rooms) {
-
                 $price = $this->getPriceRoomType($rooms, $item['room_id']);
 
-                $duration = 1;
-                $unitHours = 12; //type price of room.
+                $duration = config('room.duration');
+                $unitHours = config('room.unit_hours');
 
-                if (!empty($item['checkin_at']) && !empty($item['checkout_at'])) {
-                    $checkin = Carbon::parse($item['checkin_at']);
-                    $checkout = Carbon::parse($item['checkout_at']);
-                    $diffInHours = $checkin->diffInHours($checkout, false);
-                    $duration = $diffInHours > 0 ? max(1, ceil($diffInHours / $unitHours)) : 1;
-                }
+                $duration = $this->calculateDuration($item['checkin_at'], $item['checkout_at'], $unitHours);
 
                 $itemTotal = $duration * $price;
                 $total += $itemTotal;
@@ -213,8 +201,7 @@ class BookingService
             ]);
         })
             ->where(function ($query) use ($newCheckIn, $newCheckOut) {
-                $query->where('checkin_at', '<', $newCheckOut)
-                    ->where('checkout_at', '>', $newCheckIn);
+                $this->scopeTimeOverlap($query, $newCheckIn, $newCheckOut);
             })
             ->pluck('room_id')
             ->unique();
@@ -286,8 +273,7 @@ class BookingService
                     ]);
                 })
                 ->where(function ($query) use ($newCheckIn, $newCheckOut) {
-                    $query->where('checkin_at', '<', $newCheckOut)
-                        ->where('checkout_at', '>', $newCheckIn);
+                    $this->scopeTimeOverlap($query, $newCheckIn, $newCheckOut);
                 });
 
             if ($excludeBookingId) {
@@ -300,6 +286,46 @@ class BookingService
                 throw new \Exception("Room ID {$roomId} is not available for the selected dates.");
             }
         }
+    }
+
+    /**
+     * Calculate the duration of stay given the check-in and check-out dates.
+     *
+     * The duration is calculated in terms of the number of $unitHours blocks
+     * of time. If the check-in and check-out dates are empty, a duration of 1
+     * is returned. If the duration is less than 1, it is rounded up to 1.
+     *
+     * @param  string|null  $checkin  The check-in date.
+     * @param  string|null  $checkout  The check-out date.
+     * @param  int  $unitHours  The number of hours in a block of time.
+     * @return int  The duration of stay.
+     */
+    private function calculateDuration($checkin, $checkout, $unitHours = 12): int
+    {
+        if (empty($checkin) || empty($checkout)) {
+            return 1;
+        }
+
+        $checkin = Carbon::parse($checkin);
+        $checkout = Carbon::parse($checkout);
+        $diffInHours = $checkin->diffInHours($checkout, false);
+
+        return $diffInHours > 0 ? max(1, ceil($diffInHours / $unitHours)) : 1;
+    }
+
+    /**
+     * Scope a query to only include booking details that have a check-in time
+     * less than the given end time and a check-out time greater than the given start time.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  string  $start  The start time.
+     * @param  string  $end  The end time.
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function scopeTimeOverlap($query, $start, $end)
+    {
+        return $query->where('checkin_at', '<', $end)
+            ->where('checkout_at', '>', $start);
     }
 
     /**
