@@ -96,8 +96,26 @@ class BookingService
 
             $recordBooking->bookingDetails()->createMany($bookingDetails);
 
-            return $recordBooking;
+            return $recordBooking->pagination();
         });
+    }
+
+    /**
+     * Retrieve a booking by ID.
+     *
+     * This method retrieves a booking by its ID and returns the result as a
+     * Booking instance.
+     *
+     * @param  int  $id  The ID of the booking to be retrieved.
+     * @return \App\Models\Booking  The booking instance.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function findById($id): Booking
+    {
+        $booking = $this->model->findOrFail($id);
+
+        return $booking;
     }
 
     /**

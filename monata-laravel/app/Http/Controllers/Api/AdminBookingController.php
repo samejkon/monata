@@ -42,6 +42,19 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Display the specified booking.
+     *
+     * @param  int  $id
+     * @return \App\Http\Resources\BookingResource
+     */
+    public function show($id): BookingResource
+    {
+        $data = $this->service->findById($id);
+
+        return new BookingResource($data);
+    }
+
+    /**
      * Check room availability for the given date range.
      *
      * This method retrieves all rooms that are available for booking
