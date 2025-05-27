@@ -13,8 +13,8 @@ class UpdateBookingRequest extends FormRequest
             'guest_name' => ['required', 'string', 'max:255'],
             'guest_email' => ['required', 'email', 'max:255'],
             'guest_phone' => ['required', 'string', 'max:20'],
-            'check_in' => ['nullable', 'date', 'after_or_equal:today'],
-            'check_out' => ['nullable', 'date', 'after:check_in'],
+            // 'check_in' => ['nullable', 'date_format:Y-m-d H:i', 'after_or_equal:today'],
+            // 'check_out' => ['nullable', 'date_format:Y-m-d H:i', 'after:check_in'],
             'deposit' => ['nullable', 'numeric', 'min:0'],
             'note' => ['nullable', 'string'],
             'total_payment' => ['nullable', 'numeric', 'min:0'],
@@ -23,8 +23,8 @@ class UpdateBookingRequest extends FormRequest
             'booking_details' => ['required', 'array'],
             'booking_details.*.id' => ['nullable', 'integer', 'exists:booking_details,id'],
             'booking_details.*.room_id' => ['required', 'integer', 'exists:rooms,id', 'distinct'],
-            'booking_details.*.checkin_at' => ['required', 'date', 'after_or_equal:today'],
-            'booking_details.*.checkout_at' => ['required', 'date', 'after:checkin_at'],
+            'booking_details.*.checkin_at' => ['required', 'date_format:Y-m-d H:i', 'after_or_equal:today'],
+            'booking_details.*.checkout_at' => ['required', 'date_format:Y-m-d H:i', 'after:checkin_at'],
         ];
     }
 }

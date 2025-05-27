@@ -57,8 +57,6 @@ class BookingService
                 'guest_name'     => Arr::get($data, 'guest_name'),
                 'guest_email'    => Arr::get($data, 'guest_email'),
                 'guest_phone'    => Arr::get($data, 'guest_phone'),
-                'check_in'       => Arr::get($data, 'check_in'),
-                'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
                 'status'         => BookingStatus::CONFIRMED,
                 'note'           => Arr::get($data, 'note'),
@@ -382,7 +380,6 @@ class BookingService
         return $booking->save();
     }
 
-
     /**
      * Check in a guest with the specified booking ID.
      *
@@ -401,6 +398,7 @@ class BookingService
         $booking = $this->model->where('status', BookingStatus::CONFIRMED)->findOrFail($id);
 
         $booking->status = BookingStatus::CHECK_IN;
+        $booking->check_in = Carbon::now();
 
         return $booking->save();
     }

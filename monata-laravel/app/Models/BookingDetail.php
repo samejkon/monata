@@ -19,6 +19,11 @@ class BookingDetail extends Model
         'price_per_day',
     ];
 
+    protected $casts = [
+        'checkin_at' => 'datetime',
+        'checkout_at' => 'datetime',
+    ];
+
     public function booking()
     {
         return $this->belongsTo(Booking::class, 'booking_id');

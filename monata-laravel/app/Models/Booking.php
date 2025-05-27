@@ -24,6 +24,11 @@ class Booking extends Model
         'status',
     ];
 
+    protected $casts = [
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
+    ];
+
     public function bookingDetails()
     {
         return $this->hasMany(BookingDetail::class, 'booking_id');

@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('guest_name');
             $table->string('guest_email');
             $table->string('guest_phone');
-            $table->date('check_in')->nullable();
-            $table->date('check_out')->nullable();
+            $table->datetime('check_in')->nullable();
+            $table->datetime('check_out')->nullable();
             $table->decimal('deposit', 10, 2)->nullable();
             $table->decimal('total_payment', 10, 2)->nullable();
             $table->text('note')->nullable();

@@ -59,7 +59,7 @@ class PropertyService
      * @return \App\Models\Property
      * @throws \Exception
      */
-    public function delete($id): Property
+    public function delete($id): bool
     {
         $record = $this->model->findOrFail($id);
 

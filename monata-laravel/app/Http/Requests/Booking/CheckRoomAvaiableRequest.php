@@ -14,8 +14,8 @@ class CheckRoomAvaiableRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'checkin_at' => ['required', 'date'],
-            'checkout_at' => ['required', 'date', 'after:checkin_at'],
+            'checkin_at' => ['required', 'date_format:Y-m-d H:i'],
+            'checkout_at' => ['required', 'date_format:Y-m-d H:i', 'after:checkin_at'],
         ];
     }
 }
