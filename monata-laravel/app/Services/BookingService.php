@@ -60,7 +60,7 @@ class BookingService
                 'check_in'       => Arr::get($data, 'check_in'),
                 'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status'         => BookingStatus::PENDING,
+                'status'         => BookingStatus::CONFIRMED,
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -130,7 +130,11 @@ class BookingService
      */
     public function update($data, $id)
     {
-        $booking = $this->model->findOrFail($id);
+        $booking = $this->model->whereIn('status', [
+            BookingStatus::PENDING,
+            BookingStatus::CONFIRMED,
+            BookingStatus::CHECK_IN,
+        ])->findOrFail($id);
 
         $this->validateRoomAvailability($data['booking_details'], $booking->id);
 
@@ -143,7 +147,7 @@ class BookingService
                 'check_in'       => Arr::get($data, 'check_in'),
                 'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status'         => Arr::get($data, 'status', BookingStatus::PENDING),
+                'status'         => Arr::get($data, 'status', BookingStatus::CONFIRMED),
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -356,5 +360,48 @@ class BookingService
         }
 
         return $booking->delete();
+    }
+
+    /**
+     * Confirm a booking.
+     *
+     * This method confirms a booking with the specified ID, given that the booking status
+     * is PENDING. If the booking status is not PENDING, an exception is thrown.
+     *
+     * @param  int  $id  The ID of the booking to be confirmed.
+     * @return bool  True if the booking was confirmed successfully, false otherwise.
+     *
+     * @throws \Exception  If the booking status is not PENDING.
+     */
+    public function confirm($id): bool
+    {
+        $booking = $this->model->where('status', BookingStatus::PENDING)->findOrFail($id);
+
+        $booking->status = BookingStatus::CONFIRMED;
+
+        return $booking->save();
+    }
+
+
+    /**
+     * Check in a guest with the specified booking ID.
+     *
+     * This method retrieves a booking by its ID, given that the booking status
+     * is CONFIRMED. If the booking status is not CONFIRMED, an exception is
+     * thrown. It then updates the booking status to CHECK_IN and saves the
+     * booking.
+     *
+     * @param  int  $id  The ID of the booking to be checked in.
+     * @return bool  True if the booking was checked in successfully, false otherwise.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
+     */
+    public function checkInGuest($id): bool
+    {
+        $booking = $this->model->where('status', BookingStatus::CONFIRMED)->findOrFail($id);
+
+        $booking->status = BookingStatus::CHECK_IN;
+
+        return $booking->save();
     }
 }

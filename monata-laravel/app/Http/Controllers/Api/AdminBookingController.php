@@ -97,4 +97,24 @@ class AdminBookingController extends Controller
 
         return response()->noContent();
     }
+
+    /**
+     * Confirm the specified booking.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function confirm($id): \Illuminate\Http\Response
+    {
+        $this->service->confirm($id);
+
+        return response()->noContent();
+    }
+
+    public function checkInGuest($id)
+    {
+        $this->service->checkInGuest($id);
+
+        return response()->noContent();
+    }
 }
