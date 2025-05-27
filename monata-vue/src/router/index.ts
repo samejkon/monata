@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import adminRouter from '../modules/admin/router'
 import customerRouter from '../modules/customer/router'
+import adminRoutes from '@/modules/admin/router';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    ...adminRouter,
     ...customerRouter,
+    ...adminRoutes,
   ],
 })
 
