@@ -111,7 +111,20 @@ class AdminBookingController extends Controller
         return response()->noContent();
     }
 
-    public function checkInGuest($id)
+    /**
+     * Check in a guest with the specified booking ID.
+     *
+     * This method retrieves a booking by its ID, given that the booking status
+     * is CONFIRMED. If the booking status is not CONFIRMED, an exception is
+     * thrown. It then updates the booking status to CHECK_IN and saves the
+     * booking.
+     *
+     * @param  int  $id  The ID of the booking to be checked in.
+     * @return \Illuminate\Http\Response
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
+     */
+    public function checkInGuest($id): \Illuminate\Http\Response
     {
         $this->service->checkInGuest($id);
 
