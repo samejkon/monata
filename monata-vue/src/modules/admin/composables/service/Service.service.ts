@@ -53,7 +53,7 @@ export const useService = () => {
         }
     };
 
-    const form = reactive({
+    const form = ref({
         name: '',
         price: undefined,
         status: ServiceStatus.Active,
@@ -66,46 +66,78 @@ export const useService = () => {
         per_page: '10',
     });
 
-    const handleCreateSubmit = async () => {
-        Object.keys(errors).forEach(key => delete errors[key]);
-        console.log(errors);
-        try {
-            await createService(form);
-            router.push('/admin/services');
-        } catch (error: any) {
-            if (error.response?.status === 422) {
-                Object.assign(errors, error.response.data.errors);
-            } else {
-                console.error(error);
-            }
-        }
-    };
-
     const handleUpdateService = async () => {
+        Object.keys(errors).forEach(key => delete errors[key]);
         if (editingService.value) {
             try {
-                console.log('Updating service:', editingService.value);
                 const response = await updateService(editingService.value.id, {
                     name: editingService.value.name,
                     price: editingService.value.price,
                     status: editingService.value.status
                 });
-                console.log('Update response:', response);
                 await fetchServices();
                 editingService.value = null;
-            } catch (error) {
-                console.error('Error updating service:', error);
+            } catch (error: any) {
+                if (error.response?.status === 422) {
+                    Object.assign(errors, error.response.data.errors);
+                    return;
+                }
+                console.error(error);
                 alert('Có lỗi xảy ra khi cập nhật service');
             }
         }
     };
 
     const startEdit = (service: any) => {
+        Object.keys(errors).forEach(key => delete errors[key]);
         editingService.value = { ...service };
     };
 
     const cancelEdit = () => {
         editingService.value = null;
+    };
+
+    const isCreating = ref(false);
+
+    const startCreate = () => {
+        isCreating.value = true;
+        form.value = {
+            name: '',
+            price: undefined,
+            status: ServiceStatus.Active
+        };
+        Object.keys(errors).forEach(key => delete errors[key]);
+    };
+
+    const cancelCreate = () => {
+        isCreating.value = false;
+        form.value = {
+            name: '',
+            price: undefined,
+            status: ServiceStatus.Active
+        };
+        Object.keys(errors).forEach(key => delete errors[key]);
+    };
+
+    const handleCreate = async () => {
+        Object.keys(errors).forEach(key => delete errors[key]);
+        try {
+            await createService(form.value);
+            await fetchServices();
+            isCreating.value = false;
+            form.value = {
+                name: '',
+                price: undefined,
+                status: ServiceStatus.Active
+            };
+        } catch (error: any) {
+            if (error.response?.status === 422) {
+                Object.assign(errors, error.response.data.errors);
+            } else {
+                console.error(error);
+                alert('Có lỗi xảy ra khi tạo service');
+            }
+        }
     };
 
     const actionDeleteService = async (id: number) => {
@@ -152,11 +184,14 @@ export const useService = () => {
         actionDeleteService,
         form,
         errors,
-        handleCreateSubmit,
         updateService,
         editingService,
         startEdit,
         cancelEdit,
         handleUpdateService,
+        isCreating,
+        startCreate,
+        cancelCreate,
+        handleCreate,
     };
 };

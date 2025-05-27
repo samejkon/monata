@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Service;
+use Illuminate\Support\Arr;
 
 class ServiceService
 {
@@ -20,13 +21,16 @@ class ServiceService
     {
         $query  = $this->model->query();
 
-        $query->when($data['name'] ?? null, function ($q, $name) {
+        $query->when(Arr::get($data, 'name'), function ($q, $name) {
             $q->where('name', 'like', "%$name%");
-        })->when($data['price'] ?? null, function ($q, $price) {
+        })
+        ->when(Arr::get($data, 'price'), function ($q, $price) {
             $q->where('price', '=', $price);
-        })->when(isset($data['status']) && $data['status'] !== '', function ($q) use ($data) {
-            $q->where('status', '=', $data['status']);
+        })
+        ->when(Arr::get($data, 'status', '') !== '', function ($q) use ($data) {
+            $q->where('status', '=', Arr::get($data, 'status'));
         });
+
         $perPage = $data['per_page'] ?? 10;
         $services = $query->paginate($perPage);
 

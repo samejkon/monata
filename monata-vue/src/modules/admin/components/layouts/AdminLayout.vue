@@ -56,6 +56,13 @@
             <span>Service</span>
           </router-link>
         </li>
+        
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/contacts">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Contact</span>
+          </router-link>
+        </li>
       </ul>
       <!-- End of Sidebar -->
 
