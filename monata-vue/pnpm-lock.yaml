@@ -15,8 +15,8 @@ importers:
         specifier: ^4.1.1
         version: 4.1.1
       bootstrap:
-        specifier: ^5.3.6
-        version: 5.3.6(@popperjs/core@2.11.8)
+        specifier: ^4.6.2
+        version: 4.6.2(jquery@3.7.1)(popper.js@1.16.1)
       font-awesome:
         specifier: ^4.7.0
         version: 4.7.0
@@ -736,10 +736,11 @@ packages:
   birpc@2.3.0:
     resolution: {integrity: sha512-ijbtkn/F3Pvzb6jHypHRyve2QApOCZDR25D/VnkY2G/lBNcXCTsnsCxgY4k4PkVB7zfwzYbY3O9Lcqe3xufS5g==}
 
-  bootstrap@5.3.6:
-    resolution: {integrity: sha512-jX0GAcRzvdwISuvArXn3m7KZscWWFAf1MKBcnzaN02qWMb3jpMoUX4/qgeiGzqyIb4ojulRzs89UCUmGcFSzTA==}
+  bootstrap@4.6.2:
+    resolution: {integrity: sha512-51Bbp/Uxr9aTuy6ca/8FbFloBUJZLHwnhTcnjIeRn2suQWsWzcuJhGjKDB5eppVte/8oCdOL3VuwxvZDUggwGQ==}
     peerDependencies:
-      '@popperjs/core': ^2.11.8
+      jquery: 1.9.1 - 3
+      popper.js: ^1.16.1
 
   brace-expansion@2.0.1:
     resolution: {integrity: sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==}
@@ -1092,6 +1093,10 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  popper.js@1.16.1:
+    resolution: {integrity: sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==}
+    deprecated: You can find the new Popper v2 at @popperjs/core, this package is dedicated to the legacy v1
 
   postcss@8.5.3:
     resolution: {integrity: sha512-dle9A3yYxlBSrt8Fu+IpjGT8SY8hN0mlaA6GY8t0P5PjIOZemULz/E2Bnm/2dcUOena75OTNkHI76uZBNUUq3A==}
@@ -2070,9 +2075,10 @@ snapshots:
 
   birpc@2.3.0: {}
 
-  bootstrap@5.3.6(@popperjs/core@2.11.8):
+  bootstrap@4.6.2(jquery@3.7.1)(popper.js@1.16.1):
     dependencies:
-      '@popperjs/core': 2.11.8
+      jquery: 3.7.1
+      popper.js: 1.16.1
 
   brace-expansion@2.0.1:
     dependencies:
@@ -2380,6 +2386,8 @@ snapshots:
       vue: 3.5.14(typescript@5.8.3)
     optionalDependencies:
       typescript: 5.8.3
+
+  popper.js@1.16.1: {}
 
   postcss@8.5.3:
     dependencies:
