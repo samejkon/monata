@@ -34,6 +34,13 @@ class AuthController extends Controller
         ]);
     }
 
+    /**
+     * Logout and delete the current access token.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
