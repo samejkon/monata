@@ -8,7 +8,6 @@ use App\Enums\RoomStatus;
 
 class SearchRoomRequest extends FormRequest
 {
-
     /**
      * Get the validation rules that apply to the request.
      *
