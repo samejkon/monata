@@ -15,7 +15,7 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('properties', PropertyController::class);
         Route::apiResource('room-types', RoomTypeController::class);
-      
+
         Route::apiResource('bookings', AdminBookingController::class);
         Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
         Route::post('/bookings/{booking}/confirm', [AdminBookingController::class, 'confirm']);
