@@ -28,11 +28,23 @@ class ServiceController extends Controller
      */
     public function index(SearchServiceRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $data = $request->validated();
+        $data = $request->query();
 
         $services = $this->service->get($data);
 
         return ServiceResource::collection($services);
+    }
+
+    /**
+     * Summary of show
+     * @param int $id
+     * @return ServiceResource
+     */
+    public function show(int $id): ServiceResource
+    {
+        $data = $this->service->show($id);
+
+        return new ServiceResource($data);
     }
 
     /**
@@ -81,16 +93,12 @@ class ServiceController extends Controller
      * Restore a service.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function restore($id): JsonResponse
+    public function restore($id): Response
     {
         $service = $this->service->restore($id);
 
-        if ($service) {
-            return response()->json(['message' => 'Restored successfully!', 'data' => $service]);
-        }
-
-        return response()->json(['message' => 'No records found!'], 404);
+        return response()->noContent();
     }
 }

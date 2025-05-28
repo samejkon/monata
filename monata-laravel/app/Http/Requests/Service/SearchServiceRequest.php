@@ -22,11 +22,10 @@ class SearchServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'data' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
+            'name' => 'nullable|string|max:255',
+            'price' => 'nullable|numeric|min:0',
+            'status' => 'nullable|integer|in:1,2',
+            'per_page' => 'nullable|integer|min:1',
         ];
     }
 }

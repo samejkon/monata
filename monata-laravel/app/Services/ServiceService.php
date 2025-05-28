@@ -12,12 +12,11 @@ class ServiceService
     ) {}
 
     /**
-     * Get services.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Summary of get
+     * @param array $data
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function get(array $data): \Illuminate\Database\Eloquent\Collection
+    public function get(array $data): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query  = $this->model->query();
 
@@ -28,10 +27,20 @@ class ServiceService
         })->when(isset($data['status']) && $data['status'] !== '', function ($q) use ($data) {
             $q->where('status', '=', $data['status']);
         });
-
-        $services = $query->get();
+        $perPage = $data['per_page'] ?? 10;
+        $services = $query->paginate($perPage);
 
         return $services;
+    }
+
+    /**
+     * Summary of show
+     * @param int $id
+     * @return Service
+     */
+    public function show(int $id): Service
+    {
+        return $this->model->findOrFail($id);
     }
 
     /**
@@ -86,7 +95,7 @@ class ServiceService
      */
     public function restore($id): ?Service
     {
-        $service = $this->model->withTrashed()->find($id);
+        $service = $this->model->withTrashed()->findOrFail($id);
 
         if (!$service) {
             return null;
