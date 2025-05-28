@@ -33,18 +33,13 @@ class RoomService
      */
     public function get(array $search): LengthAwarePaginator
     {
-        $query  = $this->model->query();
-
-        $query
-            ->when(isset($search['name']), function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search['name'] . '%');
-            })
-            ->when(isset($search['room_type_id']), function ($q) use ($search) {
-                $q->where('room_type_id', 'like', '%' . $search['room_type_id'] . '%');
-            })
-            ->when(isset($search['status']), function ($q) use ($search) {
-                $q->where('status', $search['status']);
-            });
+        $query  = $this->model->when(isset($search['name']), function ($q) use ($search) {
+            $q->where('name', 'like', '%' . $search['name'] . '%');
+        })->when(isset($search['room_type_id']), function ($q) use ($search) {
+            $q->where('room_type_id', 'like', '%' . $search['room_type_id'] . '%');
+        })->when(isset($search['status']), function ($q) use ($search) {
+            $q->where('status', $search['status']);
+        });
 
         $perPage = $search['per_page'] ?? 10;
         $rooms = $query->paginate($perPage);
