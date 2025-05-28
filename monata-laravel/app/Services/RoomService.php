@@ -33,7 +33,7 @@ class RoomService
      */
     public function get(array $search): LengthAwarePaginator
     {
-        $query  = $this->model->when(isset($search['name']), function ($q) use ($search) {
+        $query = $this->model->when(isset($search['name']), function ($q) use ($search) {
             $q->where('name', 'like', '%' . $search['name'] . '%');
         })->when(isset($search['room_type_id']), function ($q) use ($search) {
             $q->where('room_type_id', 'like', '%' . $search['room_type_id'] . '%');
