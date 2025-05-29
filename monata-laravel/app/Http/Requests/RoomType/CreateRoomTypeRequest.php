@@ -11,7 +11,6 @@ class CreateRoomTypeRequest extends FormRequest
      *
      * @return array<string, mixed> The validation rules.
      */
-
     public function rules(): array
     {
         return [
