@@ -1,17 +1,12 @@
 <template>
     <div>
-        <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Service List</h1>
-        
-        <!-- DataTales Example -->
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Service List</h6>
-                <router-link to="/admin/services/create" class="btn btn-primary"><SquarePlus/></router-link>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-2">
+                    <div class="col-lg-2 col-md-2 col-sm-2 mt-1 mb-1">
                         <div class="dataTables_length" id="dataTable_length">
                             <label>Show 
                                 <select 
@@ -19,7 +14,7 @@
                                     @change="onSearch"
                                     name="dataTable_length" 
                                     aria-controls="dataTable" 
-                                    class="custom-select custom-select-sm form-control form-control-sm"
+                                    class="select-per-page custom-select custom-select-sm form-control form-control-sm"
                                 >
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -33,20 +28,20 @@
                     </div>
                     <div class="col-lg-10">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-1 mb-1">
                                 <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="Service name ..." />
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-1 mb-1">
                                 <input v-model="searchForm.price" type="number" class="form-control form-control-sm" placeholder="Service price ..." />
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2 mt-1 mb-1">
                                 <select v-model="searchForm.status" class="custom-select custom-select-sm form-control form-control-sm">
                                     <option value="">-- Select status --</option>
                                     <option :value="ServiceStatus.Active">Active</option>
                                     <option :value="ServiceStatus.Inactive">Inactive</option>
                                 </select>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2 mt-1 mb-1">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <i class="fa-solid fa-magnifying-glass me-1"></i> Search
                                 </button>
@@ -55,18 +50,18 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered row-5" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th class="text-center"><router-link to="/admin/services/create" class="btn btn-primary"><SquarePlus/></router-link></th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="service of services" :key="service.id">
-                                <td>
+                                <td class="col-lg-4 col-md-4 col-sm-4">
                                     <template v-if="editingService?.id === service.id">
                                         <input 
                                             v-model="editingService.name" 
@@ -78,7 +73,7 @@
                                         {{ service.name }}
                                     </template>
                                 </td>
-                                <td>
+                                <td class="col-lg-4 col-md-4 col-sm-4">
                                     <template v-if="editingService?.id === service.id">
                                         <input 
                                             v-model="editingService.price" 
@@ -90,7 +85,7 @@
                                         {{ service.price }}
                                     </template>
                                 </td>
-                                <td>
+                                <td class="col-lg-3 col-md-3 col-sm-3">
                                     <template v-if="editingService?.id === service.id">
                                         <select v-model="editingService.status" class="form-control">
                                             <option :value="ServiceStatus.Active">Active</option>
@@ -103,7 +98,7 @@
                                         </span>
                                     </template>
                                 </td>
-                                <td class="d-flex gap-2">
+                                <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
                                     <template v-if="editingService?.id === service.id">
                                         <button class="btn btn-success" @click="handleUpdateService">
                                             <Check />
@@ -197,10 +192,8 @@ onMounted(() => {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
-
-label {
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
+.select-per-page {
+    width: 60px;
+    display: inline-block;
 }
 </style>

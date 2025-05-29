@@ -23,7 +23,7 @@ class ServiceService
         $query->when($data['name'] ?? null, function ($q, $name) {
             $q->where('name', 'like', "%$name%");
         })->when($data['price'] ?? null, function ($q, $price) {
-            $q->where('price', 'like', "%$price%");
+            $q->where('price', '=', $price);
         })->when(isset($data['status']) && $data['status'] !== '', function ($q) use ($data) {
             $q->where('status', '=', $data['status']);
         });
