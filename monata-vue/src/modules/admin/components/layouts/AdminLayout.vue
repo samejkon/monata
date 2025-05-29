@@ -33,6 +33,19 @@
             <span>Tables</span>
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/properties">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Properties</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/bookings">
+
+            <span>Booking</span>
+          </router-link>
+        </li>
+
         <!-- Add more nav items here based on admin/index.html -->
       </ul>
       <!-- End of Sidebar -->
@@ -44,7 +57,7 @@
           <!-- Topbar -->
           <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
             <!-- Sidebar Toggle (Topbar) -->
-            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" @click="toggleSidebar">
               <i class="fa fa-bars"></i>
             </button>
 
@@ -100,17 +113,8 @@
           </div>
           <!-- /.container-fluid -->
         </div>
-        <!-- End of Main Content -->
+        <!-- End of Main Content -->  
 
-        <!-- Footer -->
-        <footer class="sticky-footer bg-white">
-          <div class="container my-auto">
-            <div class="copyright text-center my-auto">
-              <span>Copyright &copy; Monata 2024</span>
-            </div>
-          </div>
-        </footer>
-        <!-- End of Footer -->
       </div>
       <!-- End of Content Wrapper -->
     </div>
@@ -121,61 +125,42 @@
       <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-          <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="login.html">Logout</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-// It's better to manage scripts like sb-admin-2.min.js globally or via specific component logic
-// For now, we will attempt to load it dynamically, but this might need adjustments
-// import '@/modules/admin/assets/js/sb-admin-2.min.js'; // This direct import might not work as expected for non-module JS
+import { ref, defineComponent, onMounted } from 'vue';
 
 export default defineComponent({
   name: 'AdminLayout',
   setup() {
+    const isSidebarToggled = ref(false);
+
+    const toggleSidebar = () => {
+      isSidebarToggled.value = !isSidebarToggled.value;
+      const wrapper = document.getElementById('wrapper');
+      if (wrapper) {
+        wrapper.classList.toggle('toggled', isSidebarToggled.value);
+      }
+    };
+
     onMounted(() => {
-      // Load the sb-admin-2.js script dynamically if it manipulates DOM or adds global event listeners
-      // This is a common pattern for integrating older jQuery-based templates with Vue
       const script = document.createElement('script');
-      script.src = '/src/modules/admin/assets/js/sb-admin-2.min.js'; // Adjust path as necessary
       script.async = true;
       document.body.appendChild(script);
-
-      // You might need to re-initialize parts of the SB Admin 2 script after Vue mounts components
-      // or when the route changes, if it relies on specific DOM elements being present.
     });
-    return {};
+
+    return {
+      toggleSidebar
+    };
   }
 });
 </script>
 
 <style>
-/* Import global styles. Adjust paths as necessary. */
-/* @import '@/modules/admin/assets/vendor/fontawesome-free/css/all.min.css'; // Removed local FontAwesome */
 @import '@/modules/admin/assets/css/sb-admin-2.min.css';
 
-/* Scoped styles or additional global styles can go here */
-.router-link-exact-active.nav-link {
-  /* Add styles for active router links if needed, sb-admin might handle this */
+#wrapper.toggled #accordionSidebar {
+  display: none !important;
 }
 </style>

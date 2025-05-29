@@ -1,8 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router';
-import AdminLayout from '@/modules/admin/components/layouts/AdminLayout.vue';
-import DashboardView from '@/modules/admin/views/Dashboard.vue';
-// Import TablesView once it's created
-import TablesView from '@/modules/admin/views/Tables.vue';
+import Dashboard from './views/Dashboard.vue';
+import Tables from './views/Tables.vue';
+import Properties from './views/Properties.vue';
+import AdminLayout from './components/layouts/AdminLayout.vue';
+import Bookings from './views/Bookings.vue';
+
 
 const adminRoutes: Array<RouteRecordRaw> = [
     {
@@ -10,21 +12,19 @@ const adminRoutes: Array<RouteRecordRaw> = [
         component: AdminLayout,
         children: [
             {
-                path: 'dashboard',
-                name: 'AdminDashboard',
-                component: DashboardView,
-                meta: { requiresAuth: true } // Example meta field
+                path: 'dashboard', name: 'AdminDashboard', component: Dashboard, meta: { requiresAuth: true }
             },
             {
-                path: 'tables',
-                name: 'AdminTables',
-                component: TablesView,
-                meta: { requiresAuth: true }
+                path: 'tables', name: 'AdminTables', component: Tables, meta: { requiresAuth: true }
             },
-            // Add other admin routes here
             {
-                path: '', // Default child route for /admin
-                redirect: '/admin/dashboard'
+                path: 'properties', name: 'AdminProperties', component: Properties
+            },
+            {
+                path: 'bookings', name: 'AdminBookings', component: Bookings
+            },
+            {
+                path: '', redirect: '/admin/dashboard'
             }
         ]
     }
