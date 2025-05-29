@@ -15,6 +15,8 @@ class CreatePropertyRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'unique:properties,name', 'max:255'],
+
+            'per_page' => ['integer', 'min:10', 'max:100'],
         ];
     }
 }

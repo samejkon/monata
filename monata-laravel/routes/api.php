@@ -16,6 +16,7 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('properties', PropertyController::class);
         Route::apiResource('room-types', RoomTypeController::class);
+
         Route::apiResource('bookings', AdminBookingController::class);
         Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
         Route::post('/bookings/{booking}/confirm', [AdminBookingController::class, 'confirm']);
@@ -25,7 +26,7 @@ Route::prefix('admin')->group(function () {
         Route::post('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'editSave']);
         Route::delete('bookings/{booking}/invoice-details/{id}', [InvoiceDetailController::class, 'destroy']);
 
-        Route::apiResource('rooms', RoomController::class);
+        Route::apiResource('rooms', RoomController::class)->except(['update']);
         Route::post('/rooms/{room}/restore', [RoomController::class, 'restore']);
         Route::post('/rooms/{room}', [RoomController::class, 'update']);
     });
