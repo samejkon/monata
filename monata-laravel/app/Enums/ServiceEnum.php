@@ -2,8 +2,8 @@
 
 namespace App\Enums;
 
-enum ServiceEnum
+enum ServiceEnum: int
 {
-    const ACTIVE = 1;
-    const INACTIVE = 0;
+    case ACTIVE = 1;
+    case INACTIVE = 2;
 }

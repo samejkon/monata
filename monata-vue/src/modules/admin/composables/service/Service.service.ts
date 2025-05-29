@@ -12,41 +12,58 @@ export const useService = () => {
     const errors = reactive<Record<string, string[]>>({});
 
     const services = ref<Service[]>([]);
-    const page = ref(1);
-    const totalPages = ref(1);
     const currentPage = ref(1);
+    const meta = ref({
+        current_page: 1,
+        from: 1,
+        last_page: 1,
+        per_page: 10,
+        to: 0,
+        total: 0
+    });
 
-    const isCreate = computed(() => !route.params.id);
-    const formTitle = computed(() => isCreate.value ? 'Create User' : 'Update User');
-    const buttonTitle = computed(() => isCreate.value ? 'Create' : 'Update');
-
-    const actionDeleteService = async (id: number) => {
-        const confirmDelete = confirm('Are you sure you want to delete this user?');
-        if (!confirmDelete) return;
-
-        await deleteService(id);    
-        await fetchServices();
-    };
+    const editingService = ref<any>(null);
 
 
     const fetchServices = async () => {
-        const queryParams = route.query;
-        const pageNum = Number(route.query.page) || 1;
+        try {
+            const { name, price, status, page, per_page } = route.query;
+            const params: Record<string, any> = { 
+                page: Number(page) || 1,
+                per_page: Number(per_page) || 10
+            };
 
-        const params = { ...queryParams,  page: pageNum};
+            if (name) params.name = name;
+            if (price) params.price = price;
+            if (status !== undefined) {
+                params.status = Number(status);
+            }
 
-        const response = await getServices(params);
+            console.log('Fetching services with params:', params);
+            const response = await getServices(params);
+            console.log('Services response:', response);
 
-        services.value = response.data;
-        totalPages.value = response.totalPages;
-        page.value = pageNum;
-        currentPage.value = page.value;
+            if (response && response.data) {
+                services.value = response.data;
+                meta.value = response.meta;
+                currentPage.value = meta.value.current_page;
+            }
+        } catch (error) {
+            console.error('Error fetching services:', error);
+        }
     };
 
     const form = reactive({
         name: '',
         price: undefined,
         status: ServiceStatus.Active,
+    });
+
+    const searchForm = reactive({
+        name: '',
+        price: '',
+        status: '',
+        per_page: '10',
     });
 
     const handleCreateSubmit = async () => {
@@ -64,50 +81,82 @@ export const useService = () => {
         }
     };
 
-    const loadService = async (id: number) => {
-      try {
-        const serviceID = Number(route.params.id);
-        const service = await getServiceById(serviceID);
+    const handleUpdateService = async () => {
+        if (editingService.value) {
+            try {
+                console.log('Updating service:', editingService.value);
+                const response = await updateService(editingService.value.id, {
+                    name: editingService.value.name,
+                    price: editingService.value.price,
+                    status: editingService.value.status
+                });
+                console.log('Update response:', response);
+                await fetchServices();
+                editingService.value = null;
+            } catch (error) {
+                console.error('Error updating service:', error);
+                alert('Có lỗi xảy ra khi cập nhật service');
+            }
+        }
+    };
 
-        Object.assign(form, {
-            name: service.name,
-            price: service.price,
-            status: service.status
-        });
-      } catch (e) {
-        console.error(e);
-      }
+    const startEdit = (service: any) => {
+        editingService.value = { ...service };
+    };
+
+    const cancelEdit = () => {
+        editingService.value = null;
+    };
+
+    const actionDeleteService = async (id: number) => {
+        const confirmDelete = confirm('Are you sure you want to delete this user?');
+        if (!confirmDelete) return;
+
+        await deleteService(id);    
+        await fetchServices();
+    };
+
+    const onSearch = () => {
+        currentPage.value = 1;
+        const query: Record<string, string> = { 
+            page: '1',
+            per_page: searchForm.per_page
+        };
+        
+        if (searchForm.name) query.name = searchForm.name;
+        if (searchForm.price) query.price = searchForm.price;
+        if (searchForm.status !== '') query.status = searchForm.status;
+
+        console.log('Search query:', query);
+        router.push({ query });
     };
     
-    const handleUpdateSubmit = async () => {
-      Object.keys(errors).forEach(key => delete errors[key]);
-      console.log(errors);
-      try {
-        await updateService(Number(route.params.id), form);
-        router.push('/admin/services');
-      } catch (error: any) {
-        if (error.response?.status === 422) {
-            Object.assign(errors, error.response.data.errors);
-        } else {
-            console.error(error);
-        }
-      }
+    const syncFormWithQuery = () => {
+        const { name, price, status, per_page } = route.query;
+        searchForm.name = name ? String(name) : '';
+        searchForm.price = price ? String(price) : '';
+        searchForm.status = status !== undefined ? String(status) : '';
+        searchForm.per_page = per_page ? String(per_page) : '10';
+        
+        console.log('Synced form values:', searchForm);
     };
 
     return {
         services,
-        page,
-        totalPages,
+        meta,
         currentPage,
+        searchForm,
+        onSearch,
+        syncFormWithQuery,
         fetchServices,
         actionDeleteService,
-        isCreate,
-        formTitle,
-        buttonTitle,
         form,
         errors,
-        loadService,
         handleCreateSubmit,
-        handleUpdateSubmit,
+        updateService,
+        editingService,
+        startEdit,
+        cancelEdit,
+        handleUpdateService,
     };
 };

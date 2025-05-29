@@ -33,4 +33,7 @@ Route::prefix('admin')->group(function () {
         Route::apiResource('services', ServiceController::class);
         Route::post('services/{id}/restore', [ServiceController::class, 'restore']);
     });
+
+    Route::apiResource('services', ServiceController::class);
+    Route::post('services/{id}/restore', [ServiceController::class, 'restore']);
 });

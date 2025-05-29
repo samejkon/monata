@@ -1,4 +1,4 @@
 export enum ServiceStatus {
     Active = 1,
-    Inactive = 0
+    Inactive = 2
 }

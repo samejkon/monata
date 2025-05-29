@@ -2,10 +2,20 @@ import axios from "axios";
 import { api } from "../../stores/api/api";
 import type { Service } from "../../stores/model/Service.model";
 
+interface Meta {
+  current_page: number;
+  from: number;
+  last_page: number;
+  path: string;
+  per_page: number;
+  to: number;
+  total: number;
+}
+
 export const getServices = async (params: { page?: number }): Promise<{ 
   data: Service[]; 
-  totalPages: number;
-  }> => {
+  meta: Meta;
+}> => {
   const response = await api.get('/admin/services', {
       params: {
           ...params,
@@ -15,7 +25,7 @@ export const getServices = async (params: { page?: number }): Promise<{
 
   return {
       data: response.data.data,
-      totalPages: response.data.meta.last_page
+      meta: response.data.meta
   };
 };
 

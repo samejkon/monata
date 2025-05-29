@@ -24,8 +24,12 @@
     "slicknav": "^1.0.8",
     "themify-icons": "^1.0.0",
     "vue": "^3.5.13",
+<<<<<<< HEAD
     "vue-router": "^4.5.0",
     "vue-toastification": "2.0.0-rc.5"
+=======
+    "vue-router": "^4.5.1"
+>>>>>>> 93902ba (add search, pagination, perpage in file vue)
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
