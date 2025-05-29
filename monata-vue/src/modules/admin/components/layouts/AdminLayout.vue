@@ -47,6 +47,12 @@
         </li>
 
         <!-- Add more nav items here based on admin/index.html -->
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/services">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Service</span>
+          </router-link>
+        </li>
       </ul>
       <!-- End of Sidebar -->
 
