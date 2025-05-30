@@ -65,9 +65,11 @@ class RoomTypeService
                 'name' => $data['name'],
                 'price' => $data['price'],
             ];
+
             $record->update($roomType);
 
-            $record->properties()->sync($data['properties']);
+            $record->roomProperties()->delete();
+            $record->roomProperties()->createMany($data['properties']);
 
             return $record;
         });
@@ -80,19 +82,14 @@ class RoomTypeService
      * @return bool|null
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    //TODO: Wait data rooms
-    // public function delete($id)
-    // {
-    //     return DB::transaction(function () use ($id) {
-    //         $record = $this->model->findOrFail($id);
+    public function delete($id)
+    {
+        $record = $this->model->findOrFail($id);
 
-    //         if ($record->rooms()->exists()) {
-    //             throw new \Exception("Room type has associated rooms.");
-    //         }
+        if ($record->rooms()->exists()) {
+            throw new \Exception('Room Type is exists Room.');
+        }
 
-    //         $record->roomProperties()->delete();
-
-    //         return $record->delete();
-    //     });
-    // }
+        return $record->delete();
+    }
 }
