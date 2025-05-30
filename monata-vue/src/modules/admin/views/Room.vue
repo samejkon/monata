@@ -2,16 +2,14 @@
     <div>
         <h2>Rooms</h2>
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-            <div v-for="room in records" :key="room.id" class="col mb-4" @click="openRoomDetailsModal(room)"
-                style="cursor: pointer;">
+            <div v-for="room in records" :key="room.id" class="col mb-4 room-card" @click="openRoomDetailsModal(room)">
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
-                        <div class="col-md-4">
-                            <img :src="room.thumbnail_path" :alt="room.name"
-                                class="img-fluid rounded-start rounded-2 shadow-sm"
-                                style="object-fit: cover; height: 100%;">
-                        </div>
                         <div class="col-md-8">
+                            <img :src="room.thumbnail_path" :alt="room.name"
+                                class="img-fluid rounded-start rounded-2 shadow-sm room-thumbnail">
+                        </div>
+                        <div class="col-md-4">
                             <div class="card-body">
                                 <h5 class="card-title">{{ room.name }}</h5>
                                 <p class="card-text">{{ room.room_type }}</p>
@@ -30,43 +28,26 @@
 
         <div class="modal fade" :class="{ show: isModalVisible, 'd-block': isModalVisible }" tabindex="-1"
             aria-labelledby="roomDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-dialog modal-dialog-centered modal-lg w-100">
                 <div class="modal-content shadow">
                     <div class="modal-header">
                         <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">{{ roomDetails.name }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                            @click="closeRoomDetailsModal"></button>
                     </div>
                     <div class="modal-body" v-if="roomDetails">
-                        <div id="roomImagesCarousel" class="carousel slide mb-3 rounded-2 shadow-sm"
-                            v-if="roomDetails.images && roomDetails.images.length > 0">
-                            <div class="carousel-indicators">
-                                <button type="button" v-for="(image, index) in roomDetails.images" :key="image.id"
-                                    :data-bs-target="'#roomImagesCarousel'" :data-bs-slide-to="index"
-                                    :class="{ active: index === 0 }" :aria-current="index === 0 ? 'true' : 'false'"
-                                    :aria-label="'Slide ' + (index + 1)"></button>
+                        <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container">
+                            <img :src="currentLargeImage" :alt="roomDetails.name"
+                                class="room-large-image img-fluid rounded-2 shadow-sm mb-2">
+                            <div class="room-thumbnails">
+                                <img v-for="(image, index) in roomDetails.images" :key="image.id"
+                                    :src="image.image_path" :alt="'Thumbnail ' + (index + 1)"
+                                    class="room-thumbnail-item img-thumbnail rounded-2 shadow-sm"
+                                    @click="changeLargeImage(image.image_path)"
+                                    :class="{ 'active-thumbnail': currentLargeImage === image.image_path }">
                             </div>
-                            <div class="carousel-inner rounded-2">
-                                <div v-for="(image, index) in roomDetails.images" :key="image.id" class="carousel-item"
-                                    :class="{ active: index === 0 }">
-                                    <img :src="image.image_path" class="d-block w-100 rounded-2"
-                                        :alt="'Image ' + (index + 1)">
-                                </div>
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#roomImagesCarousel"
-                                data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#roomImagesCarousel"
-                                data-bs-slide="next">
-                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                                <span class="visually-hidden">Next</span>
-                            </button>
                         </div>
                         <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path"
-                            :alt="roomDetails.name" class="img-fluid mb-3 rounded-2 shadow-sm">
+                            :alt="roomDetails.name" class="img-fluid mb-3 rounded-2 shadow-sm room-single-thumbnail">
 
                         <p><strong>Loại phòng:</strong> {{ roomDetails.room_type }}</p>
                         <p v-if="roomDetails.description"><strong>Mô tả:</strong> {{ roomDetails.description }}</p>
@@ -90,16 +71,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 const records = ref([]);
 
-// State cho modal
 const isModalVisible = ref(false);
-const selectedRoomId = ref<number | null>(null); // Lưu ID của phòng được chọn
-const roomDetails = ref<any | null>(null); // Lưu thông tin chi tiết của phòng
+const roomDetails = ref<any | null>(null);
+const currentLargeImage = ref<string | null>(null);
+const currentImageIndex = ref(0);
+const isTransitioning = ref(false);
+let intervalId: NodeJS.Timeout | null = null;
 
 const fetchRooms = async () => {
     try {
@@ -115,30 +98,165 @@ const fetchRoomDetails = async (roomId: number) => {
     try {
         const response = await axios.get(`${apiUrl}/admin/rooms/${roomId}`);
         roomDetails.value = response.data.data;
+        if (roomDetails.value?.images?.length > 0) {
+            currentLargeImage.value = roomDetails.value.images[0].image_path;
+            currentImageIndex.value = 0;
+            startImageSlider();
+        } else if (roomDetails.value?.thumbnail_path) {
+            currentLargeImage.value = roomDetails.value.thumbnail_path;
+            stopImageSlider();
+        } else {
+            currentLargeImage.value = null;
+            stopImageSlider();
+        }
     } catch (error) {
         console.error(`Error fetching details for room ${roomId}:`, error);
         roomDetails.value = null;
+        currentLargeImage.value = null;
+        stopImageSlider();
     }
 };
 
 const openRoomDetailsModal = (room: any) => {
-    selectedRoomId.value = room.id;
-    roomDetails.value = null; // Reset thông tin chi tiết trước khi gọi API
+    roomDetails.value = null;
     isModalVisible.value = true;
-    fetchRoomDetails(room.id); // Gọi API khi mở modal
+    fetchRoomDetails(room.id);
 };
 
 const closeRoomDetailsModal = () => {
     isModalVisible.value = false;
-    selectedRoomId.value = null;
-    roomDetails.value = null; // Reset thông tin chi tiết khi đóng modal
+    roomDetails.value = null;
+    currentLargeImage.value = null;
+    currentImageIndex.value = 0;
+    stopImageSlider();
+    isTransitioning.value = false;
+};
+
+const changeLargeImage = (imagePath: string) => {
+    if (isTransitioning.value || currentLargeImage.value === imagePath) {
+        return;
+    }
+
+    isTransitioning.value = true;
+    const largeImageElement = document.querySelector('.room-large-image');
+    if (largeImageElement) {
+        largeImageElement.classList.add('fade-out');
+
+        setTimeout(() => {
+            currentLargeImage.value = imagePath;
+            currentImageIndex.value = roomDetails.value.images.findIndex((img: any) => img.image_path === imagePath);
+            largeImageElement.classList.remove('fade-out');
+            isTransitioning.value = false;
+        }, 300);
+    } else {
+        currentLargeImage.value = imagePath;
+        currentImageIndex.value = roomDetails.value.images.findIndex((img: any) => img.image_path === imagePath);
+        isTransitioning.value = false;
+    }
+};
+
+const nextImage = () => {
+    if (roomDetails.value?.images?.length > 1 && !isTransitioning.value) {
+        isTransitioning.value = true;
+        const largeImageElement = document.querySelector('.room-large-image');
+        if (largeImageElement) {
+            largeImageElement.classList.add('fade-out');
+            setTimeout(() => {
+                currentImageIndex.value = (currentImageIndex.value + 1) % roomDetails.value.images.length;
+                currentLargeImage.value = roomDetails.value.images[currentImageIndex.value].image_path;
+                largeImageElement.classList.remove('fade-out');
+                isTransitioning.value = false;
+            }, 300);
+        } else {
+            currentImageIndex.value = (currentImageIndex.value + 1) % roomDetails.value.images.length;
+            currentLargeImage.value = roomDetails.value.images[currentImageIndex.value].image_path;
+            isTransitioning.value = false;
+        }
+    }
+};
+
+const startImageSlider = () => {
+    if (roomDetails.value?.images?.length > 1 && !intervalId) {
+        intervalId = setInterval(nextImage, 5000);
+    }
+};
+
+const stopImageSlider = () => {
+    if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+    }
 };
 
 onMounted(() => {
     fetchRooms();
 });
+
+onUnmounted(() => {
+    stopImageSlider();
+});
 </script>
 
 <style scoped>
-/* Không cần nhiều CSS tùy chỉnh cho modal nữa vì Bootstrap đã cung cấp */
+.room-card {
+    cursor: pointer;
+}
+
+.room-thumbnail {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.room-images-container {
+    margin-bottom: 1rem;
+}
+
+.room-large-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.room-large-image.fade-out {
+    opacity: 0;
+    transform: scale(0.95);
+}
+
+.room-thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.room-thumbnail-item {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 1px solid #dee2e6;
+    padding: 0.25rem;
+    background-color: #fff;
+    max-width: 100%;
+    transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.room-thumbnail-item:hover {
+    opacity: 0.8;
+    border-color: #007bff;
+}
+
+.active-thumbnail {
+    border-color: #007bff !important;
+    opacity: 0.9;
+}
+
+.room-single-thumbnail {
+    max-height: 500px;
+    width: 100%;
+    object-fit: cover;
+}
 </style>
