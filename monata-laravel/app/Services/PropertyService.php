@@ -69,6 +69,6 @@ class PropertyService
             throw new \Exception("Property is exists Room Type.");
         }
 
-        return $record->delete();;
+        return $record->delete();
     }
 }

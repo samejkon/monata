@@ -23,7 +23,7 @@ class RoomTypeController extends Controller
     public function index(SearchRoomTypeRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->service->get($request->validated());
-        
+
         return RoomTypeResource::collection($data);
     }
 
@@ -54,23 +54,18 @@ class RoomTypeController extends Controller
         return new RoomTypeResource($data);
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified room type from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
+     * @throws \Exception if the room type is associated with existing rooms.
      */
+    public function destroy(int $id): \Illuminate\Http\Response
+    {
+        $this->service->delete($id);
 
-    //TODO: Wait data rooms
-    // public function destroy(int $id): \Illuminate\Http\JsonResponse
-    // {
-    //     try {
-    //         $this->service->delete($id);
-    //         return response()->json(['message' => 'Room type deleted successfully.'], 200);
-    //     } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-    //         return response()->json(['message' => 'Room type not found.'], 404);
-    //     } catch (\Exception $e) {
-    //         return response()->json(['message' => $e->getMessage()], 500);
-    //     }
-    // }
+        return response()->noContent();
+    }
 }
