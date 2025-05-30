@@ -12,6 +12,7 @@ import Tables from '@/modules/admin/views/Tables.vue';
 import Properties from '@/modules/admin/views/Properties.vue';
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue';
 import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue';
+import ContactList from '@/modules/admin/views/contact/ContactList.vue';
 
 const adminRoutes: Array<RouteRecordRaw> = [
     {
@@ -44,9 +45,9 @@ const adminRoutes: Array<RouteRecordRaw> = [
                 meta: { requiresAuth: true },
             },
             {
-                path: 'services/create',
-                name: 'AdminServiceCreate',
-                component: ServiceCreate,
+                path: 'contacts',
+                name: 'AdminContactList',
+                component: ContactList,
                 meta: { requiresAuth: true }
             }
         ]
