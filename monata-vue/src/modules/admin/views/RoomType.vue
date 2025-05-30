@@ -108,6 +108,7 @@ const saveRoomType = async () => {
     }
     await fetchRoomTypes();
     roomTypeModal.hide();
+    toast.success('Room type saved successfully!');
   } catch (error) {
     toast.error('Failed to save room type!');
   }
@@ -118,8 +119,10 @@ const deleteRoomType = async (id) => {
     try {
       await axios.delete(`${url}/admin/room-types/${id}`);
       await fetchRoomTypes();
+      toast.success('Room type deleted successfully!');
     } catch (error) {
       toast.error('Don\'t delete this room type!');
+      console.error('Error deleting room type:', error);
     }
   }
 };
@@ -143,6 +146,10 @@ const onPropertyChange = (index) => {
 
 const removeProperty = (index) => {
   currentRoomType.value.properties.splice(index, 1);
+};
+
+const closeModal = () => {
+  if (roomTypeModal) roomTypeModal.hide();
 };
 </script>
 
@@ -247,7 +254,7 @@ const removeProperty = (index) => {
               </button>
 
               <div class="modal-footer mt-4">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLose</button>
+                <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
                 <button type="submit" class="btn btn-primary">
                   <i class="bi bi-save"></i> Save
                 </button>
