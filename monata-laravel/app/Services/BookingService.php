@@ -23,12 +23,9 @@ class BookingService
     /**
      * Get all bookings.
      *
-     * This method retrieves all bookings from the database and returns the
-     * result as a Collection.
-     *
-     * @return \Illuminate\Support\Collection  The collection of booking instances.
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get()
+    public function get(): \Illuminate\Database\Eloquent\Collection
     {
         $query  = $this->model->query();
 
@@ -36,18 +33,12 @@ class BookingService
     }
 
     /**
-     * Create a new booking with the given data.
+     * Create a booking.
      *
-     * This method validates room availability and performs a database transaction
-     * to create a booking and its associated booking details. It calculates the
-     * total payment based on room prices and booking duration.
-     *
-     * @param  array  $data  The booking data, including booker information,
-     *                       guest details, check-in/out dates, deposit, and
-     *                       booking details.
-     * @return \App\Models\Booking  The created booking instance.
+     * @param array $data
+     * @return \App\Models\Booking
      */
-    public function create($data)
+    public function create($data): Booking
     {
         $this->validateRoomAvailability($data['booking_details']);
 
@@ -93,13 +84,10 @@ class BookingService
     }
 
     /**
-     * Retrieve a booking by ID.
+     * Find a booking by its ID.
      *
-     * This method retrieves a booking by its ID and returns the result as a
-     * Booking instance.
-     *
-     * @param  int  $id  The ID of the booking to be retrieved.
-     * @return \App\Models\Booking  The booking instance.
+     * @param  int  $id  The booking ID.
+     * @return \App\Models\Booking
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -111,18 +99,11 @@ class BookingService
     }
 
     /**
-     * Update an existing booking with the provided data.
+     * Update a booking.
      *
-     * This method retrieves a booking by its ID, validates room availability,
-     * and updates the booking and its associated booking details within a
-     * database transaction. It recalculates the total payment based on room
-     * prices and booking duration. Unused booking details are removed.
-     *
-     * @param  array  $data  The booking data, including user and guest
-     *                       information, check-in/out dates, deposit, status,
-     *                       note, and booking details.
-     * @param  int    $id    The ID of the booking to be updated.
-     * @return \App\Models\Booking  The updated booking instance.
+     * @param  array  $data
+     * @param  int  $id
+     * @return \App\Models\Booking
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -185,9 +166,13 @@ class BookingService
     }
 
     /**
-     * Get available rooms for a given date range.
+     * Find available rooms for a given date range.
      *
-     * @param  array  $data
+     * This method retrieves all rooms that are not occupied during the specified
+     * check-in and check-out dates. It excludes rooms that have a booking with
+     * one of the following statuses: pending, confirmed, or check-in.
+     *
+     * @param  array  $data  The input data.
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function checkRoom($data): \Illuminate\Database\Eloquent\Collection
@@ -216,8 +201,11 @@ class BookingService
     /**
      * Retrieve rooms by booking details.
      *
-     * @param  array  $bookingDetails
-     * @return \Illuminate\Database\Eloquent\Collection
+     * This method takes an array of booking details and returns a collection of
+     * rooms keyed by their ID. The rooms are eager loaded with their room type.
+     *
+     * @param  array  $bookingDetails  The booking details.
+     * @return \Illuminate\Support\Collection
      */
     private function getRoomsByBookingDetails(array $bookingDetails)
     {
@@ -230,14 +218,14 @@ class BookingService
     }
 
     /**
-     * Get the price of a room type based on the room ID.
+     * Retrieve the price of a room type given the room ID.
      *
-     * This method retrieves the price of the room type associated with the specified room ID
-     * from the provided collection of rooms.
+     * This method takes a collection of rooms and a room ID, and returns the
+     * price of the room type associated with the room.
      *
-     * @param  \Illuminate\Support\Collection  $rooms  The collection of rooms keyed by room ID.
-     * @param  int  $roomId  The ID of the room whose type price is to be retrieved.
-     * @return float  The price of the room type.
+     * @param  \Illuminate\Support\Collection  $rooms  The collection of rooms.
+     * @param  int  $roomId  The room ID.
+     * @return float
      */
     private function getPriceRoomType($rooms, $roomId): float
     {
@@ -249,15 +237,15 @@ class BookingService
     /**
      * Validate room availability for the given booking details.
      *
-     * This method checks if a room is available for the given check-in and check-out dates
-     * by querying the booking details table. If a room is not available, an exception is
-     * thrown.
+     * This method iterates over the booking details and checks if the room is
+     * available for the selected dates. It excludes bookings with one of the
+     * following statuses: pending, confirmed, or check-in. If the room is not
+     * available, it throws an exception with a descriptive message.
      *
      * @param  array  $bookingDetails  The booking details.
-     * @param  int|null  $excludeBookingId  The booking ID to be excluded from the query.
+     * @param  int|null  $excludeBookingId  The booking ID to exclude from the check.
      * @return void
-     *
-     * @throws \Exception  If a room is not available for the selected dates.
+     * @throws \Exception
      */
     private function validateRoomAvailability(array $bookingDetails, $excludeBookingId = null): void
     {
@@ -291,16 +279,16 @@ class BookingService
     }
 
     /**
-     * Calculate the duration of stay given the check-in and check-out dates.
+     * Calculate the duration of a booking in terms of the given time unit.
      *
-     * The duration is calculated in terms of the number of $unitHours blocks
-     * of time. If the check-in and check-out dates are empty, a duration of 1
-     * is returned. If the duration is less than 1, it is rounded up to 1.
+     * This method takes the check-in and check-out times of a booking and
+     * returns the duration of the booking in terms of the given time unit.
+     * If the check-in or check-out times are empty, the method returns 1.
      *
-     * @param  string|null  $checkin  The check-in date.
-     * @param  string|null  $checkout  The check-out date.
-     * @param  int  $unitHours  The number of hours in a block of time.
-     * @return int  The duration of stay.
+     * @param  string  $checkin  The check-in time.
+     * @param  string  $checkout  The check-out time.
+     * @param  int  $unitHours  The time unit in hours. Defaults to 12.
+     * @return int
      */
     private function calculateDuration($checkin, $checkout, $unitHours = 12): int
     {
@@ -316,12 +304,16 @@ class BookingService
     }
 
     /**
-     * Scope a query to only include booking details that have a check-in time
-     * less than the given end time and a check-out time greater than the given start time.
+     * Scope a query to only include overlapping time ranges.
+     *
+     * This scope is used to check if a booking overlaps with another booking.
+     * It takes two dates, a start and an end date, and queries the database
+     * to find any bookings whose check-in date is before the given end date
+     * and whose check-out date is after the given start date.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $start  The start time.
-     * @param  string  $end  The end time.
+     * @param  string  $start  The start date.
+     * @param  string  $end  The end date.
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function scopeTimeOverlap($query, $start, $end)
@@ -333,14 +325,13 @@ class BookingService
     /**
      * Delete a booking.
      *
-     * This method deletes a booking with the specified ID, given that the booking status
-     * is either CHECK_OUT, CANCELLED, NO_SHOW, or EXPIRED. If the booking status is not
-     * any of these, an exception is thrown.
+     * This method deletes a booking by its ID. The booking must have a status
+     * of CHECK_OUT, CANCELLED, NO_SHOW, or EXPIRED. If the booking is not found
+     * or its status is not one of the above, an exception is thrown.
      *
      * @param  int  $id  The ID of the booking to be deleted.
-     * @return bool  True if the booking was deleted successfully, false otherwise.
-     *
-     * @throws \Exception  If the booking status is not any of CHECK_OUT, CANCELLED, NO_SHOW, or EXPIRED.
+     * @return bool  True if the booking was successfully deleted, false otherwise.
+     * @throws \Exception
      */
     public function delete($id): bool
     {
@@ -361,16 +352,19 @@ class BookingService
     }
 
     /**
-     * Confirm a booking.
+     * Confirm a booking by its ID.
      *
-     * This method confirms a booking with the specified ID, given that the booking status
-     * is PENDING. If the booking status is not PENDING, an exception is thrown.
+     * This method changes the status of a booking from PENDING to CONFIRMED.
+     * It retrieves the booking by its ID, ensuring that it is currently
+     * in the PENDING status. If the booking is found, its status is updated
+     * to CONFIRMED and saved.
      *
-     * @param  int  $id  The ID of the booking to be confirmed.
-     * @return bool  True if the booking was confirmed successfully, false otherwise.
+     * @param  int  $id  The ID of the booking to confirm.
+     * @return bool  True if the booking status was successfully updated, false otherwise.
      *
-     * @throws \Exception  If the booking status is not PENDING.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
+
     public function confirm($id): bool
     {
         $booking = $this->model->where('status', BookingStatus::PENDING)->findOrFail($id);
@@ -381,7 +375,7 @@ class BookingService
     }
 
     /**
-     * Check in a guest with the specified booking ID.
+     * Check in a guest by the booking ID.
      *
      * This method retrieves a booking by its ID, given that the booking status
      * is CONFIRMED. If the booking status is not CONFIRMED, an exception is
@@ -389,7 +383,7 @@ class BookingService
      * booking.
      *
      * @param  int  $id  The ID of the booking to be checked in.
-     * @return bool  True if the booking was checked in successfully, false otherwise.
+     * @return bool  True if the booking status was successfully updated, false otherwise.
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */

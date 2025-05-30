@@ -17,7 +17,7 @@ class BookingDetailResource extends JsonResource
     {
         return [
             'room_id' => $this->room_id,
-            'room_id' => $this->room_id,
+            'room_name' => $this->rooms->name,
             'checkin_at' => Carbon::parse($this->checkin_at)->format('Y-m-d H:i'),
             'checkout_at' => Carbon::parse($this->checkout_at)->format('Y-m-d H:i'),
             'price_per_day' => $this->price_per_day,

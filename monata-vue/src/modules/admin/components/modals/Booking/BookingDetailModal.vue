@@ -1,0 +1,227 @@
+<script setup>
+import { ref, computed, watch } from 'vue';
+import axios from 'axios';
+import moment from 'moment';
+import { useToast } from 'vue-toastification';
+
+const toast = useToast();
+const apiUrl = import.meta.env.VITE_API_URL;
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false
+  },
+  booking: {
+    type: Object,
+    default: null
+  }
+});
+
+const emit = defineEmits(['close', 'bookingConfirmed', 'editBooking']);
+
+const selectedBookingDetail = ref(props.booking);
+
+watch(() => props.booking, (newVal) => {
+  selectedBookingDetail.value = newVal;
+}, { deep: true });
+
+watch(() => props.show, (newValue) => {
+  if (newValue) {
+    document.body.classList.add('modal-open-custom');
+  } else {
+    document.body.classList.remove('modal-open-custom');
+  }
+});
+
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return '';
+  return new Intl.NumberFormat('en-GB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' VNĐ';
+};
+
+const formatDate = (dateString, format = 'DD-MM-YYYY') => {
+  if (!dateString) return '';
+  return moment(dateString).format(format);
+};
+
+const getStatusText = (status) => {
+  switch (status) {
+    case 1: return 'PENDING';
+    case 2: return 'CONFIRMED';
+    case 3: return 'CHECKED IN';
+    case 4: return 'CHECKED OUT';
+    case 5: return 'CANCELLED';
+    case 6: return 'NO SHOW';
+    default: return 'UNDEFINED';
+  }
+};
+
+const close = () => {
+  emit('close');
+};
+
+const confirmBooking = async (bookingId) => {
+  if (confirm('Are you sure you want to confirm this booking?')) {
+    try {
+      await axios.post(`${apiUrl}/admin/bookings/${bookingId}/confirm`);
+      toast.success('Booking confirmed successfully!');
+      emit('bookingConfirmed'); // Emit an event to parent to refetch data
+      close();
+    } catch (error) {
+      console.error('Error confirming booking:', error.response?.data || error.message);
+      toast.error('Failed to confirm booking: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
+  }
+};
+
+const editBooking = () => {
+  emit('editBooking', selectedBookingDetail.value);
+  close();
+};
+</script>
+
+<template>
+  <div v-if="show" class="modal-overlay" @click="close">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" @click.stop="">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Booking Detail</h5>
+        </div>
+        <div class="modal-body" v-if="selectedBookingDetail">
+          <p><strong>Guest:</strong> {{ selectedBookingDetail.guest_name }}</p>
+          <p><strong>Email:</strong> {{ selectedBookingDetail.guest_email }}</p>
+          <p><strong>Phone:</strong> {{ selectedBookingDetail.guest_phone }}</p>
+          <p><strong>Total price:</strong> {{ formatCurrency(selectedBookingDetail.total_payment) }}</p>
+          <p><strong>Deposit:</strong> {{ formatCurrency(selectedBookingDetail.deposit_amount) }}</p>
+          <p><strong>Status:</strong> {{ getStatusText(selectedBookingDetail.status) }}</p>
+          <p><strong>Note:</strong> {{ selectedBookingDetail.notes || '' }}</p>
+
+          <h6 class="mt-4">Booked Rooms:</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Room</th>
+                  <th>Check-in</th>
+                  <th>Check-out</th>
+                  <th>Half day price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="detail in selectedBookingDetail.booking_details" :key="detail.id">
+                  <td>{{ detail.room_name }}</td>
+                  <td>{{ formatDate(detail.checkin_at, 'HH:mm DD-MM-YYYY') }}</td>
+                  <td>{{ formatDate(detail.checkout_at, 'HH:mm DD-MM-YYYY') }}</td>
+                  <td>{{ formatCurrency(detail.price_per_day) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="close">Close</button>
+          <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-success"
+            @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
+          <button type="button" class="btn btn-primary" @click="editBooking">Edit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+/* Copy modal-overlay, modal-dialog, modal-content, etc. styles from original component */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+  overflow-y: auto;
+}
+
+.modal-dialog {
+  position: relative;
+  pointer-events: none;
+  margin: 1.75rem auto;
+  max-width: 90%;
+  width: 90%;
+}
+
+.modal-dialog.modal-xl {
+  max-width: 1200px;
+}
+
+.modal-dialog-scrollable {
+  display: flex;
+  max-height: calc(100vh - 3.5rem);
+}
+
+.modal-content {
+  pointer-events: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+.modal-body {
+  padding: 15px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.modal-footer {
+  padding: 15px;
+  border-top: 1px solid #dee2e6;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background-color: #f8f9fa;
+  flex-shrink: 0;
+}
+
+.modal-footer .btn {
+  min-width: 80px;
+}
+
+.btn-close {
+  box-sizing: content-box;
+  width: 1em;
+  height: 1em;
+  padding: 0.25em;
+  color: #000;
+  border: 0;
+  border-radius: 0.25rem;
+  opacity: 0.5;
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.btn-close:hover {
+  color: #000;
+  opacity: 0.75;
+}
+</style>

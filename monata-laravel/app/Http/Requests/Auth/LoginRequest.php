@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Auth;
 
 use App\Base\FormRequest;
-use Illuminate\Validation\Rule;
 
 class LoginRequest extends FormRequest
 {
@@ -16,7 +15,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'email' => ['required', 'email', 'max:255'],
-            'password' => ['required'],
+            'password' => ['required', 'string', 'min:6', 'max:255'],
         ];
     }
 }
