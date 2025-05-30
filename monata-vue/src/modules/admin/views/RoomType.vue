@@ -175,8 +175,8 @@ const closeModal = () => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="roomType in roomTypes" :key="roomType.id">
-              <td class="text-center">{{ roomType.id }}</td>
+            <tr v-for="(roomType, index) in roomTypes" :key="roomType.id">
+              <td class="text-center">{{ index + 1 }}</td>
               <td>{{ roomType.name }}</td>
               <td>{{ formatCurrency(roomType.price) }}</td>
               <td>

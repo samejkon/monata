@@ -3,6 +3,7 @@
 namespace App\Http\Requests\RoomType;
 
 use App\Base\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRoomTypeRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class UpdateRoomTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'sometimes', 'max:255',],
+            'name' => ['required', 'string', 'max:255', Rule::unique('room_types')->ignore($this->route('room_type'))->whereNull('deleted_at')],
             'price' => ['required', 'numeric'],
 
             'properties' => ['nullable', 'array'],
