@@ -16,6 +16,7 @@ class RoomPropertyResource extends JsonResource
     {
         return [
             'property_id' => $this->property_id,
+            'name' => $this->property?->name,
             'value' => $this->value
         ];
     }

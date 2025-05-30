@@ -17,7 +17,7 @@ class UpdateRoomRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'room_type_id' => ['required', 'integer', 'exists:room_types,id'],
+            'room_type_id' => ['required', 'integer', Rule::exists('room_types', 'id')->whereNull('deleted_at')],
             'thumbnail' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'images_to_remove' => ['nullable', 'array', 'max:20'],
             'images' => ['nullable', 'array', 'max:10'],

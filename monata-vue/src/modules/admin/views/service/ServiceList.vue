@@ -1,17 +1,12 @@
 <template>
     <div>
-        <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Service List</h1>
-        
-        <!-- DataTales Example -->
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Service List</h6>
-                <router-link to="/admin/services/create" class="btn btn-primary"><SquarePlus/></router-link>
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-lg-2">
+                    <div class="col-lg-2 col-md-2 col-sm-2 mt-1 mb-1">
                         <div class="dataTables_length" id="dataTable_length">
                             <label>Show 
                                 <select 
@@ -19,7 +14,7 @@
                                     @change="onSearch"
                                     name="dataTable_length" 
                                     aria-controls="dataTable" 
-                                    class="custom-select custom-select-sm form-control form-control-sm"
+                                    class="select-per-page custom-select custom-select-sm form-control form-control-sm"
                                 >
                                     <option value="5">5</option>
                                     <option value="10">10</option>
@@ -33,20 +28,20 @@
                     </div>
                     <div class="col-lg-10">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-1 mb-1">
                                 <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="Service name ..." />
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 mt-1 mb-1">
                                 <input v-model="searchForm.price" type="number" class="form-control form-control-sm" placeholder="Service price ..." />
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-2 mt-1 mb-1">
                                 <select v-model="searchForm.status" class="custom-select custom-select-sm form-control form-control-sm">
                                     <option value="">-- Select status --</option>
                                     <option :value="ServiceStatus.Active">Active</option>
                                     <option :value="ServiceStatus.Inactive">Inactive</option>
                                 </select>
                             </div>
-                            <div class="col-md-1">
+                            <div class="col-md-2 mt-1 mb-1">
                                 <button type="submit" class="btn btn-primary btn-sm">
                                     <i class="fa-solid fa-magnifying-glass me-1"></i> Search
                                 </button>
@@ -55,55 +50,122 @@
                     </div>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered row-5" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Status</th>
-                                <th>Action</th>
+                                <th class="text-center">
+                                    <button class="btn btn-primary" @click="startCreate" v-if="!isCreating">
+                                        <SquarePlus/>
+                                    </button>
+                                    <button class="btn btn-secondary" @click="cancelCreate" v-else>
+                                        <X/>
+                                    </button>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
+                            <tr v-if="isCreating">
+                                <td class="col-lg-4 col-md-4 col-sm-4">
+                                    <input 
+                                        v-model="form.name" 
+                                        type="text" 
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.name }"
+                                    />
+                                    <div v-if="errors.name" class="invalid-feedback">
+                                        {{ errors.name[0] }}
+                                    </div>
+                                </td>
+                                <td class="col-lg-4 col-md-4 col-sm-4">
+                                    <input 
+                                        v-model="form.price" 
+                                        type="number" 
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.price }"
+                                    />
+                                    <div v-if="errors.price" class="invalid-feedback">
+                                        {{ errors.price[0] }}
+                                    </div>
+                                </td>
+                                <td class="col-lg-3 col-md-3 col-sm-3">
+                                    <select 
+                                        v-model="form.status" 
+                                        class="form-control"
+                                        :class="{ 'is-invalid': errors.status }"
+                                    >
+                                        <option :value="ServiceStatus.Active">Active</option>
+                                        <option :value="ServiceStatus.Inactive">Inactive</option>
+                                    </select>
+                                    <div v-if="errors.status" class="invalid-feedback">
+                                        {{ errors.status[0] }}
+                                    </div>
+                                </td>
+                                <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
+                                    <button class="btn btn-success" @click="handleCreate">
+                                        <Check />
+                                    </button>
+                                    <button class="btn btn-secondary" @click="cancelCreate">
+                                        <X />
+                                    </button>
+                                </td>
+                            </tr>
                             <tr v-for="service of services" :key="service.id">
-                                <td>
+                                <td class="col-lg-4 col-md-4 col-sm-4">
                                     <template v-if="editingService?.id === service.id">
                                         <input 
                                             v-model="editingService.name" 
                                             type="text" 
                                             class="form-control"
+                                            :class="{ 'is-invalid': errors.name }"
                                         />
+                                        <div v-if="errors.name" class="invalid-feedback">
+                                            {{ errors.name[0] }}
+                                        </div>
                                     </template>
                                     <template v-else>
                                         {{ service.name }}
                                     </template>
                                 </td>
-                                <td>
+                                <td class="col-lg-4 col-md-4 col-sm-4">
                                     <template v-if="editingService?.id === service.id">
                                         <input 
                                             v-model="editingService.price" 
                                             type="number" 
                                             class="form-control"
+                                            :class="{ 'is-invalid': errors.price }"
                                         />
+                                        <div v-if="errors.price" class="invalid-feedback">
+                                            {{ errors.price[0] }}
+                                        </div>
                                     </template>
                                     <template v-else>
                                         {{ service.price }}
                                     </template>
                                 </td>
-                                <td>
+                                <td class="col-lg-3 col-md-3 col-sm-3">
                                     <template v-if="editingService?.id === service.id">
-                                        <select v-model="editingService.status" class="form-control">
+                                        <select 
+                                            v-model="editingService.status" 
+                                            class="form-control"
+                                            :class="{ 'is-invalid': errors.status }"
+                                        >
                                             <option :value="ServiceStatus.Active">Active</option>
                                             <option :value="ServiceStatus.Inactive">Inactive</option>
                                         </select>
+                                        <div v-if="errors.status" class="invalid-feedback">
+                                            {{ errors.status[0] }}
+                                        </div>
                                     </template>
                                     <template v-else>
-                                        <span :class="service.status === ServiceStatus.Active ? 'badge bg-success' : 'badge bg-danger'">
+                                        <span :class="['status-label badge', service.status === ServiceStatus.Active ? 'btn-success' : 'btn-danger']">
                                             {{ service.status === ServiceStatus.Active ? 'Active' : 'Inactive' }}
                                         </span>
                                     </template>
                                 </td>
-                                <td class="d-flex gap-2">
+                                <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
                                     <template v-if="editingService?.id === service.id">
                                         <button class="btn btn-success" @click="handleUpdateService">
                                             <Check />
@@ -130,13 +192,12 @@
         <Pagination 
             v-model:currentPage="currentPage" 
             :meta="meta"
-            :currentPage="currentPage"
         />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch ,onMounted} from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useService } from '../../composables/service/Service.service';
 import { ServiceStatus } from '../../stores/enum/Service';
@@ -152,7 +213,6 @@ const {
     currentPage,
     fetchServices,
     actionDeleteService,
-    updateService,
     editingService,
     startEdit,
     cancelEdit,
@@ -160,6 +220,12 @@ const {
     searchForm,
     onSearch,
     syncFormWithQuery,
+    form,
+    errors,
+    isCreating,
+    startCreate,
+    cancelCreate,
+    handleCreate,
 } = useService();
 
 watch(() => route.query, (newQuery) => {
@@ -198,9 +264,14 @@ onMounted(() => {
     box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
-label {
-    font-weight: normal;
-    text-align: left;
-    white-space: nowrap;
+.select-per-page {
+    width: 60px;
+    display: inline-block;
+}
+
+.status-label {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
 }
 </style>

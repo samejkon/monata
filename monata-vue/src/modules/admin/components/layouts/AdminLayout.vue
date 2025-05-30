@@ -35,13 +35,16 @@
         </li>
         <li class="nav-item">
           <router-link class="nav-link" to="/admin/properties">
-            <i class="fas fa-fw fa-table"></i>
             <span>Properties</span>
           </router-link>
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" to="/admin/room-types">
+            <span>Room Types</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link" to="/admin/bookings">
-
             <span>Booking</span>
           </router-link>
         </li>
@@ -51,6 +54,13 @@
           <router-link class="nav-link" to="/admin/services">
             <i class="fas fa-fw fa-table"></i>
             <span>Service</span>
+          </router-link>
+        </li>
+        
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/contacts">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Contact</span>
           </router-link>
         </li>
       </ul>
@@ -119,7 +129,7 @@
           </div>
           <!-- /.container-fluid -->
         </div>
-        <!-- End of Main Content -->  
+        <!-- End of Main Content -->
 
       </div>
       <!-- End of Content Wrapper -->

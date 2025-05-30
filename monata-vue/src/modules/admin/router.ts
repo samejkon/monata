@@ -1,10 +1,18 @@
 import type { RouteRecordRaw } from 'vue-router';
+import Dashboard from './views/Dashboard.vue';
+import Tables from './views/Tables.vue';
+import Properties from './views/Properties.vue';
+import AdminLayout from './components/layouts/AdminLayout.vue';
+import Bookings from './views/Bookings.vue';
+import RoomType from './views/RoomType.vue';
+
 import AdminLayout from '@/modules/admin/components/layouts/AdminLayout.vue';
 import Dashboard from '@/modules/admin/views/Dashboard.vue';
 import Tables from '@/modules/admin/views/Tables.vue';
 import Properties from '@/modules/admin/views/Properties.vue';
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue';
 import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue';
+import ContactList from '@/modules/admin/views/contact/ContactList.vue';
 
 const adminRoutes: Array<RouteRecordRaw> = [
     {
@@ -21,6 +29,12 @@ const adminRoutes: Array<RouteRecordRaw> = [
                 path: 'properties', name: 'AdminProperties', component: Properties
             },
             {
+                path: 'bookings', name: 'AdminBookings', component: Bookings
+            },
+            {
+                path: 'room-types', name: 'AdminRoomTypes', component: RoomType
+            },
+            {
                 path: '', // Default child route for /admin
                 redirect: '/admin/dashboard'
             },
@@ -31,9 +45,9 @@ const adminRoutes: Array<RouteRecordRaw> = [
                 meta: { requiresAuth: true },
             },
             {
-                path: 'services/create',
-                name: 'AdminServiceCreate',
-                component: ServiceCreate,
+                path: 'contacts',
+                name: 'AdminContactList',
+                component: ContactList,
                 meta: { requiresAuth: true }
             }
         ]

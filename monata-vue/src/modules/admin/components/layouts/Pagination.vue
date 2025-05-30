@@ -1,11 +1,11 @@
 <template>
-  <div class="row mt-4">
-    <div class="col-sm-12 col-md-5">
+  <div class="row mt-4 mb-4">
+    <div class="col-sm-12 col-md-5 d-flex justify-content-center justify-content-md-start">
       <div class="dataTables_info" role="status" aria-live="polite">
         Showing {{ meta.from }} to {{ meta.to }} of {{ meta.total }} entries
       </div>
     </div>
-    <div class="col-sm-12 col-md-7 d-flex justify-content-end">
+    <div v-if="totalPages > 1" class="col-sm-12 col-md-7 d-flex justify-content-center justify-content-md-end">
       <div class="dataTables_paginate paging_simple_numbers">
         <ul class="pagination">
           <!-- Previous button -->
