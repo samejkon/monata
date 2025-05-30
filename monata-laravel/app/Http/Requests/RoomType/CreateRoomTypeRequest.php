@@ -15,6 +15,7 @@ class CreateRoomTypeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'unique:room_types,name', 'max:255'],
+            'price' => ['required', 'numeric'],
 
             'properties' => ['required', 'array'],
             'properties.*.property_id' => ['required', 'exists:properties,id', 'distinct'],

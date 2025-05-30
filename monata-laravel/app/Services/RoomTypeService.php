@@ -65,9 +65,11 @@ class RoomTypeService
                 'name' => $data['name'],
                 'price' => $data['price'],
             ];
+
             $record->update($roomType);
 
-            $record->properties()->sync($data['properties']);
+            $record->roomProperties()->delete();
+            $record->roomProperties()->createMany($data['properties']);
 
             return $record;
         });

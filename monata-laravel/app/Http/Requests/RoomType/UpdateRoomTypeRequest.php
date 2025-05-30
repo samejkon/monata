@@ -15,6 +15,7 @@ class UpdateRoomTypeRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'sometimes', 'max:255',],
+            'price' => ['required', 'numeric'],
 
             'properties' => ['nullable', 'array'],
             'properties.*.property_id' => ['required', 'exists:properties,id', 'distinct'],

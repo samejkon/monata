@@ -23,7 +23,7 @@ class RoomTypeController extends Controller
     public function index(SearchRoomTypeRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->service->get($request->validated());
-        
+
         return RoomTypeResource::collection($data);
     }
 
