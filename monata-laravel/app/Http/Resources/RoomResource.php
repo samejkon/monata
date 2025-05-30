@@ -19,8 +19,8 @@ class RoomResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'room_type_id' => $this->room_type_id,
-            'tumbnail_path' => $this->thumbnail_path,
+            'room_type' => $this->roomType->name,
+            'thumbnail_path' => asset('storage/' . $this->thumbnail_path),
             'description' => $this->description,
             'status' => $this->status,
             'images' => ImageResource::collection($this->images),
