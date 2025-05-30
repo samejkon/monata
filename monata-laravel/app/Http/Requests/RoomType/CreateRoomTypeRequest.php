@@ -3,6 +3,7 @@
 namespace App\Http\Requests\RoomType;
 
 use App\Base\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateRoomTypeRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class CreateRoomTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'unique:room_types,name', 'max:255'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('room_types')->whereNull('deleted_at')],
             'price' => ['required', 'numeric'],
 
             'properties' => ['required', 'array'],
