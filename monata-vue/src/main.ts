@@ -5,6 +5,7 @@ import 'vue-toastification/dist/index.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import VueUploadMultipleImage from 'vue-upload-multiple-image'
 
 import App from './App.vue'
 import router from './router'
