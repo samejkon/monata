@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\AuthUserController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\RoomClientController;
+use App\Http\Controllers\Api\UserHomeController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -53,5 +54,5 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);
 Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);
-
+Route::get('/user-home', [UserHomeController::class, 'index']);
 Route::get('/rooms/{id}', [RoomClientController::class, 'show']);

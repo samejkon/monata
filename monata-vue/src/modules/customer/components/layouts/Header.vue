@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
+import { provideModal } from '../../composables/useModal'
+import CheckAvailable from '../forms/CheckAvailable.vue'
 
 const props = defineProps({
   bgClass: {
@@ -18,6 +20,7 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
+const { openModal } = provideModal()
 
 async function logout() {
   try {
@@ -45,7 +48,7 @@ async function logout() {
           <li class="menu-toogle-item">Pages</li>
           <li class="menu-toogle-item">Contact</li>
           <li class="menu-toogle-item">
-            <a href="#" class="menu-toogle-item-link text-decor-none" onclick="toggleModal()">Book A Room</a>
+            <a href="#" class="menu-toogle-item-link text-decor-none" @click.prevent="openModal">Book A Room</a>
           </li>
         </ul>
       </div>
@@ -71,7 +74,7 @@ async function logout() {
           <form @submit.prevent="logout()" v-if="authStore.authenticated">
             <button type="submit" class="btn btn-danger">Logout</button>
           </form>
-          <button class="nav-booking" onclick="toggleModal()">
+          <button class="nav-booking" @click="openModal">
             Book A Room
           </button>
         </div>
@@ -83,5 +86,12 @@ async function logout() {
         </div>
       </div>
     </section>
+    <CheckAvailable />
   </header>
 </template>
+
+<style scoped>
+.nav-booking {
+  cursor: pointer;
+}
+</style>
