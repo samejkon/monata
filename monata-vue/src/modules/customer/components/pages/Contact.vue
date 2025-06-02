@@ -41,32 +41,34 @@
                     <div class="col-lg-8">
                         <form class="form-contact contact_form" @submit.prevent="submitForm" id="contactForm">
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <input 
-                                            v-model="formData.guest_name"
-                                            class="form-control" 
-                                            :class="{ 'is-invalid': errors.guest_name }"
-                                            name="guest_name" 
-                                            type="text" 
-                                            placeholder="Enter your name"
-                                        >
-                                        <div class="invalid-feedback" v-if="errors.guest_name">{{ errors.guest_name }}</div>
+                                <template v-if="!authStore.authenticated">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <input 
+                                                v-model="formData.guest_name"
+                                                class="form-control" 
+                                                :class="{ 'is-invalid': errors.guest_name }"
+                                                name="guest_name" 
+                                                type="text" 
+                                                placeholder="Enter your name"
+                                            >
+                                            <div class="invalid-feedback" v-if="errors.guest_name">{{ errors.guest_name }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <input 
-                                            v-model="formData.guest_email"
-                                            class="form-control" 
-                                            :class="{ 'is-invalid': errors.guest_email }"
-                                            name="guest_email" 
-                                            type="email" 
-                                            placeholder="Email"
-                                        >
-                                        <div class="invalid-feedback" v-if="errors.guest_email">{{ errors.guest_email }}</div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <input 
+                                                v-model="formData.guest_email"
+                                                class="form-control" 
+                                                :class="{ 'is-invalid': errors.guest_email }"
+                                                name="guest_email" 
+                                                type="email" 
+                                                placeholder="Email"
+                                            >
+                                            <div class="invalid-feedback" v-if="errors.guest_email">{{ errors.guest_email }}</div>
+                                        </div>
                                     </div>
-                                </div>
+                                </template>
                                 <div class="col-12">
                                     <div class="form-group">
                                         <input 
@@ -136,10 +138,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { api } from "../../../admin/stores/api/api"
 import type { Contact } from "../../../admin/stores/model/Contact.model"
 import { HouseIcon, PhoneIcon, MailIcon } from 'lucide-vue-next'
+import { csrf, api } from '../../lib/axios'
+import { useAuthStore } from '@/modules/customer/stores/auth'
 
+const authStore = useAuthStore()
 const mapError = ref(false)
 
 const handleMapError = () => {
@@ -147,15 +151,17 @@ const handleMapError = () => {
 }
 
 const sendContact = async (data: Partial<Contact>) => {
+    await csrf.get('/sanctum/csrf-cookie')
     const response = await api.post('/contacts/send-contact', data)
     return response.data.data
 }
 
 interface ContactForm {
-    guest_name: string
-    guest_email: string
+    guest_name?: string
+    guest_email?: string
     title: string
     content: string
+    user_id?: number
 }
 
 interface FormErrors {
@@ -183,17 +189,17 @@ const errors = reactive<FormErrors>({})
 const isSubmitting = ref(false)
 
 const handleApiErrors = (error: any) => {
-
+    // Reset errors
     Object.keys(errors).forEach(key => {
         errors[key as keyof FormErrors] = ''
     })
 
     if (error.response?.data) {
         const apiError = error.response.data as ApiError
+        console.log('API Error:', apiError) // Debug log
         
         if (apiError.errors) {
             Object.entries(apiError.errors).forEach(([field, messages]) => {
-
                 const fieldName = field.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
                 if (fieldName in errors) {
                     errors[fieldName as keyof FormErrors] = messages[0]
@@ -211,7 +217,26 @@ const handleApiErrors = (error: any) => {
 const submitForm = async () => {
     try {
         isSubmitting.value = true
-        await sendContact(formData)
+        
+        const dataToSend: ContactForm = {
+            title: formData.title,
+            content: formData.content
+        }
+
+        if (authStore.authenticated) {
+            try {
+                const response = await api.get('/profile')
+                dataToSend.user_id = response.data.data.id
+            } catch (error: any) {
+                console.error('Lỗi khi lấy thông tin user:', error.response?.data)
+                throw new Error('Không thể lấy thông tin người dùng')
+            }
+        } else {
+            dataToSend.guest_name = formData.guest_name
+            dataToSend.guest_email = formData.guest_email
+        }
+        
+        const response = await sendContact(dataToSend)
         
         alert('Gửi tin nhắn thành công!')
         
@@ -224,6 +249,7 @@ const submitForm = async () => {
         })
         
     } catch (error: any) {
+        console.error('Chi tiết lỗi:', error.response?.data) // Debug log
         handleApiErrors(error)
     } finally {
         isSubmitting.value = false
