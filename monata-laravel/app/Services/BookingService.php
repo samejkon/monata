@@ -306,20 +306,21 @@ class BookingService
     /**
      * Scope a query to only include overlapping time ranges.
      *
-     * This scope is used to check if a booking overlaps with another booking.
-     * It takes two dates, a start and an end date, and queries the database
-     * to find any bookings whose check-in date is before the given end date
-     * and whose check-out date is after the given start date.
+     * This scope takes a start and end time, and returns a query that only
+     * includes records that have a check-in time before the end time and a
+     * check-out time after the start time.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $start  The start date.
-     * @param  string  $end  The end date.
+     * @param  string  $start  The start time.
+     * @param  string  $end  The end time.
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function scopeTimeOverlap($query, $start, $end)
     {
-        return $query->where('checkin_at', '<', $end)
-            ->where('checkout_at', '>', $start);
+        return $query->where(function ($q) use ($start, $end) {
+            $q->where('checkin_at', '<', $end)
+                ->where('checkout_at', '>', $start);
+        });
     }
 
     /**

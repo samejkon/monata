@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'; // watch for body class handled in modals
+import { ref, computed, onMounted } from 'vue';
 import { api } from '../lib/axios';
 import moment from 'moment';
 import 'moment/locale/en-gb';
@@ -216,7 +216,18 @@ const closeCreateBookingModal = () => {
 };
 
 const handleBookingCreated = () => {
-  fetchBookings(); // Re-fetch bookings after new booking is created
+  fetchBookings();
+};
+
+const checkInBooking = async (bookingId) => {
+  try {
+    const response = await api.post(`/bookings/${bookingId}/check-in`);
+    toast.success('Check-in successful!');
+    await fetchBookings(); // Re-fetch to update the UI
+  } catch (error) {
+    console.error('Error during check-in:', error);
+    toast.error('Failed to check-in booking. Please try again.');
+  }
 };
 </script>
 
@@ -274,9 +285,12 @@ const handleBookingCreated = () => {
                     Phone: <strong>{{ booking.guest_phone }}</strong>
                   </p>
                   <p class="card-text">
-                    Status: <strong>{{ getStatusText(booking.status) }}</strong>
+                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
+                    }}</span>
                   </p>
-                  <button v-if="booking.status === 1" class="btn btn-success btn-sm mr-2"
+                  <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
+                    @click="checkInBooking(booking.id)">Check In</button>
+                  <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="openBookingDetailModal(booking)">Confirm</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
                 </div>

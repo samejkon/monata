@@ -113,13 +113,19 @@ const checkRoomAvailability = async () => {
     toast.error('Please enter both check-in and check-out times to check room availability.');
     return;
   }
-  if (moment(availabilityCheck.value.checkin_at).isSameOrAfter(moment(availabilityCheck.value.checkout_at))) {
+  const now = moment();
+  const checkin = moment(availabilityCheck.value.checkin_at);
+  const checkout = moment(availabilityCheck.value.checkout_at);
+  if (checkin.isSameOrBefore(now)) {
+    toast.error('Check-in time must be in the future.');
+    return;
+  }
+  if (checkin.isSameOrAfter(checkout)) {
     toast.error('Check-out time must be after check-in time.');
     return;
   }
 
   try {
-    // Moment.js vẫn sẽ định dạng đúng 24h vì input đã cấp cho nó giá trị 24h
     const formattedCheckin = moment(availabilityCheck.value.checkin_at).format('YYYY-MM-DD HH:mm');
     const formattedCheckout = moment(availabilityCheck.value.checkout_at).format('YYYY-MM-DD HH:mm');
 
@@ -188,6 +194,21 @@ const createBooking = async () => {
   for (const selectedId of selectedRoomIdsSet) {
     if (!currentlyAvailableRoomIdsSet.has(selectedId)) {
       toast.error(`Room ID ${selectedId} is no longer available for the selected period. Please check again!`);
+      return;
+    }
+  }
+
+  // Validate all booking_details for time logic
+  const now = moment();
+  for (const detail of newBooking.value.booking_details) {
+    const checkin = moment(detail.checkin_at);
+    const checkout = moment(detail.checkout_at);
+    if (checkin.isSameOrBefore(now)) {
+      toast.error('Check-in time for all rooms must be in the future.');
+      return;
+    }
+    if (checkin.isSameOrAfter(checkout)) {
+      toast.error('Check-out time must be after check-in time for all rooms.');
       return;
     }
   }
