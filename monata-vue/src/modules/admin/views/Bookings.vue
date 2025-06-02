@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'; // watch for body class handled in modals
-import axios from 'axios';
+import { api } from '../lib/axios';
 import moment from 'moment';
 import 'moment/locale/en-gb';
 moment.locale('en-gb');
@@ -27,7 +27,7 @@ const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 
 const fetchBookings = async () => {
   try {
-    const response = await axios.get(`${apiUrl}/admin/bookings`);
+    const response = await api.get(`/bookings`);
     rawBookings.value = response.data?.data || [];
     processBookings(rawBookings.value);
   } catch (error) {

@@ -1,13 +1,11 @@
 <script setup>
 import { ref, watch } from 'vue';
-import axios from 'axios';
+import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
 
-// Import Flatpickr components và CSS
 import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
-// import 'flatpickr/dist/themes/material_blue.css'; // Uncomment để dùng theme khác nếu muốn
 
 const toast = useToast();
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -36,7 +34,6 @@ const newBooking = ref({
 });
 
 const availabilityCheck = ref({
-  // Khởi tạo với định dạng 24h
   checkin_at: moment().startOf('day').format('YYYY-MM-DDTHH:mm'),
   checkout_at: moment().startOf('day').add(1, 'day').format('YYYY-MM-DDTHH:mm'),
 });
@@ -45,14 +42,13 @@ const availableRoomsForSelection = ref([]);
 const selectedAvailableRoomIds = ref([]);
 const validationErrors = ref({});
 
-// Cấu hình Flatpickr để hiển thị 24 giờ
 const flatpickrConfig = {
   enableTime: true,
-  noCalendar: false, // Hiển thị cả lịch và thời gian
-  dateFormat: "Y-m-d H:i", // Định dạng hiển thị và giá trị nội bộ
-  time_24hr: true, // Rất quan trọng: Bật chế độ 24 giờ cho picker
-  allowInput: true, // Cho phép người dùng nhập trực tiếp
-  // minuteIncrement: 1, // Tùy chỉnh bước nhảy phút (mặc định là 5)
+  noCalendar: false,
+  dateFormat: "Y-m-d H:i",
+  time_24hr: true,
+  allowInput: true,
+
 };
 
 const formatCurrency = (value) => {
@@ -65,7 +61,6 @@ watch(() => props.show, async (newValue) => {
     document.body.classList.add('modal-open-custom');
     resetForm();
     if (props.initialCheckinDate) {
-      // Đảm bảo khởi tạo cũng ở định dạng 24h và đúng với flatpickrConfig
       availabilityCheck.value.checkin_at = moment(props.initialCheckinDate).startOf('day').format('YYYY-MM-DDTHH:mm');
       availabilityCheck.value.checkout_at = moment(props.initialCheckinDate).add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm');
     }
@@ -75,8 +70,6 @@ watch(() => props.show, async (newValue) => {
   }
 });
 
-// Watch for changes in checkin_at/checkout_at to re-check availability
-// Các watcher này không cần thay đổi gì vì giá trị đã là 24h
 watch(() => availabilityCheck.value.checkin_at, () => {
   // selectedAvailableRoomIds.value = [];
   // newBooking.value.booking_details = [];
@@ -130,7 +123,7 @@ const checkRoomAvailability = async () => {
     const formattedCheckin = moment(availabilityCheck.value.checkin_at).format('YYYY-MM-DD HH:mm');
     const formattedCheckout = moment(availabilityCheck.value.checkout_at).format('YYYY-MM-DD HH:mm');
 
-    const response = await axios.post(`${apiUrl}/admin/bookings/check-room-availability`, {
+    const response = await api.post(`/bookings/check-room-availability`, {
       checkin_at: formattedCheckin,
       checkout_at: formattedCheckout,
     });
@@ -212,7 +205,7 @@ const createBooking = async () => {
       booking_details: finalBookingDetails
     };
 
-    const response = await axios.post(`${apiUrl}/admin/bookings`, payload);
+    const response = await api.post(`/bookings`, payload);
     toast.success('Booking created successfully!');
     emit('bookingCreated'); // Emit event to parent to refetch data
     close();
