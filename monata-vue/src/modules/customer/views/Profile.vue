@@ -79,7 +79,6 @@ const toggleEditProfileForm = (): void => {
   if (showEditProfileForm.value) {
     editUser.value = { ...user.value };
 
-
     if (showChangePasswordForm.value) {
       showChangePasswordForm.value = false;
       resetPasswordForm();
@@ -124,7 +123,6 @@ const handleUpdateProfile = async (): Promise<void> => {
     });
 
     profileUpdateMessage.value = 'Profile updated successfully!';
-
 
     user.value = {
       ...user.value,

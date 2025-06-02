@@ -56,7 +56,7 @@
             <span>Service</span>
           </router-link>
         </li>
-        
+
         <li class="nav-item">
           <router-link class="nav-link" to="/admin/contacts">
             <i class="fas fa-fw fa-table"></i>
@@ -175,6 +175,39 @@ export default defineComponent({
 
 <style>
 @import '@/modules/admin/assets/css/sb-admin-2.min.css';
+
+#wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+#accordionSidebar {
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  flex-shrink: 0;
+  /* Nếu muốn sidebar có scroll riêng khi quá dài: */
+  overflow-y: auto;
+}
+
+#content-wrapper {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#content {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-fluid {
+  flex: 1 1 auto;
+  /* Nếu muốn phần nội dung cuộn khi quá dài: */
+  overflow-y: auto;
+}
 
 #wrapper.toggled #accordionSidebar {
   display: none !important;

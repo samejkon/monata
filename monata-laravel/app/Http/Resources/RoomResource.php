@@ -20,6 +20,8 @@ class RoomResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'room_type_id' => $this->room_type_id,
+            'room_type' => $this->roomType->name,
+            'price' => $this->roomType->price,
             'tumbnail_path' => $this->thumbnail_path,
             'description' => $this->description,
             'status' => $this->status,

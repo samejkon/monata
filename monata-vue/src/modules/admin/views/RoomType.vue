@@ -163,12 +163,12 @@ const closeModal = () => {
         <table class="table table-hover table-bordered align-middle">
           <thead>
             <tr>
-              <th scope="col" class="text-center">#</th>
+              <th width="5%" scope="col" class="text-center">#</th>
               <th scope="col">Name</th>
               <th scope="col">Price</th>
               <th scope="col">Properties</th>
-              <th scope="col" class="text-center">
-                <button class="btn btn-success" @click="openAddModal">
+              <th width="10%" class="text-center">
+                <button class="btn btn-primary btn-sm" @click="openAddModal">
                   <Plus />
                 </button>
               </th>

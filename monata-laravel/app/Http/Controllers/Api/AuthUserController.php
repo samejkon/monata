@@ -80,7 +80,6 @@ class AuthUserController extends Controller
         return new UserResource($user);
     }
 
-
     /**
      * Change the password for the authenticated user.
      *

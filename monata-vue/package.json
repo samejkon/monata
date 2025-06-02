@@ -21,6 +21,7 @@
     "lodash": "^4.17.21",
     "lucide-vue-next": "^0.511.0",
     "magnific-popup": "^1.2.0",
+    "moment": "^2.30.1",
     "owl.carousel": "^2.3.4",
     "pinia": "^3.0.1",
     "pinia-plugin-persistedstate": "^4.3.0",

@@ -24,7 +24,6 @@ export const useService = () => {
 
     const editingService = ref<any>(null);
 
-
     const fetchServices = async () => {
         try {
             const { name, price, status, page, per_page } = route.query;
