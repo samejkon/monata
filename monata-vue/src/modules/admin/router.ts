@@ -5,9 +5,10 @@ import Properties from './views/Properties.vue'
 import AdminLayout from './components/layouts/AdminLayout.vue'
 import Bookings from './views/Bookings.vue'
 import RoomType from './views/RoomType.vue'
+
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
 import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue'
-import Room from '@/modules/admin/views/Room.vue'
+import ContactList from '@/modules/admin/views/contact/ContactList.vue'
 
 const adminRoutes: Array<RouteRecordRaw> = [
   {
@@ -52,15 +53,9 @@ const adminRoutes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true },
       },
       {
-        path: 'services/create',
-        name: 'AdminServiceCreate',
-        component: ServiceCreate,
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'rooms',
-        name: 'Room',
-        component: Room,
+        path: 'contacts',
+        name: 'AdminContactList',
+        component: ContactList,
         meta: { requiresAuth: true },
       },
     ],
