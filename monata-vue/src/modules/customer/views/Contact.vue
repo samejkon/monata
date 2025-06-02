@@ -1,18 +1,16 @@
 <script setup lang="ts">
 import '../assets/scss/main.scss'
 import Header from '../components/layouts/Header.vue'
-import Home from '../components/pages/Home.vue'
+import Contact from '../components/pages/Contact.vue'
 import Footer from '../components/layouts/Footer.vue'
 import CheckAvailable from '../components/forms/CheckAvailable.vue'
 </script>
 
 <template>
-  <Header bgClass="1" 
-  title="Montana Resort" 
-  description="Unlock to enjoy the view of Martine" />
+  <Header bgClass="2" title="Get in Touch" description="" />
 
   <main>
-    <Home />
+    <Contact />
   </main>
 
   <Footer />

@@ -1,6 +1,22 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
+
+const props = defineProps({
+  bgClass: {
+    type: String,
+    default: '1'
+  },
+  title: {
+    type: String,
+    default: 'Montana Resort'
+  },
+  description: {
+    type: String,
+    default: 'Unlock to enjoy the view of Martine'
+  }
+})
+
 const authStore = useAuthStore()
 
 async function logout() {
@@ -13,11 +29,12 @@ async function logout() {
     alert('Logout failed!')
   }
 }
+
 </script>
 
 <template>
   <header>
-    <section class="section-header">
+    <section :class="['section-header', `section-header_${bgClass}`]">
       <div class="menu-toogle-display d-none" id="menu-toogle">
         <i class="icon fa fa-menu" id="close-menu-icon" onclick="toggleMenu()"></i>
         <ul class="menu-toogle-list">
@@ -61,8 +78,8 @@ async function logout() {
       </nav>
       <div class="text-overlay">
         <div>
-          <h3 class="text-overlay-heading">Montana Resort</h3>
-          <p class="text-overlay-p">Unlock to enjoy the view of Martine</p>
+          <h3 class="text-overlay-heading">{{ title }}</h3>
+          <p class="text-overlay-p">{{ description }}</p>
         </div>
       </div>
     </section>

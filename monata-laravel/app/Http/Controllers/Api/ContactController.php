@@ -60,7 +60,7 @@ class ContactController extends Controller
      * @param \App\Http\Requests\Contact\SendMailRequest $request
      * @return ContactResources
      */
-    public function sendContact(SendMailRequest $request): ContactResources
+    public function sendContact(GetContactRequest $request): ContactResources
     {
         $data = $request->validated();
 
