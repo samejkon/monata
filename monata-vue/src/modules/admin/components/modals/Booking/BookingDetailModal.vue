@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
-import axios from 'axios';
+import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
 
@@ -63,7 +63,7 @@ const close = () => {
 const confirmBooking = async (bookingId) => {
   if (confirm('Are you sure you want to confirm this booking?')) {
     try {
-      await axios.post(`${apiUrl}/admin/bookings/${bookingId}/confirm`);
+      await api.post(`/bookings/${bookingId}/confirm`);
       toast.success('Booking confirmed successfully!');
       emit('bookingConfirmed'); // Emit an event to parent to refetch data
       close();
