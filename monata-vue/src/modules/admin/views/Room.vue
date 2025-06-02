@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, reactive } from 'vue';
-import RoomFormModal from '@/modules/admin/views/room/CreateForm.vue';
+import axios from 'axios';
+import RoomFormModal from '@/modules/admin/views/room/Form.vue';
+import EditRomModal from '@/modules/admin/views/room/EditForm.vue';
 import { Modal } from 'bootstrap';
 import { api } from '@/modules/admin/lib/axios';
 
@@ -67,7 +69,6 @@ const searchRooms = async () => {
     }
 };
 
-// Handle Room detail modal
 const openRoomDetailsModal = (room: any) => {
     roomDetails.value = null;
     isModalVisible.value = true;
