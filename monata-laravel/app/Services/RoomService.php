@@ -41,7 +41,7 @@ class RoomService
             $q->where('status', $search['status']);
         });
 
-        $perPage = $search['per_page'] ?? 10;
+        $perPage = $search['per_page'] ?? 12;
         $rooms = $query->paginate($perPage);
 
         return $rooms;
