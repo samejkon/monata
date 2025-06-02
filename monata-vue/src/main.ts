@@ -1,4 +1,5 @@
 import './assets/main.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import 'vue-toastification/dist/index.css'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'vue-toastification/dist/index.css'

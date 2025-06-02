@@ -17,6 +17,7 @@ const user = ref<User>({
   createdAt: '',
   updatedAt: ''
 });
+
 const loading = ref(false);
 const error = ref<string | null>(null);
 
@@ -28,6 +29,7 @@ const editUser = ref<User>({
   createdAt: '',
   updatedAt: ''
 });
+
 const isSubmittingProfile = ref(false);
 const profileUpdateMessage = ref<string | null>(null);
 const profileUpdateError = ref<string | null>(null);

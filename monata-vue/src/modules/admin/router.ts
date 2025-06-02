@@ -1,12 +1,14 @@
-import type { RouteRecordRaw } from 'vue-router';
-import AdminLayout from '@/modules/admin/components/layouts/AdminLayout.vue';
-import Dashboard from './views/Dashboard.vue';
-import Bookings from './views/Bookings.vue';
-import RoomType from './views/RoomType.vue';
-import Tables from '@/modules/admin/views/Tables.vue';
-import Properties from '@/modules/admin/views/Properties.vue';
-import ServiceList from '@/modules/admin/views/service/ServiceList.vue';
-import ContactList from '@/modules/admin/views/contact/ContactList.vue';
+import type { RouteRecordRaw } from 'vue-router'
+import Dashboard from './views/Dashboard.vue'
+import Tables from './views/Tables.vue'
+import Properties from './views/Properties.vue'
+import AdminLayout from './components/layouts/AdminLayout.vue'
+import Bookings from './views/Bookings.vue'
+import RoomType from './views/RoomType.vue'
+
+import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
+import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue'
+import ContactList from '@/modules/admin/views/contact/ContactList.vue'
 
 const adminRoutes: Array<RouteRecordRaw> = [
   {

@@ -39,7 +39,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('contacts', ContactController::class);
     Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);
     Route::post('contacts/{id}/send-mail', [ContactController::class, 'sendMail']);
-    // 
+  //
 });
 
 Route::middleware('auth:sanctum')->group(function () {
