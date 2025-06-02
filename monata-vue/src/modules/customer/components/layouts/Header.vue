@@ -85,23 +85,3 @@ async function logout() {
     </section>
   </header>
 </template>
-
-<script>
-export default {
-  name: 'Header',
-  props: {
-    bgClass: {
-      type: String,
-      default: '1' // Giá trị mặc định là '1' nếu không truyền prop
-    },
-    title: {
-      type: String,
-      default: 'Montana Resort'
-    },
-    description: {
-      type: String,
-      default: 'Unlock to enjoy the view of Martine'
-    }
-  }
-}
-</script>
