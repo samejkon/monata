@@ -2,8 +2,10 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Modal } from 'bootstrap'
 import { api, csrf } from '@/modules/admin/lib/axios'
+import { useToast } from 'vue-toastification'
 
-const emit = defineEmits(['room-created', 'room-updated'])
+const toast = useToast();
+const emit = defineEmits(['room-updated'])
 
 const props = defineProps({
   modalId: {
@@ -219,34 +221,27 @@ const submitForm = async () => {
     validationErrors.value = {}
     let response;
 
-    if (props.initialRoomData.id) {
-      response = await api.post(`admin/rooms/${props.initialRoomData.id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+    response = await api.post(`admin/rooms/${props.initialRoomData.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
 
-      emit('room-updated', response.data)
-    } else {
-      response = await api.post('admin/rooms', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-
-      emit('room-created', response.data)
-    }
-
+    emit('room-updated', response.data)
     const modal = Modal.getInstance(document.getElementById(props.modalId))
     
     if (modal) {
       modal.hide()
     }
+
+    toast.success('Room updated successfully!')
   } catch (error) {
-    console.error('Error sending data:', error)
     if (error.response && error.response.status === 422) {
       validationErrors.value = error.response.data.errors
     }
+    
+    console.error('Error sending data:', error)
+    toast.error('Fail to update room!')
   }
 };
 </script>
