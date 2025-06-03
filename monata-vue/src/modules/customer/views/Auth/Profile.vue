@@ -17,9 +17,9 @@ const user = ref<User>({
   createdAt: '',
   updatedAt: ''
 });
+
 const loading = ref(false);
 const error = ref<string | null>(null);
-
 
 const showEditProfileForm = ref(false);
 const editUser = ref<User>({
@@ -29,13 +29,13 @@ const editUser = ref<User>({
   createdAt: '',
   updatedAt: ''
 });
+
 const isSubmittingProfile = ref(false);
 const profileUpdateMessage = ref<string | null>(null);
 const profileUpdateError = ref<string | null>(null);
 const nameError = ref<string | null>(null);
 const emailError = ref<string | null>(null);
 const phoneError = ref<string | null>(null);
-
 
 const showChangePasswordForm = ref(false);
 const currentPassword = ref('');

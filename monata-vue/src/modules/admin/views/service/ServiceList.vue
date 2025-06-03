@@ -26,7 +26,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-lg-10">
+                    <div class="col-lg-10 col-md-10 col-sm-10 mt-3 mb-1">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
                             <div class="col-md-4 mt-1 mb-1">
                                 <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="Service name ..." />
@@ -57,10 +57,10 @@
                                 <th>Price</th>
                                 <th>Status</th>
                                 <th class="text-center">
-                                    <button class="btn btn-primary" @click="startCreate" v-if="!isCreating">
-                                        <SquarePlus/>
+                                    <button class="btn btn-primary btn-sm" @click="startCreate" v-if="!isCreating">
+                                        <Plus/>
                                     </button>
-                                    <button class="btn btn-secondary" @click="cancelCreate" v-else>
+                                    <button class="btn btn-secondary btn-sm" @click="cancelCreate" v-else>
                                         <X/>
                                     </button>
                                 </th>
@@ -104,10 +104,10 @@
                                     </div>
                                 </td>
                                 <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
-                                    <button class="btn btn-success" @click="handleCreate">
+                                    <button class="btn btn-success btn-sm" @click="handleCreate">
                                         <Check />
                                     </button>
-                                    <button class="btn btn-secondary" @click="cancelCreate">
+                                    <button class="btn btn-secondary btn-sm" @click="cancelCreate">
                                         <X />
                                     </button>
                                 </td>
@@ -167,18 +167,18 @@
                                 </td>
                                 <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
                                     <template v-if="editingService?.id === service.id">
-                                        <button class="btn btn-success" @click="handleUpdateService">
+                                        <button class="btn btn-success btn-sm" @click="handleUpdateService">
                                             <Check />
                                         </button>
-                                        <button class="btn btn-secondary" @click="cancelEdit">
+                                        <button class="btn btn-secondary btn-sm" @click="cancelEdit">
                                             <X />
                                         </button>
                                     </template>
                                     <template v-else>
-                                        <button class="btn btn-warning" @click="startEdit(service)">
+                                        <button class="btn btn-warning btn-sm" @click="startEdit(service)">
                                             <SquarePen />
                                         </button>
-                                        <button class="btn btn-danger" @click="actionDeleteService(service.id)">
+                                        <button class="btn btn-danger btn-sm" @click="actionDeleteService(service.id)">
                                             <Trash2 />
                                         </button>
                                     </template>
@@ -202,7 +202,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useService } from '../../composables/service/Service.service';
 import { ServiceStatus } from '../../stores/enum/Service';
 import Pagination from '../../components/layouts/Pagination.vue';
-import { SquarePen, Trash2, SquarePlus, Check, X } from 'lucide-vue-next';
+import { SquarePen, Trash2, Plus, Check, X } from 'lucide-vue-next';
 
 const route = useRoute();
 const router = useRouter();

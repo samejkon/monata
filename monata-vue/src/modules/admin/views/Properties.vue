@@ -1,5 +1,5 @@
 <script setup>
-import axios from 'axios'
+import { api } from '../lib/axios'
 import { ref, onMounted, nextTick, reactive, watch } from 'vue'
 import { X, Save, SquarePen, Plus, Trash2 } from 'lucide-vue-next'
 import { useToast } from 'vue-toastification'
@@ -24,7 +24,7 @@ const queryParams = reactive({
 const fetchData = async (page = 1) => {
   queryParams.page = page
   try {
-    const response = await axios.get(`${url}/admin/properties`, {
+    const response = await api.get(`/properties`, {
       params: queryParams
     })
     records.value = response.data?.data || []
@@ -66,7 +66,7 @@ const saveRecord = async () => {
   if (!editingRecord.value) return
 
   try {
-    const response = await axios.put(`${url}/admin/properties/${editingRecord.value.id}`, {
+    const response = await api.put(`/properties/${editingRecord.value.id}`, {
       name: editingRecord.value.name
     })
 
@@ -89,7 +89,7 @@ const deleteRecord = async (id) => {
   if (!confirm('Are you sure you want to delete this record?')) return
 
   try {
-    await axios.delete(`${url}/admin/properties/${id}`)
+    await api.delete(`/properties/${id}`)
     const isLastItemOnPage = records.value.length === 1 && pagination.value.current_page > 1
     const nextPage = isLastItemOnPage ? pagination.value.current_page - 1 : pagination.value.current_page
     await fetchData(nextPage)
@@ -118,7 +118,7 @@ const cancelCreating = () => {
 
 const createRecord = async () => {
   try {
-    await axios.post(`${url}/admin/properties`, {
+    await api.post(`/properties`, {
       name: creatingRecord.value.name
     })
     creatingRecord.value = ''

@@ -42,7 +42,7 @@
                                 v-if="!isReplying" 
                                 class="btn btn-primary btn-sm" 
                                 @click="startReply"
-                            >
+                                >
                                 Reply
                             </button>
                         <div v-if="isReplying" class="reply-form">
@@ -54,14 +54,14 @@
                             </div>
                             <div class="d-flex gap-2">
                                 <button 
-                                    class="btn btn-success" 
+                                    class="btn btn-success btn-sm" 
                                     @click="handleReply"
                                     :disabled="isSubmitting"
                                 >
                                     {{ isSubmitting ? 'Sending...' : 'Send Reply' }}
                                 </button>
                                 <button 
-                                    class="btn btn-secondary" 
+                                    class="btn btn-secondary btn-sm" 
                                     @click="cancelReply"
                                     :disabled="isSubmitting"
                                 >

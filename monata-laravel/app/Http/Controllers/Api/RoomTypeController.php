@@ -54,7 +54,6 @@ class RoomTypeController extends Controller
         return new RoomTypeResource($data);
     }
 
-
     /**
      * Remove the specified room type from storage.
      *

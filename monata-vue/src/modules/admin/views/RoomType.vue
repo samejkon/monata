@@ -1,5 +1,5 @@
 <script setup>
-import axios from 'axios';
+import { api } from '../lib/axios';
 import { ref, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 import { Plus, SquarePen, Trash2, X } from 'lucide-vue-next';
@@ -22,7 +22,7 @@ const propertiesList = ref([]);
 
 const fetchProperties = async () => {
   try {
-    const response = await axios.get(`${url}/admin/properties`, { params: { per_page: 1000 } });
+    const response = await api.get(`/properties`, { params: { per_page: 1000 } });
     propertiesList.value = response.data?.data || [];
   } catch (error) {
     propertiesList.value = [];
@@ -31,7 +31,7 @@ const fetchProperties = async () => {
 
 const fetchRoomTypes = async () => {
   try {
-    const response = await axios.get(`${url}/admin/room-types`);
+    const response = await api.get(`/room-types`);
     roomTypes.value = (response.data?.data || []).map(item => ({
       ...item,
       price: parseFloat(item.price),
@@ -102,9 +102,9 @@ const saveRoomType = async () => {
         }))
     };
     if (isEditing.value) {
-      await axios.put(`${url}/admin/room-types/${currentRoomType.value.id}`, payload);
+      await api.put(`/room-types/${currentRoomType.value.id}`, payload);
     } else {
-      await axios.post(`${url}/admin/room-types`, payload);
+      await api.post(`/room-types`, payload);
     }
     await fetchRoomTypes();
     roomTypeModal.hide();
@@ -117,7 +117,7 @@ const saveRoomType = async () => {
 const deleteRoomType = async (id) => {
   if (confirm('Are you sure you want to delete this room type?')) {
     try {
-      await axios.delete(`${url}/admin/room-types/${id}`);
+      await api.delete(`/room-types/${id}`);
       await fetchRoomTypes();
       toast.success('Room type deleted successfully!');
     } catch (error) {
@@ -163,12 +163,12 @@ const closeModal = () => {
         <table class="table table-hover table-bordered align-middle">
           <thead>
             <tr>
-              <th scope="col" class="text-center">#</th>
+              <th width="5%" scope="col" class="text-center">#</th>
               <th scope="col">Name</th>
               <th scope="col">Price</th>
               <th scope="col">Properties</th>
-              <th scope="col" class="text-center">
-                <button class="btn btn-success" @click="openAddModal">
+              <th width="10%" class="text-center">
+                <button class="btn btn-primary btn-sm" @click="openAddModal">
                   <Plus />
                 </button>
               </th>

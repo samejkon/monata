@@ -18,7 +18,6 @@ export const useContact = () => {
         total: 0
     });
 
-
     const fetchContacts = async () => {
         try {
             const { user_id, guest_name, guest_email, status, page, per_page } = route.query;
