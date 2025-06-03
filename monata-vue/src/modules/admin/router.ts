@@ -6,7 +6,6 @@ import AdminLayout from './components/layouts/AdminLayout.vue'
 import Bookings from './views/Bookings.vue'
 import RoomType from './views/RoomType.vue'
 import Rooms from './views/Room.vue'
-import RoomCreate from './views/room/CreateForm.vue'
 
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
 import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue'
@@ -65,12 +64,6 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'rooms',
         name: 'Rooms',
         component: Rooms,
-        meta: { requiresAuth: true },
-      },
-      {
-        path: 'rooms/create',
-        name: 'RoomCreate',
-        component: RoomCreate,
         meta: { requiresAuth: true },
       },
     ],

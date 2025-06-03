@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
 import { api, csrf } from '@/modules/admin/lib/axios'
+import { useToast } from 'vue-toastification'
+
+const toast = useToast();
 
 const emit = defineEmits(['room-created', 'room-updated'])
 
@@ -120,10 +123,13 @@ const submitForm = async () => {
     if (modal) {
       modal.hide()
     }
+
+    toast.success('Room created successfully!')
   } catch (error) {
     if (error.response && error.response.status === 422) {
       validationErrors.value = error.response.data.errors
     } else {
+      toast.error('Fail to create room!')
       console.error('Error sending data:', error)
     }
   }

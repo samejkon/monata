@@ -2,8 +2,8 @@
 import { ref, onMounted, onUnmounted, reactive, nextTick, computed, watch } from 'vue'
 import { Modal } from 'bootstrap'
 import { api } from '@/modules/admin/lib/axios'
-import CreateRoomModal from '@/modules/admin/views/room/CreateForm.vue'
-import EditRoomModal from '@/modules/admin/views/room/EditForm.vue'
+import CreateRoomModal from '@/modules/admin/components/modals/room/CreateForm.vue'
+import EditRoomModal from '@/modules/admin/components/modals/room/EditForm.vue'
 import Pagination from '@/modules/admin/components/layouts/Pagination.vue'
 
 const records = ref([])
