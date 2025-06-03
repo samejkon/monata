@@ -10,6 +10,7 @@ const toast = useToast();
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
 import CreateBookingModal from '../components/modals/Booking/CreateBookingModal.vue';
 import InvoiceServiceModal from '../components/modals/InvoiceServiceModal.vue';
+import ViewInvoiceModal from '../components/modals/ViewInvoiceModal.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -28,6 +29,9 @@ const bookingToEdit = ref(null);
 
 const showInvoiceServiceModal = ref(false);
 const selectedBookingForInvoice = ref(null);
+
+const isViewInvoiceModalVisible = ref(false);
+const bookingDataForInvoiceView = ref(null);
 
 const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -250,6 +254,21 @@ const handleInvoiceUpdated = () => {
   fetchBookings(); // Re-fetch bookings if invoice update might change booking display
 };
 
+// Functions for ViewInvoiceModal
+const openViewInvoiceModal = (booking) => {
+  if (booking && booking.status === 4) {
+    bookingDataForInvoiceView.value = booking;
+    isViewInvoiceModalVisible.value = true;
+  } else {
+    toast.warn('Không thể xem hóa đơn cho đặt phòng này hoặc thiếu dữ liệu.');
+  }
+};
+
+const closeViewInvoiceModal = () => {
+  isViewInvoiceModalVisible.value = false;
+  bookingDataForInvoiceView.value = null;
+};
+
 const checkInBooking = async (bookingId) => {
   try {
     const response = await api.post(`/bookings/${bookingId}/check-in`);
@@ -317,7 +336,7 @@ const checkInBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                      }}</span>
+                    }}</span>
                   </p>
                   <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
                     @click="checkInBooking(booking.id)">Check In</button>
@@ -326,6 +345,8 @@ const checkInBooking = async (bookingId) => {
                   <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
+                  <button v-if="booking.status === 4" type="button" class="btn btn-info btn-sm ms-2"
+                    @click="openViewInvoiceModal(booking)">Xem Hóa Đơn</button>
                 </div>
               </div>
             </div>
@@ -344,6 +365,9 @@ const checkInBooking = async (bookingId) => {
 
   <InvoiceServiceModal :show="showInvoiceServiceModal" :booking="selectedBookingForInvoice"
     @close="closeInvoiceServiceModal" @invoice-updated="handleInvoiceUpdated" />
+
+  <ViewInvoiceModal :show="isViewInvoiceModalVisible" :booking-data="bookingDataForInvoiceView"
+    @close="closeViewInvoiceModal" />
 </template>
 
 <style scoped>
