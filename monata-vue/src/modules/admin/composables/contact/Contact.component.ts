@@ -1,5 +1,4 @@
-import axios from "axios";
-import { api } from "../../stores/api/api";
+import { api, csrf } from "@/modules/customer/lib/axios";
 import type { Contact } from "../../stores/model/Contact.model";
 
 interface Meta {

@@ -1,5 +1,4 @@
-import axios from "axios";
-import { api } from "../../stores/api/api";
+import { api } from "@/modules/admin/lib/axios";
 import type { Service } from "../../stores/model/Service.model";
 
 interface Meta {
