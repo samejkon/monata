@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Room\SearchRoomRequest;
 use App\Http\Requests\Room\StoreRoomRequest;
 use App\Http\Requests\Room\UpdateRoomRequest;
+use App\Http\Resources\RoomDetailResource;
 use App\Http\Resources\RoomResource;
 use App\Services\RoomService;
 
@@ -43,11 +44,11 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(int $id): RoomResource
+    public function show(int $id): RoomDetailResource
     {
         $room = $this->roomService->findById($id);
 
-        return new RoomResource($room);
+        return new RoomDetailResource($room);
     }
 
     /**
