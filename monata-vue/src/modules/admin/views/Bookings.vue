@@ -23,6 +23,9 @@ const showBookingDetailModal = ref(false);
 const selectedBookingDetail = ref(null);
 
 const showCreateBookingModal = ref(false);
+const showEditBookingModal = ref(false);
+const bookingToEdit = ref(null);
+
 const showInvoiceServiceModal = ref(false);
 const selectedBookingForInvoice = ref(null);
 
@@ -204,9 +207,19 @@ const handleBookingConfirmed = () => {
   fetchBookings(); // Re-fetch bookings after confirmation
 };
 
-const handleEditBooking = (booking) => {
-  console.log('Editing booking:', booking);
-  toast.info('Edit functionality is not yet implemented.');
+const openEditBookingModal = (booking) => {
+  bookingToEdit.value = booking;
+  showEditBookingModal.value = true;
+};
+
+const closeEditBookingModal = () => {
+  showEditBookingModal.value = false;
+  bookingToEdit.value = null;
+};
+
+const handleBookingUpdated = () => {
+  fetchBookings();
+  closeEditBookingModal();
 };
 
 // Functions for CreateBookingModal
@@ -304,13 +317,13 @@ const checkInBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
                   <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
                     @click="checkInBooking(booking.id)">Check In</button>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="openBookingDetailModal(booking)">Confirm</button>
-                  <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2" 
+                  <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
                 </div>
@@ -324,17 +337,13 @@ const checkInBooking = async (bookingId) => {
   </div>
 
   <BookingDetailModal :show="showBookingDetailModal" :booking="selectedBookingDetail" @close="closeBookingDetailModal"
-    @booking-confirmed="handleBookingConfirmed" @edit-booking="handleEditBooking" />
+    @booking-confirmed="handleBookingConfirmed" @edit-booking="openEditBookingModal" />
 
   <CreateBookingModal :show="showCreateBookingModal" :initial-checkin-date="selectedDate"
     @close="closeCreateBookingModal" @booking-created="handleBookingCreated" />
 
-  <InvoiceServiceModal 
-    :show="showInvoiceServiceModal" 
-    :booking="selectedBookingForInvoice" 
-    @close="closeInvoiceServiceModal"
-    @invoice-updated="handleInvoiceUpdated" 
-  />
+  <InvoiceServiceModal :show="showInvoiceServiceModal" :booking="selectedBookingForInvoice"
+    @close="closeInvoiceServiceModal" @invoice-updated="handleInvoiceUpdated" />
 </template>
 
 <style scoped>

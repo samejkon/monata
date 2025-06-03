@@ -5,6 +5,7 @@ import { useToast } from 'vue-toastification';
 import moment from 'moment'; // Import moment
 import vSelect from 'vue-select'; // Import vue-select
 import 'vue-select/dist/vue-select.css'; // Import vue-select CSS
+import { Trash2 } from 'lucide-vue-next';
 
 const props = defineProps({
   show: Boolean,
@@ -46,7 +47,7 @@ const fetchInvoiceDetails = async (bookingId) => {
     // Backend: InvoiceDetailService->get($id) which returns InvoiceDetailResource::collection()
     const response = await api.get(`/bookings/${bookingId}/invoice-details`);
     // Access data using response.data?.data as Resource Collections are wrapped in a 'data' key
-    invoiceDetails.value = response.data?.data || []; 
+    invoiceDetails.value = response.data?.data || [];
   } catch (error) {
     console.error('Error fetching invoice details:', error);
     invoiceDetails.value = []; // Reset nếu có lỗi
@@ -70,14 +71,13 @@ watch(() => props.show, (newVal) => {
   if (newVal && props.booking && props.booking.id) {
     fetchInvoiceDetails(props.booking.id);
     if (availableServices.value.length === 0) {
-        fetchAvailableServices();
+      fetchAvailableServices();
     }
   } else if (!newVal) { // Thêm else if để reset khi modal đóng bằng cách khác (vd: props.show đổi từ ngoài)
     invoiceDetails.value = [];
     selectedServiceId.value = null;
   }
 });
-
 
 const addServiceToInvoice = () => {
   if (!selectedServiceId.value) {
@@ -159,18 +159,62 @@ const totalAmount = computed(() => {
   }, 0);
 });
 
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return '';
+  return new Intl.NumberFormat('en-GB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' VNĐ';
+};
+
 onMounted(() => {
   fetchAvailableServices();
 });
 
+const handleCheckout = async () => {
+  if (!props.booking || !props.booking.id) {
+    toast.error('Không có thông tin đặt phòng để thanh toán.');
+    return;
+  }
+  // Nút Thanh toán đã có :disabled="isLoading || invoiceDetails.length === 0"
+  // nên không cần kiểm tra invoiceDetails.length ở đây nữa.
+
+  isLoading.value = true;
+  try {
+    // Bước 1: Lưu chi tiết hóa đơn hiện tại
+    const payload = {
+      invoice_details: invoiceDetails.value.map(d => ({
+        id: d.id, // id của invoice_detail (nếu có, cho update)
+        service_id: d.service_id,
+        quantity: d.quantity,
+      })),
+    };
+    const invoiceSaveResponse = await api.post(`/bookings/${props.booking.id}/invoice-details`, payload);
+    // Cập nhật lại invoiceDetails từ phản hồi, phòng trường hợp có ID mới được tạo
+    invoiceDetails.value = invoiceSaveResponse.data?.invoice_details || [];
+
+    // Bước 2: Gọi API check-out
+    await api.post(`/bookings/${props.booking.id}/check-out`);
+
+    toast.success('Thanh toán thành công và hóa đơn đã được cập nhật!');
+    emit('invoice-updated'); // Sự kiện này có thể dùng để làm mới danh sách đặt phòng
+    closeModal();
+
+  } catch (error) {
+    console.error('Lỗi trong quá trình thanh toán:', error);
+    const errorMessage = error.response?.data?.message || 'Thanh toán thất bại. Vui lòng thử lại.';
+    toast.error(errorMessage);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 </script>
 
 <template>
-  <div v-if="show" class="modal fade show d-block" tabindex="-1" aria-labelledby="invoiceServiceModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+  <div v-if="show" class="modal fade show d-block" tabindex="-1" aria-labelledby="invoiceServiceModalLabel"
+    aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="invoiceServiceModalLabel">Quản lý Dịch vụ cho Hóa đơn - Đặt phòng #{{ booking?.id }}</h5>
+          <h5 class="modal-title" id="invoiceServiceModalLabel">Invoice Detail</h5>
           <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -180,29 +224,32 @@ onMounted(() => {
             </div>
           </div>
           <div v-else>
+            <div class="mb-3">
+              <div>
+                <p class="mb-1"><strong>Khách hàng:</strong> {{ booking?.guest_name || 'N/A' }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ booking?.guest_email || 'N/A' }}</p>
+                <p class="mb-1"><strong>Số điện thoại:</strong> {{ booking?.guest_phone || 'N/A' }}</p>
+                <p class="mb-1"><strong>Giá phòng tạm tính:</strong> {{ formatCurrency(booking?.total_payment) }}</p>
+              </div>
+            </div>
+            <hr />
             <!-- Phần thêm dịch vụ -->
             <div class="row mb-3 align-items-end">
               <div class="col-md-8">
                 <label for="serviceSelect" class="form-label">Chọn dịch vụ:</label>
-                <v-select
-                  id="serviceSelect"
-                  label="name"
-                  :options="availableServices"
-                  :reduce="service => service.id"
-                  v-model="selectedServiceId"
-                  placeholder="-- Tìm kiếm và chọn dịch vụ --"
-                  class="form-control-vue-select"
-                >
+                <v-select id="serviceSelect" label="name" :options="availableServices" :reduce="service => service.id"
+                  v-model="selectedServiceId" placeholder="Search" class="form-control-vue-select">
                   <template #option="option">
-                    {{ option.name }} - {{ option.price?.toLocaleString() }} VND
+                    {{ option.name }} - {{ formatCurrency(option.price) }}
                   </template>
                   <template #selected-option="option">
-                    {{ option.name }} - {{ option.price?.toLocaleString() }} VND
+                    {{ option.name }} - {{ formatCurrency(option.price) }} VND
                   </template>
                 </v-select>
               </div>
               <div class="col-md-4">
-                <button class="btn btn-success w-100 mt-auto" @click="addServiceToInvoice" :disabled="!selectedServiceId">
+                <button class="btn btn-success w-100 mt-auto" @click="addServiceToInvoice"
+                  :disabled="!selectedServiceId">
                   <i class="fas fa-plus"></i> Thêm vào HĐ
                 </button>
               </div>
@@ -221,7 +268,7 @@ onMounted(() => {
                   <th style="width: 120px;">Số Lượng</th>
                   <th style="width: 180px;">Thời gian</th>
                   <th style="width: 150px;">Thành Tiền</th>
-                  <th style="width: 80px;">Hành Động</th>
+                  <th style="width: 100px;">Hành Động</th>
                 </tr>
               </thead>
               <tbody>
@@ -229,15 +276,18 @@ onMounted(() => {
                   <td>{{ detail.name }}</td>
                   <td>{{ parseFloat(detail.price)?.toLocaleString() }} VND</td>
                   <td>
-                    <input type="number" class="form-control form-control-sm" v-model.number="detail.quantity" min="1" @change="detail.quantity = Math.max(1, detail.quantity || 1)">
+                    <input type="number" class="form-control form-control-sm" v-model.number="detail.quantity" min="1"
+                      @change="detail.quantity = Math.max(1, detail.quantity || 1)">
                   </td>
                   <td>
-                    {{ detail.added_this_session_at ? formatDateTime(detail.added_this_session_at) : (detail.created_at ? formatDateTime(detail.created_at) : 'N/A') }}
+                    {{ detail.added_this_session_at ? formatDateTime(detail.added_this_session_at) : (detail.created_at
+                      ?
+                      formatDateTime(detail.created_at) : 'N/A') }}
                   </td>
                   <td>{{ (parseFloat(detail.price) * parseInt(detail.quantity))?.toLocaleString() }} VND</td>
-                  <td>
+                  <td class="text-center">
                     <button class="btn btn-danger btn-sm" @click="removeServiceFromInvoice(detail, index)">
-                      <i class="fas fa-trash"></i>
+                      <Trash2 />
                     </button>
                   </td>
                 </tr>
@@ -245,7 +295,7 @@ onMounted(() => {
               <tfoot>
                 <tr>
                   <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
-                  <td colspan="2" class="fw-bold">{{ totalAmount?.toLocaleString() }} VND</td>
+                  <td colspan="2" class="fw-bold">{{ formatCurrency(totalAmount) }}</td>
                 </tr>
               </tfoot>
             </table>
@@ -253,9 +303,14 @@ onMounted(() => {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="closeModal">Đóng</button>
-          <button type="button" class="btn btn-primary" @click="saveInvoice" :disabled="isLoading || invoiceDetails.length === 0">
+          <button type="button" class="btn btn-primary" @click="saveInvoice"
+            :disabled="isLoading || invoiceDetails.length === 0">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Lưu Hóa Đơn
+          </button>
+          <button type="button" class="btn btn-success" @click="handleCheckout" :disabled="isLoading || invoiceDetails.length === 0">
+            <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            Thanh toán
           </button>
         </div>
       </div>
@@ -265,60 +320,80 @@ onMounted(() => {
 
 <style scoped>
 .modal-dialog {
-  max-width: 800px; /* Kích thước lớn hơn cho modal */
+  max-width: 1000px;
+  /* Kích thước lớn hơn cho modal */
 }
-.table th, .table td {
+
+.table th,
+.table td {
   vertical-align: middle;
 }
+
 /* Thêm style nếu cần thiết */
 /* Style to make vue-select look more like a Bootstrap form-control */
 .form-control-vue-select :deep(.vs__dropdown-toggle) {
   border-color: #ced4da;
-  border-radius: 0.25rem; /* Bootstrap's default border-radius */
-  min-height: calc(1.5em + 0.75rem + 2px); /* Match Bootstrap form-control height */
+  border-radius: 0.25rem;
+  /* Bootstrap's default border-radius */
+  min-height: calc(1.5em + 0.75rem + 2px);
+  /* Match Bootstrap form-control height */
   display: flex;
   align-items: center;
 }
 
 .form-control-vue-select.is-invalid :deep(.vs__dropdown-toggle) {
-  border-color: #dc3545; /* Bootstrap's danger color for invalid fields */
+  border-color: #dc3545;
+  /* Bootstrap's danger color for invalid fields */
 }
 
 .form-control-vue-select :deep(.vs__search::placeholder),
 .form-control-vue-select :deep(.vs__search) {
   margin-top: 0;
-  padding-left: 0.1rem; /* Minor adjustment for alignment */
-  padding-top: 0; 
+  padding-left: 0.1rem;
+  /* Minor adjustment for alignment */
+  padding-top: 0;
   padding-bottom: 0;
-  font-size: 1rem; /* Match Bootstrap's default font size */
-  line-height: 1.5; /* Match Bootstrap's default line-height */
+  font-size: 1rem;
+  /* Match Bootstrap's default font size */
+  line-height: 1.5;
+  /* Match Bootstrap's default line-height */
   /* height ensure it doesn't overflow when empty */
-  height: calc(1.5em + 0.75rem - 4px);  /* Approximate height for input area within vue-select */
+  height: calc(1.5em + 0.75rem - 4px);
+  /* Approximate height for input area within vue-select */
 }
 
 .form-control-vue-select :deep(.vs__selected) {
-  margin: 0; /* Reset margin */
-  padding: 0 0.25rem 0 0.1rem; /* Adjust padding for selected item to align better */
-  font-size: 1rem; /* Match Bootstrap's default font size */
-  line-height: 1.5; /* Match Bootstrap's default line-height */
+  margin: 0;
+  /* Reset margin */
+  padding: 0 0.25rem 0 0.1rem;
+  /* Adjust padding for selected item to align better */
+  font-size: 1rem;
+  /* Match Bootstrap's default font size */
+  line-height: 1.5;
+  /* Match Bootstrap's default line-height */
   /* Prevent selected item from pushing layout too much */
-  max-width: calc(100% - 30px); /* Adjust based on space for icons */
+  max-width: calc(100% - 30px);
+  /* Adjust based on space for icons */
 }
 
 .form-control-vue-select :deep(.vs__actions) {
-  padding: 0 6px 0 3px; /* Adjust padding for clear/dropdown toggle icons */
-  align-self: center; /* Vertically center icons */
+  padding: 0 6px 0 3px;
+  /* Adjust padding for clear/dropdown toggle icons */
+  align-self: center;
+  /* Vertically center icons */
 }
 
 .form-control-vue-select :deep(.vs__clear),
 .form-control-vue-select :deep(.vs__open-indicator) {
-  fill: #495057; /* Bootstrap's default text color for icons */
+  fill: #495057;
+  /* Bootstrap's default text color for icons */
 }
 
 /* Ensure the select itself aligns well if in a form group or similar */
 .form-control-vue-select {
-  padding: 0; /* vue-select handles its own internal padding */
-  line-height: normal; /* Reset line-height that might be inherited */
+  padding: 0;
+  /* vue-select handles its own internal padding */
+  line-height: normal;
+  /* Reset line-height that might be inherited */
 }
-
-</style> 
+</style>

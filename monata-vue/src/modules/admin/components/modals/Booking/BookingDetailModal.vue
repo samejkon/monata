@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
+import ViewInvoiceModal from '../ViewInvoiceModal.vue';
 
 const toast = useToast();
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -21,6 +22,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'bookingConfirmed', 'editBooking']);
 
 const selectedBookingDetail = ref(props.booking);
+const isViewInvoiceModalVisible = ref(false);
+const bookingDataForInvoice = ref(null);
 
 watch(() => props.booking, (newVal) => {
   selectedBookingDetail.value = newVal;
@@ -78,6 +81,20 @@ const editBooking = () => {
   emit('editBooking', selectedBookingDetail.value);
   close();
 };
+
+const openViewInvoice = () => {
+  if (selectedBookingDetail.value && selectedBookingDetail.value.status === 4) {
+    bookingDataForInvoice.value = selectedBookingDetail.value;
+    isViewInvoiceModalVisible.value = true;
+  } else {
+    toast.warn('Không thể xem hóa đơn cho đặt phòng này hoặc thiếu dữ liệu.');
+  }
+};
+
+const closeViewInvoiceModal = () => {
+  isViewInvoiceModalVisible.value = false;
+  bookingDataForInvoice.value = null;
+};
 </script>
 
 <template>
@@ -123,10 +140,17 @@ const editBooking = () => {
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-success"
             @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
           <button type="button" class="btn btn-primary" @click="editBooking">Edit</button>
+          <button v-if="selectedBookingDetail?.status === 4" type="button" class="btn btn-info"
+            @click="openViewInvoice">Xem Hóa Đơn</button>
         </div>
       </div>
     </div>
   </div>
+  <ViewInvoiceModal
+    :show="isViewInvoiceModalVisible"
+    :booking-data="bookingDataForInvoice"
+    @close="closeViewInvoiceModal"
+  />
 </template>
 
 <style scoped>
