@@ -57,6 +57,12 @@
             <span>Contact</span>
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/users">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Users</span>
+          </router-link>
+        </li>
       </ul>
       <div id="content-wrapper" class="d-flex flex-column">
         <div id="content">

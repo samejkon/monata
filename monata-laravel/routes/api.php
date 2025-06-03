@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\AuthUserController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoomClientController;
 use App\Http\Controllers\Api\UserHomeController;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,9 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('contacts', ContactController::class);
     Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);
     Route::post('contacts/{id}/send-mail', [ContactController::class, 'sendMail']);
-    //
+
+    Route::apiResource('users', UserController::class);
+    Route::post('users/{id}/restore', [UserController::class, 'restore']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {
