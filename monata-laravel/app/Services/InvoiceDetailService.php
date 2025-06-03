@@ -32,12 +32,10 @@ class InvoiceDetailService
 
         $invoiceDetails = $this->invoiceModel->where('booking_id', $id)->get();
 
-        $data = [
+        return   $data = [
             'booking' => $booking,
             'invoice_details' => $invoiceDetails
         ];
-
-        return $data;
     }
 
     /**

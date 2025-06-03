@@ -26,9 +26,7 @@ class InvoiceDetailController extends Controller
     {
         $data =  $this->service->get($id);
 
-        return new BookingResource($data['booking'])->additional([
-            'invoice_details' => InvoiceDetailResource::collection($data['invoice_details'])
-        ]);
+        return $data;
     }
 
     /**
@@ -47,9 +45,7 @@ class InvoiceDetailController extends Controller
     {
         $data = $this->service->upSert($request->validated(), $id);
 
-        return new BookingResource($data['booking'])->additional([
-            'invoice_details' => InvoiceDetailResource::collection($data['invoice_details'])
-        ]);
+        return new InvoiceDetailResource($data);
     }
 
     /**
