@@ -9,6 +9,7 @@ const toast = useToast();
 
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
 import CreateBookingModal from '../components/modals/Booking/CreateBookingModal.vue';
+import InvoiceServiceModal from '../components/modals/InvoiceServiceModal.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -22,6 +23,8 @@ const showBookingDetailModal = ref(false);
 const selectedBookingDetail = ref(null);
 
 const showCreateBookingModal = ref(false);
+const showInvoiceServiceModal = ref(false);
+const selectedBookingForInvoice = ref(null);
 
 const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -219,6 +222,21 @@ const handleBookingCreated = () => {
   fetchBookings();
 };
 
+// Functions for InvoiceServiceModal
+const openInvoiceServiceModal = (booking) => {
+  selectedBookingForInvoice.value = booking;
+  showInvoiceServiceModal.value = true;
+};
+
+const closeInvoiceServiceModal = () => {
+  showInvoiceServiceModal.value = false;
+  selectedBookingForInvoice.value = null;
+};
+
+const handleInvoiceUpdated = () => {
+  fetchBookings(); // Re-fetch bookings if invoice update might change booking display
+};
+
 const checkInBooking = async (bookingId) => {
   try {
     const response = await api.post(`/bookings/${bookingId}/check-in`);
@@ -292,6 +310,8 @@ const checkInBooking = async (bookingId) => {
                     @click="checkInBooking(booking.id)">Check In</button>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="openBookingDetailModal(booking)">Confirm</button>
+                  <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2" 
+                    @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
                 </div>
               </div>
@@ -308,6 +328,13 @@ const checkInBooking = async (bookingId) => {
 
   <CreateBookingModal :show="showCreateBookingModal" :initial-checkin-date="selectedDate"
     @close="closeCreateBookingModal" @booking-created="handleBookingCreated" />
+
+  <InvoiceServiceModal 
+    :show="showInvoiceServiceModal" 
+    :booking="selectedBookingForInvoice" 
+    @close="closeInvoiceServiceModal"
+    @invoice-updated="handleInvoiceUpdated" 
+  />
 </template>
 
 <style scoped>
