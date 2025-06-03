@@ -43,9 +43,10 @@ const fetchInvoiceDetails = async (bookingId) => {
   if (!bookingId) return;
   isLoading.value = true;
   try {
-    // Backend: InvoiceDetailService->get($id)
+    // Backend: InvoiceDetailService->get($id) which returns InvoiceDetailResource::collection()
     const response = await api.get(`/bookings/${bookingId}/invoice-details`);
-    invoiceDetails.value = response.data?.invoice_details || [];
+    // Access data using response.data?.data as Resource Collections are wrapped in a 'data' key
+    invoiceDetails.value = response.data?.data || []; 
   } catch (error) {
     console.error('Error fetching invoice details:', error);
     invoiceDetails.value = []; // Reset nếu có lỗi
@@ -271,30 +272,53 @@ onMounted(() => {
 }
 /* Thêm style nếu cần thiết */
 /* Style to make vue-select look more like a Bootstrap form-control */
-.form-control-vue-select ::v-deep(.vs__dropdown-toggle) {
+.form-control-vue-select :deep(.vs__dropdown-toggle) {
   border-color: #ced4da;
   border-radius: 0.25rem; /* Bootstrap's default border-radius */
+  min-height: calc(1.5em + 0.75rem + 2px); /* Match Bootstrap form-control height */
+  display: flex;
+  align-items: center;
 }
 
-.form-control-vue-select.is-invalid ::v-deep(.vs__dropdown-toggle) {
+.form-control-vue-select.is-invalid :deep(.vs__dropdown-toggle) {
   border-color: #dc3545; /* Bootstrap's danger color for invalid fields */
 }
 
-.form-control-vue-select ::v-deep(.vs__search::placeholder),
-.form-control-vue-select ::v-deep(.vs__search) {
+.form-control-vue-select :deep(.vs__search::placeholder),
+.form-control-vue-select :deep(.vs__search) {
   margin-top: 0;
-  padding-top: 0.375rem; /* Approximate Bootstrap padding */
-  padding-bottom: 0.375rem;
-}
-
-.form-control-vue-select ::v-deep(.vs__selected) {
-  padding-top: 0.1rem; /* Adjust padding for selected item to align better */
-  padding-bottom: 0.1rem;
+  padding-left: 0.1rem; /* Minor adjustment for alignment */
+  padding-top: 0; 
+  padding-bottom: 0;
   font-size: 1rem; /* Match Bootstrap's default font size */
+  line-height: 1.5; /* Match Bootstrap's default line-height */
+  /* height ensure it doesn't overflow when empty */
+  height: calc(1.5em + 0.75rem - 4px);  /* Approximate height for input area within vue-select */
 }
 
-.form-control-vue-select ::v-deep(.vs__actions) {
-  padding-top: 0.2rem; /* Adjust padding for clear/dropdown toggle icons */
+.form-control-vue-select :deep(.vs__selected) {
+  margin: 0; /* Reset margin */
+  padding: 0 0.25rem 0 0.1rem; /* Adjust padding for selected item to align better */
+  font-size: 1rem; /* Match Bootstrap's default font size */
+  line-height: 1.5; /* Match Bootstrap's default line-height */
+  /* Prevent selected item from pushing layout too much */
+  max-width: calc(100% - 30px); /* Adjust based on space for icons */
+}
+
+.form-control-vue-select :deep(.vs__actions) {
+  padding: 0 6px 0 3px; /* Adjust padding for clear/dropdown toggle icons */
+  align-self: center; /* Vertically center icons */
+}
+
+.form-control-vue-select :deep(.vs__clear),
+.form-control-vue-select :deep(.vs__open-indicator) {
+  fill: #495057; /* Bootstrap's default text color for icons */
+}
+
+/* Ensure the select itself aligns well if in a form group or similar */
+.form-control-vue-select {
+  padding: 0; /* vue-select handles its own internal padding */
+  line-height: normal; /* Reset line-height that might be inherited */
 }
 
 </style> 
