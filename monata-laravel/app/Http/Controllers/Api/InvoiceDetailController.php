@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\InvocieDetail\IdsRequest;
 use App\Http\Requests\InvocieDetail\InvoiceDetailRequest;
-use App\Http\Resources\BookingResource;
 use App\Http\Resources\InvoiceDetailResource;
 use App\Services\InvoiceDetailService;
 
@@ -18,45 +16,40 @@ class InvoiceDetailController extends Controller
     /**
      * Display the specified booking invoice detail.
      *
-     * @param  int  $id
-     * @return \App\Http\Resources\BookingResource
-     * @return \App\Http\Resources\InvoiceDetailResource
+     * @param  int  $booking The ID of the booking.
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(int $id)
+    public function index(int $booking)
     {
-        $data =  $this->service->get($id);
+        $invoiceDetails =  $this->service->get($booking);
 
-        return $data;
+        return InvoiceDetailResource::collection($invoiceDetails);
     }
 
     /**
      * Create or update the invoice details associated with a booking.
      *
-     * This method performs a database transaction to create or update the
-     * invoice details associated with a booking. It returns the result as an
-     * array containing the booking instance and the collection of invoice
-     * detail instances.
-     *
      * @param  \App\Http\Requests\InvocieDetail\InvoiceDetailRequest  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  int  $booking The ID of the booking.
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function editSave(InvoiceDetailRequest $request, $id)
+    public function editSave(InvoiceDetailRequest $request, int $booking)
     {
-        $data = $this->service->upSert($request->validated(), $id);
+        $updatedInvoiceDetails = $this->service->upSert($request->validated(), $booking);
 
-        return new InvoiceDetailResource($data);
+        return InvoiceDetailResource::collection($updatedInvoiceDetails);
     }
 
     /**
      * Remove the specified invoice detail from storage.
      *
-     * @param  int|array  $ids
+     * @param  int  $booking The ID of the booking.
+     * @param  int  $invoiceDetailId The ID of the invoice detail to remove.
      * @return \Illuminate\Http\Response
      */
-    public function destroy(int $id, int $idInvocie): \Illuminate\Http\Response
+    public function destroy(int $booking, int $invoiceDetailId): \Illuminate\Http\Response
     {
-        $this->service->deleteService($id, $idInvocie);
+        $this->service->deleteService($booking, $invoiceDetailId);
 
         return response()->noContent();
     }

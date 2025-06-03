@@ -24,18 +24,15 @@ class InvoiceDetailService
      * instance and the collection of invoice detail instances.
      *
      * @param  int  $id  The ID of the booking to be retrieved.
-     * @return array  The booking instance and its invoice details.
+     * @return \Illuminate\Database\Eloquent\Collection  The collection of invoice detail instances.
      */
-    public function get($id): array
+    public function get($id): \Illuminate\Database\Eloquent\Collection
     {
-        $booking = $this->checkBooking($id);
+        $this->checkBooking($id);
 
         $invoiceDetails = $this->invoiceModel->where('booking_id', $id)->get();
 
-        return   $data = [
-            'booking' => $booking,
-            'invoice_details' => $invoiceDetails
-        ];
+        return $invoiceDetails;
     }
 
     /**
@@ -48,19 +45,18 @@ class InvoiceDetailService
      *
      * @param  array  $data  The invoice detail data.
      * @param  int    $id    The ID of the booking to be updated.
-     * @return array  The booking instance and its invoice details.
+     * @return \Illuminate\Support\Collection  The collection of invoice detail instances.
      */
-    public function upSert(array $data, int $id): array
+    public function upSert(array $data, int $id): \Illuminate\Support\Collection
     {
         return DB::transaction(function () use ($data, $id) {
-            $booking = $this->checkBooking($id);
+            $this->checkBooking($id);
 
-            $invoiceDetails = [];
+            $invoiceDetailsCollection = collect();
             foreach ($data['invoice_details'] as $detail) {
                 $service = Service::findOrFail($detail['service_id']);
 
                 $invoiceDetailData = [
-                    'id' => Arr::get($detail, 'id'),
                     'booking_id' => $id,
                     'service_id' => $detail['service_id'],
                     'name' => $service->name,
@@ -73,13 +69,10 @@ class InvoiceDetailService
                     $invoiceDetailData
                 );
 
-                $invoiceDetails[] = $updatedDetail;
+                $invoiceDetailsCollection->push($updatedDetail);
             }
 
-            return [
-                'booking' => $booking,
-                'invoice_details' => $invoiceDetails
-            ];
+            return $invoiceDetailsCollection;
         });
     }
 
