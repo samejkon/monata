@@ -135,7 +135,7 @@ const fetchRoomTypes = async () => {
   errorRoomTypes.value = null
 
   try {
-    const response = await api.get('admin/room-types')
+    const response = await api.get('/room-types')
     roomTypes.value = response.data.data
   } catch (error) {
     console.error('Error loading room types:', error)
@@ -190,7 +190,7 @@ const removeNewImage = (index) => {
 
 const markImageForRemoval = (imageId) => {
   const index = imagesToRemove.value.indexOf(imageId)
-  
+
   if (index === -1) {
     imagesToRemove.value.push(imageId)
   } else {
@@ -221,7 +221,7 @@ const submitForm = async () => {
     validationErrors.value = {}
     let response;
 
-    response = await api.post(`admin/rooms/${props.initialRoomData.id}`, formData, {
+    response = await api.post(`/rooms/${props.initialRoomData.id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -229,7 +229,7 @@ const submitForm = async () => {
 
     emit('room-updated', response.data)
     const modal = Modal.getInstance(document.getElementById(props.modalId))
-    
+
     if (modal) {
       modal.hide()
     }
@@ -239,7 +239,7 @@ const submitForm = async () => {
     if (error.response && error.response.status === 422) {
       validationErrors.value = error.response.data.errors
     }
-    
+
     console.error('Error sending data:', error)
     toast.error('Fail to update room!')
   }
@@ -271,7 +271,8 @@ const submitForm = async () => {
                   <option v-for="type in roomTypes" :key="type.id" :value="type.id">{{ type.name }}
                   </option>
                 </select>
-                <div v-if="validationErrors.room_type_id" class="text-danger mt-1">{{ validationErrors.room_type_id[0] }}</div>
+                <div v-if="validationErrors.room_type_id" class="text-danger mt-1">{{ validationErrors.room_type_id[0]
+                }}</div>
                 <div v-if="loadingRoomTypes">Loading room types...</div>
                 <div v-if="errorRoomTypes" class="text-danger">{{ errorRoomTypes }}</div>
               </div>
@@ -291,7 +292,8 @@ const submitForm = async () => {
             <div class="mb-3">
               <label for="description" class="form-label">Description:</label>
               <textarea class="form-control" id="description" v-model="room.description" rows="3"></textarea>
-              <div v-if="validationErrors.description" class="text-danger mt-1">{{ validationErrors.description[0] }}</div>
+              <div v-if="validationErrors.description" class="text-danger mt-1">{{ validationErrors.description[0] }}
+              </div>
             </div>
 
             <div class="mb-3">
@@ -299,8 +301,7 @@ const submitForm = async () => {
               <input type="file" class="form-control" id="thumbnail" @change="handleThumbnailChange" accept="image/*">
               <div v-if="validationErrors.thumbnail" class="text-danger mt-1">{{ validationErrors.thumbnail[0] }}</div>
               <div v-if="thumbnailPreview" class="mt-2">
-                <img :src="thumbnailPreview" alt="Thumbnail Preview"
-                  class="thumbnail-preview-img">
+                <img :src="thumbnailPreview" alt="Thumbnail Preview" class="thumbnail-preview-img">
               </div>
             </div>
 
@@ -312,12 +313,12 @@ const submitForm = async () => {
                   :class="{ 'image-to-remove opacity-50 border-danger border-2': imagesToRemove.includes(image.id) }">
                   <img :src="image.image_path" :alt="'Existing Image ' + image.id" class="img-fluid image-display">
                   <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 action-button"
-                    aria-label="Mark for Removal"
-                    @click="markImageForRemoval(image.id)">
+                    aria-label="Mark for Removal" @click="markImageForRemoval(image.id)">
                     &times;
                   </button>
                   <span v-if="imagesToRemove.includes(image.id)"
-                    class="position-absolute bottom-0 start-50 translate-middle-x badge bg-danger to-remove-badge">To Remove</span>
+                    class="position-absolute bottom-0 start-50 translate-middle-x badge bg-danger to-remove-badge">To
+                    Remove</span>
                 </div>
               </div>
             </div>
@@ -335,8 +336,7 @@ const submitForm = async () => {
                   class="position-relative m-1 p-1 border rounded image-container">
                   <img :src="image.preview" alt="New Image Preview" class="img-fluid image-display">
                   <button type="button" class="btn btn-sm btn-warning position-absolute top-0 end-0 m-1 action-button"
-                    aria-label="Remove New Image"
-                    @click="removeNewImage(index)">&times;</button>
+                    aria-label="Remove New Image" @click="removeNewImage(index)">&times;</button>
                 </div>
               </div>
             </div>

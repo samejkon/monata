@@ -30,7 +30,7 @@ const searchTerm = reactive({
 
 const fetchRooms = async () => {
   try {
-    const response = await api.get('admin/rooms', {
+    const response = await api.get('/rooms', {
       params: {
         page: currentPage.value
       }
@@ -46,7 +46,7 @@ const fetchRooms = async () => {
 
 const fetchRoomTypes = async () => {
   try {
-    const response = await api.get('admin/room-types')
+    const response = await api.get('/room-types')
     roomTypes.value = response.data.data
   } catch (error) {
     console.error('Error fetching room types:', error)
@@ -56,7 +56,7 @@ const fetchRoomTypes = async () => {
 
 const fetchRoomDetails = async (roomId: number) => {
   try {
-    const response = await api.get(`admin/rooms/${roomId}`)
+    const response = await api.get(`/rooms/${roomId}`)
     const fetchedData = response.data.data
 
     if (fetchedData) {
@@ -102,14 +102,14 @@ const fetchRoomDetails = async (roomId: number) => {
     console.error(`Error fetching details for room ${roomId}:`, error)
     roomDetails.value = null
     currentLargeImage.value = null
-    
+
     stopImageSlider()
   }
 }
 
 const searchRooms = async () => {
   try {
-    const response = await api.get('admin/rooms', {
+    const response = await api.get('/rooms', {
       params: {
         ...searchTerm,
       }
@@ -342,10 +342,10 @@ onUnmounted(() => {
             <option value="4">Cleaning</option>
             <option value="5">Inactive</option>
           </select>
-          <input v-model="searchTerm.name" type="text" class="form-control" placeholder="Name..."
-          aria-label="Search" aria-describedby="basic-addon2">
+          <input v-model="searchTerm.name" type="text" class="form-control" placeholder="Name..." aria-label="Search"
+            aria-describedby="basic-addon2">
           <button class="btn btn-outline-secondary" type="button" @click="resetFilter">
-              <i class="fa-solid fa-rotate-left"></i>
+            <i class="fa-solid fa-rotate-left"></i>
           </button>
         </div>
       </form>
@@ -353,7 +353,7 @@ onUnmounted(() => {
 
     <create-room-modal modalId="createRoomModal" modalTitle="New Room" @room-created="handleRoomCreated" />
     <edit-room-modal v-if="roomToEdit" :modalId="'editRoomModal'" :modalTitle="'Edit Room'"
-      :initialRoomData="roomToEdit" @room-updated="handleRoomUpdated" :roomTypesApiUrl="'admin/room-types'" />
+      :initialRoomData="roomToEdit" @room-updated="handleRoomUpdated" :roomTypesApiUrl="'/room-types'" />
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
       <div v-for="room in records" :key="room.id" class="col mb-4 room-card" @click="openRoomDetailsModal(room)">
         <div class="card shadow-sm">
@@ -368,21 +368,19 @@ onUnmounted(() => {
                 <h5 class="card-title">{{ room.name }}</h5>
                 <p class="card-text">{{ room.room_type }}</p>
                 <p class="card-text">
-                  <span
-                    :class="{
-                      'badge bg-success text-white': room.status === 1,
-                      'badge bg-primary text-white': room.status === 2,
-                      'badge bg-warning text-dark': room.status === 3,
-                      'badge bg-info text-white': room.status === 4,
-                      'badge bg-secondary text-white': room.status === 5
-                    }"
-                  >
+                  <span :class="{
+                    'badge bg-success text-white': room.status === 1,
+                    'badge bg-primary text-white': room.status === 2,
+                    'badge bg-warning text-dark': room.status === 3,
+                    'badge bg-info text-white': room.status === 4,
+                    'badge bg-secondary text-white': room.status === 5
+                  }">
                     {{
                       room.status === 1 ? 'Active' :
-                      room.status === 2 ? 'Booked' :
-                      room.status === 3 ? 'Occupied' :
-                      room.status === 4 ? 'Cleaning' :
-                      'Inactive'
+                        room.status === 2 ? 'Booked' :
+                          room.status === 3 ? 'Occupied' :
+                            room.status === 4 ? 'Cleaning' :
+                              'Inactive'
                     }}
                   </span>
                 </p>
@@ -393,7 +391,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <Pagination v-if="meta" v-model:currentPage="currentPage" :meta="meta"/>
+    <Pagination v-if="meta" v-model:currentPage="currentPage" :meta="meta" />
 
     <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
       aria-hidden="true">
