@@ -86,7 +86,6 @@ const fetchFullInvoiceDetails = async (bookingId) => {
 
 watch([() => props.show, () => props.bookingData?.id], ([newShow, newBookingId], [oldShow, oldBookingId]) => {
   if (newShow && newBookingId) {
-    console.log(`Modal is shown for booking ID: ${newBookingId}. Fetching details.`);
     fetchFullInvoiceDetails(newBookingId);
   } else if (!newShow) {
     detailedBookingInfo.value = null;
