@@ -1,9 +1,23 @@
 <script setup lang="ts">
-import { useModal } from '../../composables/useModal'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '../../lib/axios'
 
-const { isModalOpen, closeModal } = useModal()
+const props = defineProps<{
+  modelValue: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+}>()
+
+const isModalOpen = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+})
+
+const closeModal = () => {
+  isModalOpen.value = false
+}
 
 interface RoomType {
     id: number
