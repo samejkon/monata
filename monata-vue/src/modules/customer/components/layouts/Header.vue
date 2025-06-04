@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
-import { provideModal } from '../../composables/useModal'
+import { useModal } from '../../composables/useModal'
 import CheckAvailable from '../forms/CheckAvailable.vue'
 
 const props = defineProps({
@@ -20,7 +20,7 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
-const { openModal } = provideModal()
+const { openModal } = useModal()
 
 async function logout() {
   try {
