@@ -5,7 +5,9 @@ import { ref } from 'vue'
 import type { LoginForm, ValidationErrors } from '@/modules/customer/types/auth'
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const router = useRouter()
 const authStore = useAuthStore()
 const errors = ref<ValidationErrors>({})
@@ -22,13 +24,16 @@ async function login() {
     await api.post(`/login`, loginForm)
     authStore.login()
 
+    toast.success("Login successfully!")
     router.push('/')
   } catch (error: any) {
     if (error.response?.status === 422) {
       errors.value = error.response.data.errors
+    } else if (error.response?.status === 401) {
+      alert('Email or password is not valid.')
     } else {
       console.error('Login failed:', error.message)
-      alert('Login failed!')
+      toast.error("Login fail!")
     }
   }
 }

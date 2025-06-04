@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { Modal } from 'bootstrap'
-import { api, csrf } from '@/modules/admin/lib/axios'
+import { api } from '@/modules/admin/lib/axios'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast();

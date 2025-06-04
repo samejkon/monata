@@ -3,7 +3,9 @@ import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
 import { ref } from 'vue'
 import CheckAvailable from '../forms/CheckAvailable.vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const props = defineProps({
   bgClass: {
     type: String,
@@ -30,7 +32,7 @@ async function logout() {
   try {
     await api.post(`/logout`)
     authStore.logout()
-    alert('Logout successful!')
+    toast.success("You had logout!")
   } catch (error: any) {
     console.error('Logout failed:', error.message)
     alert('Logout failed!')
