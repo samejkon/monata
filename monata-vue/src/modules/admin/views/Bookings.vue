@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'; // watch for body class handled in modals
+import { ref, computed, onMounted } from 'vue';
 import { api } from '../lib/axios';
 import moment from 'moment';
 import 'moment/locale/en-gb';
@@ -9,6 +9,8 @@ const toast = useToast();
 
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
 import CreateBookingModal from '../components/modals/Booking/CreateBookingModal.vue';
+import InvoiceServiceModal from '../components/modals/InvoiceServiceModal.vue';
+import ViewInvoiceModal from '../components/modals/ViewInvoiceModal.vue';
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -22,6 +24,14 @@ const showBookingDetailModal = ref(false);
 const selectedBookingDetail = ref(null);
 
 const showCreateBookingModal = ref(false);
+const showEditBookingModal = ref(false);
+const bookingToEdit = ref(null);
+
+const showInvoiceServiceModal = ref(false);
+const selectedBookingForInvoice = ref(null);
+
+const isViewInvoiceModalVisible = ref(false);
+const bookingDataForInvoiceView = ref(null);
 
 const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -198,15 +208,24 @@ const closeBookingDetailModal = () => {
 };
 
 const handleBookingConfirmed = () => {
-  fetchBookings(); // Re-fetch bookings after confirmation
+  fetchBookings(); 
 };
 
-const handleEditBooking = (booking) => {
-  console.log('Editing booking:', booking);
-  toast.info('Edit functionality is not yet implemented.');
+const openEditBookingModal = (booking) => {
+  bookingToEdit.value = booking;
+  showEditBookingModal.value = true;
 };
 
-// Functions for CreateBookingModal
+const closeEditBookingModal = () => {
+  showEditBookingModal.value = false;
+  bookingToEdit.value = null;
+};
+
+const handleBookingUpdated = () => {
+  fetchBookings();
+  closeEditBookingModal();
+};
+
 const openCreateBookingModal = () => {
   showCreateBookingModal.value = true;
 };
@@ -216,7 +235,46 @@ const closeCreateBookingModal = () => {
 };
 
 const handleBookingCreated = () => {
-  fetchBookings(); // Re-fetch bookings after new booking is created
+  fetchBookings();
+};
+
+const openInvoiceServiceModal = (booking) => {
+  selectedBookingForInvoice.value = booking;
+  showInvoiceServiceModal.value = true;
+};
+
+const closeInvoiceServiceModal = () => {
+  showInvoiceServiceModal.value = false;
+  selectedBookingForInvoice.value = null;
+};
+
+const handleInvoiceUpdated = () => {
+  fetchBookings(); 
+};
+
+const openViewInvoiceModal = (booking) => {
+  if (booking && (booking.status === 3 || booking.status === 4)) {
+    bookingDataForInvoiceView.value = booking;
+    isViewInvoiceModalVisible.value = true;
+  } else {
+    toast.warn('Không thể xem hóa đơn cho các đặt phòng chưa check-in hoặc không ở trạng thái phù hợp.');
+  }
+};
+
+const closeViewInvoiceModal = () => {
+  isViewInvoiceModalVisible.value = false;
+  bookingDataForInvoiceView.value = null;
+};
+
+const checkInBooking = async (bookingId) => {
+  try {
+    const response = await api.post(`/bookings/${bookingId}/check-in`);
+    toast.success('Check-in successful!');
+    await fetchBookings(); 
+  } catch (error) {
+    console.error('Error during check-in:', error);
+    toast.error('Failed to check-in booking. Please try again.');
+  }
 };
 </script>
 
@@ -274,11 +332,18 @@ const handleBookingCreated = () => {
                     Phone: <strong>{{ booking.guest_phone }}</strong>
                   </p>
                   <p class="card-text">
-                    Status: <strong>{{ getStatusText(booking.status) }}</strong>
+                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
+                    }}</span>
                   </p>
-                  <button v-if="booking.status === 1" class="btn btn-success btn-sm mr-2"
+                  <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
+                    @click="checkInBooking(booking.id)">Check In</button>
+                  <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="openBookingDetailModal(booking)">Confirm</button>
+                  <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
+                    @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
+                  <button v-if="booking.status === 3 || booking.status === 4" type="button"
+                    class="btn btn-info btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
                 </div>
               </div>
             </div>
@@ -290,10 +355,16 @@ const handleBookingCreated = () => {
   </div>
 
   <BookingDetailModal :show="showBookingDetailModal" :booking="selectedBookingDetail" @close="closeBookingDetailModal"
-    @booking-confirmed="handleBookingConfirmed" @edit-booking="handleEditBooking" />
+    @booking-confirmed="handleBookingConfirmed" @edit-booking="openEditBookingModal" />
 
   <CreateBookingModal :show="showCreateBookingModal" :initial-checkin-date="selectedDate"
     @close="closeCreateBookingModal" @booking-created="handleBookingCreated" />
+
+  <InvoiceServiceModal :show="showInvoiceServiceModal" :booking="selectedBookingForInvoice"
+    @close="closeInvoiceServiceModal" @invoice-updated="handleInvoiceUpdated" />
+
+  <ViewInvoiceModal :show="isViewInvoiceModalVisible" :booking-data="bookingDataForInvoiceView"
+    @close="closeViewInvoiceModal" />
 </template>
 
 <style scoped>

@@ -109,17 +109,32 @@ const handleModalClickOutside = (event) => {
 };
 
 const checkRoomAvailability = async () => {
-  if (!availabilityCheck.value.checkin_at || !availabilityCheck.value.checkout_at) {
-    toast.error('Please enter both check-in and check-out times to check room availability.');
+  validationErrors.value = {}; // Clear previous validation errors
+
+  if (!availabilityCheck.value.checkin_at) {
+    validationErrors.value.checkin_at = ['Please enter a check-in time.'];
+  }
+  if (!availabilityCheck.value.checkout_at) {
+    validationErrors.value.checkout_at = ['Please enter a check-out time.'];
+  }
+  if (validationErrors.value.checkin_at || validationErrors.value.checkout_at) {
     return;
   }
-  if (moment(availabilityCheck.value.checkin_at).isSameOrAfter(moment(availabilityCheck.value.checkout_at))) {
-    toast.error('Check-out time must be after check-in time.');
+
+  const now = moment();
+  const checkin = moment(availabilityCheck.value.checkin_at);
+  const checkout = moment(availabilityCheck.value.checkout_at);
+
+  if (checkin.isSameOrBefore(now)) {
+    validationErrors.value.checkin_at = ['Check-in time must be in the future.'];
+    return;
+  }
+  if (checkin.isSameOrAfter(checkout)) {
+    validationErrors.value.checkout_at = ['Check-out time must be after check-in time.'];
     return;
   }
 
   try {
-    // Moment.js vẫn sẽ định dạng đúng 24h vì input đã cấp cho nó giá trị 24h
     const formattedCheckin = moment(availabilityCheck.value.checkin_at).format('YYYY-MM-DD HH:mm');
     const formattedCheckout = moment(availabilityCheck.value.checkout_at).format('YYYY-MM-DD HH:mm');
 
@@ -133,14 +148,14 @@ const checkRoomAvailability = async () => {
     );
 
     if (availableRoomsForSelection.value.length === 0) {
-      toast.info('No available rooms for the selected period.');
+      validationErrors.value.general = ['No available rooms for the selected period.'];
     } else {
       toast.success(`Found ${availableRoomsForSelection.value.length} available rooms.`);
     }
     updateBookingDetailsFromSelection();
   } catch (error) {
     console.error('Error checking room availability:', error.response?.data || error.message);
-    toast.error('Failed to check room availability: ' + (error.response?.data?.message || 'Unknown error.'));
+    validationErrors.value.general = ['Failed to check room availability. Please try again.'];
     availableRoomsForSelection.value = [];
     selectedAvailableRoomIds.value = [];
     newBooking.value.booking_details = [];
@@ -148,14 +163,11 @@ const checkRoomAvailability = async () => {
 };
 
 const updateBookingDetailsFromSelection = () => {
-  // Chỉ giữ lại các phòng đang được chọn
   newBooking.value.booking_details = selectedAvailableRoomIds.value.map(roomId => {
     const room = availableRoomsForSelection.value.find(r => r.id === roomId);
-    // Nếu đã có detail thì giữ lại thời gian đã chỉnh, nếu chưa thì lấy mặc định
     const oldDetail = newBooking.value.booking_details.find(d => d.room_id === roomId);
     return {
       room_id: roomId,
-      // Đảm bảo giá trị của booking_details cũng là 24h
       checkin_at: oldDetail ? oldDetail.checkin_at : availabilityCheck.value.checkin_at,
       checkout_at: oldDetail ? oldDetail.checkout_at : availabilityCheck.value.checkout_at,
       room_name: room ? `Room ${room.id} (${room.room_type || 'N/A'})` : `Room ${roomId}`
@@ -166,14 +178,13 @@ const updateBookingDetailsFromSelection = () => {
 watch(selectedAvailableRoomIds, updateBookingDetailsFromSelection, { deep: true });
 
 function getRoomDetail(roomId) {
-  // Chỉ trả về detail nếu phòng đang được chọn
   let detail = newBooking.value.booking_details.find(d => d.room_id === roomId);
   if (!detail && selectedAvailableRoomIds.value.includes(roomId)) {
     detail = {
       room_id: roomId,
       checkin_at: availabilityCheck.value.checkin_at,
       checkout_at: availabilityCheck.value.checkout_at,
-      room_name: '' // Will be updated by updateBookingDetailsFromSelection
+      room_name: ''
     };
     newBooking.value.booking_details.push(detail);
   }
@@ -192,7 +203,20 @@ const createBooking = async () => {
     }
   }
 
-  // Lấy booking_details với thời gian từng phòng (đã được Flatpickr đảm bảo 24h)
+  const now = moment();
+  for (const detail of newBooking.value.booking_details) {
+    const checkin = moment(detail.checkin_at);
+    const checkout = moment(detail.checkout_at);
+    if (checkin.isSameOrBefore(now)) {
+      toast.error('Check-in time for all rooms must be in the future.');
+      return;
+    }
+    if (checkin.isSameOrAfter(checkout)) {
+      toast.error('Check-out time must be after check-in time for all rooms.');
+      return;
+    }
+  }
+
   const finalBookingDetails = newBooking.value.booking_details.map(detail => ({
     room_id: detail.room_id,
     checkin_at: moment(detail.checkin_at).format('YYYY-MM-DD HH:mm'),
@@ -207,7 +231,7 @@ const createBooking = async () => {
 
     const response = await api.post(`/bookings`, payload);
     toast.success('Booking created successfully!');
-    emit('bookingCreated'); // Emit event to parent to refetch data
+    emit('bookingCreated');
     close();
   } catch (error) {
     if (error.response && error.response.status === 422) {
@@ -275,15 +299,24 @@ const createBooking = async () => {
                 <label for="checkinAvailability" class="form-label">Check-in Time:</label>
                 <FlatPickr id="checkinAvailability" v-model="availabilityCheck.checkin_at" :config="flatpickrConfig"
                   class="form-control" @on-change="checkRoomAvailability" required />
+                <div v-if="validationErrors.checkin_at" class="text-danger small">
+                  {{ validationErrors.checkin_at[0] }}
+                </div>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="checkoutAvailability" class="form-label">Check-out Time:</label>
                 <FlatPickr id="checkoutAvailability" v-model="availabilityCheck.checkout_at" :config="flatpickrConfig"
                   class="form-control" @on-change="checkRoomAvailability" required />
+                <div v-if="validationErrors.checkout_at" class="text-danger small">
+                  {{ validationErrors.checkout_at[0] }}
+                </div>
               </div>
             </div>
             <button type="button" class="btn btn-info btn-sm mb-3" @click="checkRoomAvailability">Check
               Availability</button>
+            <div v-if="validationErrors.general" class="text-danger small">
+              {{ validationErrors.general[0] }}
+            </div>
 
             <hr>
             <h6>Select Rooms for This Booking:</h6>
@@ -340,7 +373,6 @@ const createBooking = async () => {
 </template>
 
 <style scoped>
-/* Copy modal-overlay, modal-dialog, modal-content, etc. styles from original component */
 .modal-overlay {
   position: fixed;
   top: 0;

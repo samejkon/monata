@@ -31,7 +31,7 @@ const fetchData = async (page = 1) => {
     pagination.value = response.data?.meta || {}
     errorMessages.value = {}
   } catch (error) {
-    console.error('Error fetching users', error)
+    console.error('Error fetching data', error)
     errorMessages.value = { global: 'Failed to fetch properties. Please try again later.' }
     records.value = []
   }

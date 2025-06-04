@@ -196,7 +196,6 @@ const handleApiErrors = (error: any) => {
 
     if (error.response?.data) {
         const apiError = error.response.data as ApiError
-        console.log('API Error:', apiError) // Debug log
         
         if (apiError.errors) {
             Object.entries(apiError.errors).forEach(([field, messages]) => {
