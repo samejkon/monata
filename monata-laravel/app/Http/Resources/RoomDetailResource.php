@@ -5,9 +5,8 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Carbon\Carbon;
-use App\Http\Resources\ImageResource;
 
-class RoomResource extends JsonResource
+class RoomDetailResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,10 +18,11 @@ class RoomResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'room_type' => $this->roomType->name,
+            'room_type_id' => $this->room_type_id,
             'thumbnail_path' => asset('storage/' . $this->thumbnail_path),
+            'description' => $this->description,
             'status' => $this->status,
-            'properties' => $this->roomType->properties,
+            'images' => ImageResource::collection($this->images),
         ];
     }
 }

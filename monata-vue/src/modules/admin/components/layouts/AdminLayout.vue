@@ -34,6 +34,11 @@
           </router-link>
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" to="/admin/rooms">
+            <span>Rooms</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link" to="/admin/properties">
             <span>Properties</span>
           </router-link>

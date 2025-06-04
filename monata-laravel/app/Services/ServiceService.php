@@ -34,6 +34,11 @@ class ServiceService
         $perPage = $data['per_page'] ?? 10;
         $services = $query->paginate($perPage);
 
+        $services->getCollection()->transform(function ($service) {
+            $service->price = number_format(round($service->price), 0, ',', '.');
+            return $service;
+        });
+
         return $services;
     }
 

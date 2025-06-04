@@ -12,6 +12,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
+    "@ckeditor/ckeditor5-vue": "^7.3.0",
     "@popperjs/core": "^2.11.8",
     "animate.css": "^4.1.1",
     "axios": "^1.9.0",

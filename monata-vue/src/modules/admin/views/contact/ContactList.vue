@@ -39,7 +39,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="col-lg-10">
+                    <div class="col-lg-10 col-md-10 col-sm-10 mt-3 mb-1">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
                             <div class="col-md-2 mt-1 mb-1">
                                 <input v-model="searchForm.user_id" type="number" class="form-control form-control-sm" placeholder="Service userID ..." />
@@ -87,7 +87,7 @@
                                     </span>
                                 </td>
                                 <td class="col-lg-1 col-md-1 col-sm-1 text-center">
-                                    <button class="btn btn-info" @click="showContactModal(contact)" title="Show Contact Detail">
+                                    <button class="btn btn-info btn-sm" @click="showContactModal(contact)" title="Show Contact Detail">
                                         <Eye />
                                     </button>
                                 </td>
@@ -206,7 +206,7 @@ const handleReplySent = (success: boolean) => {
     border-radius: 0.5rem;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
     border: none;
-    margin-left: auto; /* Đẩy toast sang phải */
+    margin-left: auto;
 }
 
 .toast-header {
@@ -230,7 +230,6 @@ const handleReplySent = (success: boolean) => {
     opacity: 1;
 }
 
-/* Animation cho toast */
 .toast.showing {
     opacity: 0;
 }
