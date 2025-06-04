@@ -1,14 +1,21 @@
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, toRefs } from 'vue';
 import moment from 'moment';
-import { Printer } from 'lucide-vue-next'; // Icon cho nút in
+import { Printer } from 'lucide-vue-next';
+import { api } from '../../lib/axios';
+import { useToast } from 'vue-toastification';
 
 const props = defineProps({
   show: Boolean,
-  bookingData: Object, // Sẽ chứa toàn bộ thông tin booking đã checkout, bao gồm customer, invoice_details, total_payment, etc.
+  bookingData: Object,
 });
 
 const emit = defineEmits(['close']);
+const toast = useToast();
+
+const detailedBookingInfo = ref(null);
+const fetchedInvoiceServices = ref([]);
+const isLoading = ref(false);
 
 const formatCurrency = (value) => {
   if (value === null || value === undefined || isNaN(Number(value))) return '0 VNĐ';
@@ -20,168 +27,191 @@ const formatDateTime = (dateTimeString) => {
   return moment(dateTimeString).format('HH:mm:ss DD/MM/YYYY');
 };
 
-const invoiceServices = computed(() => {
-  // Giả sử bookingData.invoice_details chứa danh sách các dịch vụ đã lưu của hóa đơn này
-  // Backend khi checkout đã tính total_payment bao gồm cả tiền phòng và tiền dịch vụ rồi.
-  // Nếu invoice_details không có sẵn hoặc cần lấy lại, sẽ cần thêm logic fetch.
-  // Trong BookingService->checkout, $priceService đã được tính.
-  // total_payment trong booking sau khi checkout là tổng cuối cùng.
-  // Chúng ta cầnแยก tiền phòng và tiền dịch vụ để hiển thị.
-  // Tạm thời giả định bookingData có các trường:
-  // bookingData.room_price_initial (giá phòng ban đầu/tạm tính trước dịch vụ)
-  // bookingData.invoice_details (danh sách dịch vụ)
-  // bookingData.total_payment (tổng tiền cuối cùng sau checkout)
-  return props.bookingData?.invoice_details || [];
+const displayBookingId = computed(() => detailedBookingInfo.value?.id || props.bookingData?.id || 'N/A');
+const guestNameDisplay = computed(() => detailedBookingInfo.value?.guest_name || props.bookingData?.guest_name || 'N/A');
+const guestEmailDisplay = computed(() => detailedBookingInfo.value?.guest_email || props.bookingData?.guest_email || 'N/A');
+const guestPhoneDisplay = computed(() => detailedBookingInfo.value?.guest_phone || props.bookingData?.guest_phone || 'N/A');
+
+const checkInDateDisplay = computed(() => {
+  const date = detailedBookingInfo.value?.check_in_date || detailedBookingInfo.value?.booking_details?.[0]?.checkin_at;
+  return date ? formatDateTime(date) : 'N/A';
 });
 
-const roomPrice = computed(() => {
-    // total_payment của booking object là tổng tiền cuối cùng (phòng + dịch vụ)
-    // Ta cần giá phòng gốc. Nếu booking object có trường giá phòng gốc (ví dụ: room_charge, initial_room_price)
-    // Hoặc nếu bookingData.total_payment là tổng cuối cùng, và ta có tổng dịch vụ.
-    // total_payment (sau checkout) = room_price_actual + total_service_price
-    // Để đơn giản, nếu bookingData.total_payment đã là tổng cuối cùng,
-    // và ta có thể tính totalServicePrice, thì roomPriceForDisplay = bookingData.total_payment - totalServicePrice.
-    // Tuy nhiên, hàm checkout của bạn cập nhật booking.total_payment = priceRoom + priceService.
-    // Nên total_payment này chính là tổng cuối cùng.
-    // Để hiển thị riêng tiền phòng, chúng ta cần biết giá phòng *trước khi* cộng dịch vụ.
-    // Giả sử có một trường như `room_charge_at_checkout` hoặc `price_room_final` trong `bookingData`.
-    // Hoặc, nếu `bookingData.total_payment` LÀ tổng cuối cùng, và `totalServiceCost` được tính từ `invoiceServices`,
-    // thì `room_price = bookingData.total_payment - totalServiceCost`.
-    // Cho mục đích hiển thị, tôi sẽ tạm giả định `bookingData` có một trường `price_room_final`
-    // Hoặc chúng ta có thể suy luận nếu `total_payment` là tổng cuối cùng.
-    // Trong BookingService, $priceRoom được lấy từ $booking->total_payment *trước khi* update.
-    // Đây chính là giá phòng mà ta cần hiển thị.
-    // Vậy, ta cần một trường trong bookingData đại diện cho giá phòng này.
-    // Giả sử đó là `bookingData.base_room_price` hoặc `bookingData.room_amount_before_services`
+const checkOutDateDisplay = computed(() => {
+  const date = detailedBookingInfo.value?.check_out_date || detailedBookingInfo.value?.booking_details?.[0]?.checkout_at;
+  return date ? formatDateTime(date) : 'N/A';
+});
 
-    // Dựa trên hàm checkout của bạn, `total_payment` trong `Booking` được cập nhật thành `priceRoom + priceService`.
-    // `priceRoom` được lấy từ `booking->total_payment` *trước khi* nó được cập nhật.
-    // Vậy, nếu `bookingData` là booking *sau khi* đã checkout, `bookingData.total_payment` là tổng cuối.
-    // Để lấy `priceRoom` riêng, chúng ta cần backend trả về giá trị này một cách rõ ràng,
-    // hoặc trừ đi tổng giá dịch vụ từ `bookingData.total_payment`.
-
-    // Giả sử backend trả về bookingData.room_price (là giá phòng đã được xác định tại thời điểm checkout, không bao gồm dịch vụ)
-    return props.bookingData?.room_price || 0; // Cần đảm bảo trường này có trong bookingData
+const roomNamesDisplay = computed(() => {
+  if (detailedBookingInfo.value?.booking_details && detailedBookingInfo.value.booking_details.length > 0) {
+    return detailedBookingInfo.value.booking_details.map(detail => detail.room?.name || detail.rooms?.name || 'Không xác định').join(', ');
+  }
+  return props.bookingData?.room?.name || 'N/A';
 });
 
 const totalServiceCost = computed(() => {
-  return invoiceServices.value.reduce((sum, detail) => {
+  return fetchedInvoiceServices.value.reduce((sum, detail) => {
     return sum + (parseFloat(detail.price) * parseInt(detail.quantity));
   }, 0);
 });
 
 const finalTotalAmount = computed(() => {
-  // total_payment từ bookingData đã là tổng cuối cùng sau khi checkout
-  return props.bookingData?.total_payment || 0;
+  return detailedBookingInfo.value?.total_payment || 0;
 });
+
+const roomPrice = computed(() => {
+  return (finalTotalAmount.value || 0) - (totalServiceCost.value || 0);
+});
+
+const fetchFullInvoiceDetails = async (bookingId) => {
+  if (!bookingId) return;
+  isLoading.value = true;
+  try {
+    const bookingResponse = await api.get(`/bookings/${bookingId}`);
+    detailedBookingInfo.value = bookingResponse.data?.data;
+
+    const servicesResponse = await api.get(`/bookings/${bookingId}/invoice-details`);
+    fetchedInvoiceServices.value = servicesResponse.data?.data || [];
+
+  } catch (error) {
+    console.error('Error fetching full invoice details:', error);
+    toast.error('Error.');
+
+    detailedBookingInfo.value = null;
+    fetchedInvoiceServices.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+watch([() => props.show, () => props.bookingData?.id], ([newShow, newBookingId], [oldShow, oldBookingId]) => {
+  if (newShow && newBookingId) {
+    console.log(`Modal is shown for booking ID: ${newBookingId}. Fetching details.`);
+    fetchFullInvoiceDetails(newBookingId);
+  } else if (!newShow) {
+    detailedBookingInfo.value = null;
+    fetchedInvoiceServices.value = [];
+    isLoading.value = false;
+    console.log("Modal closed, resetting data.");
+  }
+}, { immediate: false });
 
 const closeModal = () => {
   emit('close');
 };
 
 const printInvoice = () => {
-  // Logic để ẩn các nút và phần không cần thiết khi in
   const printableArea = document.getElementById('printable-invoice-area');
   if (printableArea) {
     const printContents = printableArea.innerHTML;
     const originalContents = document.body.innerHTML;
-    document.body.innerHTML = printContents;
-    window.print();
-    document.body.innerHTML = originalContents;
-    // Reload lại các event listener nếu cần, hoặc reload trang/component
-    // Đối với Vue, tốt hơn là có một CSS riêng cho print media (@media print)
+
+    const iframe = document.createElement('iframe');
+    iframe.style.height = '0';
+    iframe.style.width = '0';
+    iframe.style.position = 'absolute';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+
+    iframe.contentDocument.write('<html><head><title>Print Invoice</title>');
+
+    Array.from(document.querySelectorAll('style, link[rel="stylesheet"]')).forEach(styleEl => {
+      iframe.contentDocument.head.appendChild(styleEl.cloneNode(true));
+    });
+    iframe.contentDocument.write('</head><body>');
+    iframe.contentDocument.write(printContents);
+    iframe.contentDocument.write('</body></html>');
+    iframe.contentDocument.close();
+
+    iframe.onload = function () {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      document.body.removeChild(iframe);
+    };
   } else {
-    window.print(); // Fallback đơn giản
+    window.print();
   }
 };
 
-watch(() => props.bookingData, (newVal) => {
-    // console.log("Booking data for ViewInvoiceModal:", newVal);
-    // Bạn có thể thêm log ở đây để kiểm tra dữ liệu nhận được
-}, { deep: true });
+watch(() => props.bookingData, (newVal, oldVal) => {
+  console.log("Initial/Prop bookingData for ViewInvoiceModal changed from:", oldVal, "to:", newVal);
+}, { deep: true, immediate: true });
 
 </script>
 
 <template>
-  <div v-if="show" class="modal fade show d-block" tabindex="-1" aria-labelledby="viewInvoiceModalLabel" aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
+  <div v-if="show" class="modal fade show d-block" tabindex="-1" aria-labelledby="viewInvoiceModalLabel"
+    aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="viewInvoiceModalLabel">Chi Tiết Hóa Đơn - Đặt phòng #{{ bookingData?.id }}</h5>
+          <h5 class="modal-title" id="viewInvoiceModalLabel">Booking Invoice</h5>
           <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="printable-invoice-area">
-          <div v-if="!bookingData">
-            <p>Không có dữ liệu hóa đơn để hiển thị.</p>
+          <div v-if="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading...</p>
+          </div>
+          <div v-else-if="!detailedBookingInfo && !isLoading">
+            <p>No invoice found.</p>
           </div>
           <div v-else>
-            <!-- Thông tin khách hàng và đặt phòng -->
             <div class="customer-info mb-4">
-              <h6 class="mb-3">Thông tin Khách hàng & Đặt phòng</h6>
-              <div class="row">
-                <div class="col-md-6">
-                  <p><strong>Khách hàng:</strong> {{ bookingData.guest_name || bookingData.customer?.name || 'N/A' }}</p>
-                  <p><strong>Email:</strong> {{ bookingData.guest_email || bookingData.customer?.email || 'N/A' }}</p>
-                  <p><strong>Số điện thoại:</strong> {{ bookingData.guest_phone || bookingData.customer?.phone || 'N/A' }}</p>
-                </div>
-                <div class="col-md-6">
-                  <p><strong>Mã đặt phòng:</strong> #{{ bookingData.id }}</p>
-                  <p><strong>Ngày nhận phòng:</strong> {{ bookingData.check_in_date ? formatDateTime(bookingData.check_in_date) : 'N/A' }}</p>
-                  <p><strong>Ngày trả phòng:</strong> {{ bookingData.check_out_date ? formatDateTime(bookingData.check_out_date) : 'N/A' }}</p>
-                  <!-- Thêm thông tin phòng nếu cần, ví dụ: bookingData.room.name -->
-                   <p><strong>Phòng:</strong> {{ bookingData.room?.name || 'N/A' }}</p>
-                </div>
+              <div>
+                <p><strong>Guest:</strong> {{ guestNameDisplay }}</p>
+                <p><strong>Email:</strong> {{ guestEmailDisplay }}</p>
+                <p><strong>Phone number:</strong> {{ guestPhoneDisplay }}</p>
+                <p><strong>Check in:</strong> {{ checkInDateDisplay }}</p>
+                <p><strong>Check out:</strong> {{ checkOutDateDisplay }}</p>
               </div>
             </div>
-            <hr/>
 
-            <!-- Chi tiết thanh toán -->
             <div class="payment-details">
-              <h6 class="mb-3">Chi tiết Thanh toán</h6>
-              
-              <!-- Tiền phòng -->
-              <div class="row mb-2">
-                <div class="col-8"><strong>Tiền phòng:</strong></div>
+              <h6 class="mb-3 text-uppercase text"><strong>Payment Details</strong></h6>
 
-                <div class="col-4 text-end">{{ formatCurrency(roomPrice) }}</div>
-              </div>
-              
-              <!-- Danh sách dịch vụ -->
-              <div v-if="invoiceServices.length > 0">
-                <p><strong>Dịch vụ đã sử dụng:</strong></p>
+              <div v-if="fetchedInvoiceServices.length > 0">
+                <p><strong>Services used</strong></p>
                 <table class="table table-sm">
                   <thead>
                     <tr>
-                      <th>Tên Dịch Vụ</th>
-                      <th class="text-center">Số Lượng</th>
-                      <th class="text-end">Đơn Giá</th>
-                      <th class="text-end">Thành Tiền</th>
+                      <th>Name</th>
+                      <th class="text-center">Quantity</th>
+                      <th class="text-end">Unit price</th>
+                      <th class="text-end">Total</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="service in invoiceServices" :key="service.id || service.client_temp_id || service.service_id">
+                    <tr v-for="service in fetchedInvoiceServices" :key="service.id || service.service_id">
                       <td>{{ service.name || service.service?.name }}</td>
                       <td class="text-center">{{ service.quantity }}</td>
                       <td class="text-end">{{ formatCurrency(service.price || service.service?.price) }}</td>
-                      <td class="text-end">{{ formatCurrency((service.price || service.service?.price) * service.quantity) }}</td>
+                      <td class="text-end">{{ formatCurrency((service.price || service.service?.price) *
+                        service.quantity) }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colspan="3" class="text-end fw-bold">Tổng tiền dịch vụ:</td>
+                      <td colspan="3" class="text-end fw-bold">Total service amount:</td>
                       <td class="text-end fw-bold">{{ formatCurrency(totalServiceCost) }}</td>
                     </tr>
                   </tfoot>
+
                 </table>
               </div>
               <div v-else>
-                <p><em>Không có dịch vụ nào được sử dụng.</em></p>
+                <p><em>No services used</em></p>
               </div>
-              <hr/>
-              
-              <!-- Tổng cộng cuối cùng -->
+              <hr />
+              <div class="row mb-2">
+                <div class="col-8"><strong>Room rate:</strong></div>
+                <div class="col-4 text-end">{{ formatCurrency(roomPrice) }}</div>
+              </div>
+              <hr>
               <div class="row mt-3">
-                <div class="col-8 h5"><strong>TỔNG CỘNG THANH TOÁN:</strong></div>
+                <div class="col-8 h5"><strong>Total payment:</strong></div>
                 <div class="col-4 text-end h5">{{ formatCurrency(finalTotalAmount) }}</div>
               </div>
             </div>
@@ -189,10 +219,11 @@ watch(() => props.bookingData, (newVal) => {
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" @click="closeModal">
-            Đóng
+            Close
           </button>
-          <button type="button" class="btn btn-primary" @click="printInvoice" :disabled="!bookingData">
-            <Printer class="me-1" size="16"/> In Hóa Đơn
+          <button type="button" class="btn btn-primary" @click="printInvoice"
+            :disabled="isLoading || !detailedBookingInfo">
+            <Printer class="me-1" size="16" />
           </button>
         </div>
       </div>
@@ -202,36 +233,47 @@ watch(() => props.bookingData, (newVal) => {
 
 <style scoped>
 .modal-dialog {
-  max-width: 800px; 
+  max-width: 800px;
 }
-.table th, .table td {
+
+.table th,
+.table td {
   vertical-align: middle;
 }
-.customer-info p, .payment-details p {
+
+.customer-info p,
+.payment-details p {
   margin-bottom: 0.5rem;
 }
-/* CSS cho bản in */
+
 @media print {
   body * {
     visibility: hidden;
   }
-  #printable-invoice-area, #printable-invoice-area * {
+
+  #printable-invoice-area,
+  #printable-invoice-area * {
     visibility: visible;
   }
+
   #printable-invoice-area {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
   }
-  .modal-footer button { /* Ẩn nút trong bản in nếu chúng nằm ngoài #printable-invoice-area */
+
+  .modal-content {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .modal-header,
+  .modal-footer {
     display: none !important;
   }
-  /* Nếu modal-footer nằm trong #printable-invoice-area và bạn muốn ẩn nó khi in: */
-  /*
-  #printable-invoice-area .modal-footer {
-    display: none !important;
-  }
-  */
 }
-</style> 
+</style>

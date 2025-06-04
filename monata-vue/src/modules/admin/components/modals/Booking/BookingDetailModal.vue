@@ -68,7 +68,7 @@ const confirmBooking = async (bookingId) => {
     try {
       await api.post(`/bookings/${bookingId}/confirm`);
       toast.success('Booking confirmed successfully!');
-      emit('bookingConfirmed'); // Emit an event to parent to refetch data
+      emit('bookingConfirmed');
       close();
     } catch (error) {
       console.error('Error confirming booking:', error.response?.data || error.message);
@@ -83,11 +83,11 @@ const editBooking = () => {
 };
 
 const openViewInvoice = () => {
-  if (selectedBookingDetail.value && selectedBookingDetail.value.status === 4) {
+  if (selectedBookingDetail.value && (selectedBookingDetail.value.status === 3 || selectedBookingDetail.value.status === 4)) {
     bookingDataForInvoice.value = selectedBookingDetail.value;
     isViewInvoiceModalVisible.value = true;
   } else {
-    toast.warn('Không thể xem hóa đơn cho đặt phòng này hoặc thiếu dữ liệu.');
+    toast.warn('Error');
   }
 };
 
@@ -140,21 +140,17 @@ const closeViewInvoiceModal = () => {
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-success"
             @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
           <button type="button" class="btn btn-primary" @click="editBooking">Edit</button>
-          <button v-if="selectedBookingDetail?.status === 4" type="button" class="btn btn-info"
-            @click="openViewInvoice">Xem Hóa Đơn</button>
+          <button v-if="selectedBookingDetail?.status === 3 || selectedBookingDetail?.status === 4" type="button"
+            class="btn btn-info" @click="openViewInvoice">Invoice</button>
         </div>
       </div>
     </div>
   </div>
-  <ViewInvoiceModal
-    :show="isViewInvoiceModalVisible"
-    :booking-data="bookingDataForInvoice"
-    @close="closeViewInvoiceModal"
-  />
+  <ViewInvoiceModal :show="isViewInvoiceModalVisible" :booking-data="bookingDataForInvoice"
+    @close="closeViewInvoiceModal" />
 </template>
 
 <style scoped>
-/* Copy modal-overlay, modal-dialog, modal-content, etc. styles from original component */
 .modal-overlay {
   position: fixed;
   top: 0;

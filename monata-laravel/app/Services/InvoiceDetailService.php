@@ -111,8 +111,9 @@ class InvoiceDetailService
      */
     public function checkBooking(int $id): Booking
     {
-        return $this->booking->where('status', BookingStatus::CHECK_IN)
-            ->where('id', $id)
-            ->firstOrFail();
+        return $this->booking->whereIn('status', [
+            BookingStatus::CHECK_IN,
+            BookingStatus::CHECK_OUT
+        ])->where('id', $id)->firstOrFail();
     }
 }

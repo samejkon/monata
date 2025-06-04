@@ -2,36 +2,33 @@
 import { ref, watch, onMounted, computed } from 'vue';
 import { api } from '../../lib/axios';
 import { useToast } from 'vue-toastification';
-import moment from 'moment'; // Import moment
-import vSelect from 'vue-select'; // Import vue-select
-import 'vue-select/dist/vue-select.css'; // Import vue-select CSS
+import moment from 'moment';
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 import { Trash2 } from 'lucide-vue-next';
 
 const props = defineProps({
   show: Boolean,
-  booking: Object, // Sẽ chứa thông tin booking, đặc biệt là bookingId
+  booking: Object,
 });
 
 const emit = defineEmits(['close', 'invoice-updated']);
 
 const toast = useToast();
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const invoiceDetails = ref([]);
 const availableServices = ref([]);
 const isLoading = ref(false);
-const selectedServiceId = ref(null); // Dùng cho việc thêm dịch vụ mới
+const selectedServiceId = ref(null);
 
-// Helper function to format date and time
 const formatDateTime = (dateTimeString) => {
   if (!dateTimeString) return 'N/A';
   return moment(dateTimeString).format('HH:mm:ss DD/MM/YYYY');
 };
 
-// Lấy danh sách tất cả dịch vụ có sẵn
 const fetchAvailableServices = async () => {
   try {
-    const response = await api.get(`/services`); // Giả sử endpoint là /services
+    const response = await api.get(`/services`);
     availableServices.value = response.data?.data || [];
   } catch (error) {
     console.error('Error fetching available services:', error);
@@ -39,19 +36,15 @@ const fetchAvailableServices = async () => {
   }
 };
 
-// Lấy chi tiết hóa đơn hiện tại của booking
 const fetchInvoiceDetails = async (bookingId) => {
   if (!bookingId) return;
   isLoading.value = true;
   try {
-    // Backend: InvoiceDetailService->get($id) which returns InvoiceDetailResource::collection()
     const response = await api.get(`/bookings/${bookingId}/invoice-details`);
-    // Access data using response.data?.data as Resource Collections are wrapped in a 'data' key
     invoiceDetails.value = response.data?.data || [];
   } catch (error) {
     console.error('Error fetching invoice details:', error);
-    invoiceDetails.value = []; // Reset nếu có lỗi
-    // toast.error('Không thể tải chi tiết hóa đơn.'); // Có thể không cần toast ở đây nếu booking mới chưa có hóa đơn
+    invoiceDetails.value = [];
   } finally {
     isLoading.value = false;
   }
@@ -61,7 +54,6 @@ watch(() => props.booking, (newBooking) => {
   if (newBooking && newBooking.id && props.show) {
     fetchInvoiceDetails(newBooking.id);
   } else if (!props.show) {
-    // Reset khi modal đóng
     invoiceDetails.value = [];
     selectedServiceId.value = null;
   }
@@ -73,7 +65,7 @@ watch(() => props.show, (newVal) => {
     if (availableServices.value.length === 0) {
       fetchAvailableServices();
     }
-  } else if (!newVal) { // Thêm else if để reset khi modal đóng bằng cách khác (vd: props.show đổi từ ngoài)
+  } else if (!newVal) {
     invoiceDetails.value = [];
     selectedServiceId.value = null;
   }
@@ -87,15 +79,15 @@ const addServiceToInvoice = () => {
   const serviceToAdd = availableServices.value.find(s => s.id === selectedServiceId.value);
   if (serviceToAdd) {
     invoiceDetails.value.push({
-      id: null, // ID này sẽ được gán bởi backend nếu là item mới
-      client_temp_id: Date.now() + Math.random(), // Unique key for v-for before saving
+      id: null,
+      client_temp_id: Date.now() + Math.random(),
       service_id: serviceToAdd.id,
       name: serviceToAdd.name,
       price: serviceToAdd.price,
-      quantity: 1, // Default quantity to 1 for new entries
-      added_this_session_at: new Date(), // Timestamp for this session addition
+      quantity: 1,
+      added_this_session_at: new Date(),
     });
-    selectedServiceId.value = null; // Reset lựa chọn
+    selectedServiceId.value = null;
   }
 };
 
@@ -103,9 +95,8 @@ const removeServiceFromInvoice = async (detail, index) => {
   const confirmation = confirm(`Bạn có chắc muốn xóa dịch vụ "${detail.name}" khỏi hóa đơn?`);
   if (!confirmation) return;
 
-  if (detail.id) { // Nếu dịch vụ đã có trong CSDL (có ID)
+  if (detail.id) {
     try {
-      // Backend: InvoiceDetailService->deleteService(int $id, int $idInvoice)
       await api.delete(`/bookings/${props.booking.id}/invoice-details/${detail.id}`);
       toast.success(`Đã xóa dịch vụ "${detail.name}".`);
       invoiceDetails.value.splice(index, 1);
@@ -114,7 +105,7 @@ const removeServiceFromInvoice = async (detail, index) => {
       console.error('Error deleting service from invoice:', error);
       toast.error(`Không thể xóa dịch vụ "${detail.name}".`);
     }
-  } else { // Nếu dịch vụ mới thêm ở client, chưa lưu vào CSDL
+  } else {
     invoiceDetails.value.splice(index, 1);
     toast.info(`Đã xóa dịch vụ "${detail.name}" (chưa lưu).`);
   }
@@ -129,12 +120,11 @@ const saveInvoice = async () => {
   try {
     const payload = {
       invoice_details: invoiceDetails.value.map(d => ({
-        id: d.id, // id của invoice_detail (nếu có, cho update)
+        id: d.id,
         service_id: d.service_id,
         quantity: d.quantity,
       })),
     };
-    // Backend: InvoiceDetailService->upSert(array $data, int $id)
     const response = await api.post(`/bookings/${props.booking.id}/invoice-details`, payload);
     invoiceDetails.value = response.data?.invoice_details || [];
     toast.success('Đã cập nhật hóa đơn thành công!');
@@ -173,28 +163,23 @@ const handleCheckout = async () => {
     toast.error('Không có thông tin đặt phòng để thanh toán.');
     return;
   }
-  // Nút Thanh toán đã có :disabled="isLoading || invoiceDetails.length === 0"
-  // nên không cần kiểm tra invoiceDetails.length ở đây nữa.
 
   isLoading.value = true;
   try {
-    // Bước 1: Lưu chi tiết hóa đơn hiện tại
     const payload = {
       invoice_details: invoiceDetails.value.map(d => ({
-        id: d.id, // id của invoice_detail (nếu có, cho update)
+        id: d.id,
         service_id: d.service_id,
         quantity: d.quantity,
       })),
     };
     const invoiceSaveResponse = await api.post(`/bookings/${props.booking.id}/invoice-details`, payload);
-    // Cập nhật lại invoiceDetails từ phản hồi, phòng trường hợp có ID mới được tạo
     invoiceDetails.value = invoiceSaveResponse.data?.invoice_details || [];
 
-    // Bước 2: Gọi API check-out
     await api.post(`/bookings/${props.booking.id}/check-out`);
 
     toast.success('Thanh toán thành công và hóa đơn đã được cập nhật!');
-    emit('invoice-updated'); // Sự kiện này có thể dùng để làm mới danh sách đặt phòng
+    emit('invoice-updated');
     closeModal();
 
   } catch (error) {
@@ -214,29 +199,28 @@ const handleCheckout = async () => {
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="invoiceServiceModalLabel">Invoice Detail</h5>
+          <h5 class="modal-title" id="invoiceServiceModalLabel"><strong>Service</strong></h5>
           <button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <div v-if="isLoading" class="text-center">
             <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">Đang tải...</span>
+              <span class="visually-hidden">Loading...</span>
             </div>
           </div>
           <div v-else>
             <div class="mb-3">
               <div>
-                <p class="mb-1"><strong>Khách hàng:</strong> {{ booking?.guest_name || 'N/A' }}</p>
+                <p class="mb-1"><strong>Guest:</strong> {{ booking?.guest_name || 'N/A' }}</p>
                 <p class="mb-1"><strong>Email:</strong> {{ booking?.guest_email || 'N/A' }}</p>
-                <p class="mb-1"><strong>Số điện thoại:</strong> {{ booking?.guest_phone || 'N/A' }}</p>
-                <p class="mb-1"><strong>Giá phòng tạm tính:</strong> {{ formatCurrency(booking?.total_payment) }}</p>
+                <p class="mb-1"><strong>Phone number:</strong> {{ booking?.guest_phone || 'N/A' }}</p>
+                <p class="mb-1"><strong>Estimated room rate:</strong> {{ formatCurrency(booking?.total_payment) }}</p>
               </div>
             </div>
             <hr />
-            <!-- Phần thêm dịch vụ -->
             <div class="row mb-3 align-items-end">
               <div class="col-md-8">
-                <label for="serviceSelect" class="form-label">Chọn dịch vụ:</label>
+                <label for="serviceSelect" class="form-label">Select service:</label>
                 <v-select id="serviceSelect" label="name" :options="availableServices" :reduce="service => service.id"
                   v-model="selectedServiceId" placeholder="Search" class="form-control-vue-select">
                   <template #option="option">
@@ -250,25 +234,24 @@ const handleCheckout = async () => {
               <div class="col-md-4">
                 <button class="btn btn-success w-100 mt-auto" @click="addServiceToInvoice"
                   :disabled="!selectedServiceId">
-                  <i class="fas fa-plus"></i> Thêm vào HĐ
+                  <i class="fas fa-plus"></i> Add
                 </button>
               </div>
             </div>
 
-            <!-- Danh sách dịch vụ đã thêm -->
-            <h6>Danh sách dịch vụ đã chọn:</h6>
+            <h6>List of services:</h6>
             <div v-if="invoiceDetails.length === 0" class="alert alert-info">
-              Chưa có dịch vụ nào được thêm vào hóa đơn.
+              No services have been added.
             </div>
             <table v-else class="table table-sm table-bordered">
               <thead>
                 <tr>
-                  <th>Tên Dịch Vụ</th>
-                  <th style="width: 150px;">Đơn Giá</th>
-                  <th style="width: 120px;">Số Lượng</th>
-                  <th style="width: 180px;">Thời gian</th>
-                  <th style="width: 150px;">Thành Tiền</th>
-                  <th style="width: 100px;">Hành Động</th>
+                  <th>Name</th>
+                  <th style="width: 150px;">Unit Price</th>
+                  <th style="width: 120px;">Quantity</th>
+                  <th style="width: 180px;">Time</th>
+                  <th style="width: 150px;">Total</th>
+                  <th style="width: 100px;"></th>
                 </tr>
               </thead>
               <tbody>
@@ -294,7 +277,7 @@ const handleCheckout = async () => {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+                  <td colspan="4" class="text-end fw-bold">Total amount:</td>
                   <td colspan="2" class="fw-bold">{{ formatCurrency(totalAmount) }}</td>
                 </tr>
               </tfoot>
@@ -302,15 +285,16 @@ const handleCheckout = async () => {
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" @click="closeModal">Đóng</button>
+          <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
           <button type="button" class="btn btn-primary" @click="saveInvoice"
             :disabled="isLoading || invoiceDetails.length === 0">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Lưu Hóa Đơn
+            Save
           </button>
-          <button type="button" class="btn btn-success" @click="handleCheckout" :disabled="isLoading || invoiceDetails.length === 0">
+          <button type="button" class="btn btn-success" @click="handleCheckout"
+            :disabled="isLoading || invoiceDetails.length === 0">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Thanh toán
+            Check out
           </button>
         </div>
       </div>
@@ -321,7 +305,6 @@ const handleCheckout = async () => {
 <style scoped>
 .modal-dialog {
   max-width: 1000px;
-  /* Kích thước lớn hơn cho modal */
 }
 
 .table th,
@@ -329,71 +312,49 @@ const handleCheckout = async () => {
   vertical-align: middle;
 }
 
-/* Thêm style nếu cần thiết */
-/* Style to make vue-select look more like a Bootstrap form-control */
 .form-control-vue-select :deep(.vs__dropdown-toggle) {
   border-color: #ced4da;
   border-radius: 0.25rem;
-  /* Bootstrap's default border-radius */
   min-height: calc(1.5em + 0.75rem + 2px);
-  /* Match Bootstrap form-control height */
   display: flex;
   align-items: center;
 }
 
 .form-control-vue-select.is-invalid :deep(.vs__dropdown-toggle) {
   border-color: #dc3545;
-  /* Bootstrap's danger color for invalid fields */
 }
 
 .form-control-vue-select :deep(.vs__search::placeholder),
 .form-control-vue-select :deep(.vs__search) {
   margin-top: 0;
   padding-left: 0.1rem;
-  /* Minor adjustment for alignment */
   padding-top: 0;
   padding-bottom: 0;
   font-size: 1rem;
-  /* Match Bootstrap's default font size */
   line-height: 1.5;
-  /* Match Bootstrap's default line-height */
-  /* height ensure it doesn't overflow when empty */
   height: calc(1.5em + 0.75rem - 4px);
-  /* Approximate height for input area within vue-select */
 }
 
 .form-control-vue-select :deep(.vs__selected) {
   margin: 0;
-  /* Reset margin */
   padding: 0 0.25rem 0 0.1rem;
-  /* Adjust padding for selected item to align better */
   font-size: 1rem;
-  /* Match Bootstrap's default font size */
   line-height: 1.5;
-  /* Match Bootstrap's default line-height */
-  /* Prevent selected item from pushing layout too much */
   max-width: calc(100% - 30px);
-  /* Adjust based on space for icons */
 }
 
 .form-control-vue-select :deep(.vs__actions) {
   padding: 0 6px 0 3px;
-  /* Adjust padding for clear/dropdown toggle icons */
   align-self: center;
-  /* Vertically center icons */
 }
 
 .form-control-vue-select :deep(.vs__clear),
 .form-control-vue-select :deep(.vs__open-indicator) {
   fill: #495057;
-  /* Bootstrap's default text color for icons */
 }
 
-/* Ensure the select itself aligns well if in a form group or similar */
 .form-control-vue-select {
   padding: 0;
-  /* vue-select handles its own internal padding */
   line-height: normal;
-  /* Reset line-height that might be inherited */
 }
 </style>

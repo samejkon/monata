@@ -1,13 +1,13 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api/admin',
+  baseURL: 'http://localhost:8800/api/admin',
   withCredentials: true,
   withXSRFToken: true,
 })
 
 const csrf = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://localhost:8800',
   withCredentials: true,
 })
 

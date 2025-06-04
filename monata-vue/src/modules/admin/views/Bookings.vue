@@ -208,7 +208,7 @@ const closeBookingDetailModal = () => {
 };
 
 const handleBookingConfirmed = () => {
-  fetchBookings(); // Re-fetch bookings after confirmation
+  fetchBookings(); 
 };
 
 const openEditBookingModal = (booking) => {
@@ -226,7 +226,6 @@ const handleBookingUpdated = () => {
   closeEditBookingModal();
 };
 
-// Functions for CreateBookingModal
 const openCreateBookingModal = () => {
   showCreateBookingModal.value = true;
 };
@@ -239,7 +238,6 @@ const handleBookingCreated = () => {
   fetchBookings();
 };
 
-// Functions for InvoiceServiceModal
 const openInvoiceServiceModal = (booking) => {
   selectedBookingForInvoice.value = booking;
   showInvoiceServiceModal.value = true;
@@ -251,16 +249,15 @@ const closeInvoiceServiceModal = () => {
 };
 
 const handleInvoiceUpdated = () => {
-  fetchBookings(); // Re-fetch bookings if invoice update might change booking display
+  fetchBookings(); 
 };
 
-// Functions for ViewInvoiceModal
 const openViewInvoiceModal = (booking) => {
-  if (booking && booking.status === 4) {
+  if (booking && (booking.status === 3 || booking.status === 4)) {
     bookingDataForInvoiceView.value = booking;
     isViewInvoiceModalVisible.value = true;
   } else {
-    toast.warn('Không thể xem hóa đơn cho đặt phòng này hoặc thiếu dữ liệu.');
+    toast.warn('Không thể xem hóa đơn cho các đặt phòng chưa check-in hoặc không ở trạng thái phù hợp.');
   }
 };
 
@@ -273,7 +270,7 @@ const checkInBooking = async (bookingId) => {
   try {
     const response = await api.post(`/bookings/${bookingId}/check-in`);
     toast.success('Check-in successful!');
-    await fetchBookings(); // Re-fetch to update the UI
+    await fetchBookings(); 
   } catch (error) {
     console.error('Error during check-in:', error);
     toast.error('Failed to check-in booking. Please try again.');
@@ -345,8 +342,8 @@ const checkInBooking = async (bookingId) => {
                   <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
-                  <button v-if="booking.status === 4" type="button" class="btn btn-info btn-sm ms-2"
-                    @click="openViewInvoiceModal(booking)">Xem Hóa Đơn</button>
+                  <button v-if="booking.status === 3 || booking.status === 4" type="button"
+                    class="btn btn-info btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
                 </div>
               </div>
             </div>
