@@ -72,6 +72,8 @@ class BookingService
 
                 $item['price_per_day'] = $price;
 
+                $item['id'] = Arr::get($item, 'id');
+
                 return $item;
             })->toArray();
 
@@ -169,6 +171,11 @@ class BookingService
                 $total += $itemTotal;
 
                 $item['price_per_day'] = $price;
+
+                // Ensure all required fields are present
+                $item['id'] = $item['id'] ?? null;
+                $item['created_at'] = now();
+                $item['updated_at'] = now();
 
                 return $item;
             })->toArray();
