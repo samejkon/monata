@@ -1,6 +1,6 @@
 // import Index from './views/Index.vue'
 import Index from '../customer/views/Index.vue'
- import Contact from '../customer/views/Contact.vue'
+import Contact from '../customer/views/Contact.vue'
 export default [
   {
     path: '/',
@@ -26,4 +26,9 @@ export default [
     path: '/contact',
     component: Contact,
   },
+  {
+    path: '/room/:id',
+    name: 'room',
+    component: () => import('./views/RoomDetail.vue'),
+  }
 ]
