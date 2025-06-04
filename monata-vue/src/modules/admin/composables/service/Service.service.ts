@@ -38,9 +38,7 @@ export const useService = () => {
                 params.status = Number(status);
             }
 
-            console.log('Fetching services with params:', params);
             const response = await getServices(params);
-            console.log('Services response:', response);
 
             if (response && response.data) {
                 services.value = response.data;
@@ -158,7 +156,6 @@ export const useService = () => {
         if (searchForm.price) query.price = searchForm.price;
         if (searchForm.status !== '') query.status = searchForm.status;
 
-        console.log('Search query:', query);
         router.push({ query });
     };
     
@@ -169,8 +166,12 @@ export const useService = () => {
         searchForm.status = status !== undefined ? String(status) : '';
         searchForm.per_page = per_page ? String(per_page) : '10';
         
-        console.log('Synced form values:', searchForm);
     };
+
+    const formatCurrency = (value) => {
+        if (value === null || value === undefined) return '';
+        return new Intl.NumberFormat('en-GB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' VNĐ';
+      };
 
     return {
         services,
@@ -192,5 +193,6 @@ export const useService = () => {
         startCreate,
         cancelCreate,
         handleCreate,
+        formatCurrency
     };
 };
