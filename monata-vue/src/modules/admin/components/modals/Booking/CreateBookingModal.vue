@@ -334,7 +334,7 @@ const createBooking = async () => {
                 </thead>
                 <tbody>
                   <tr v-for="room in availableRoomsForSelection" :key="room.id">
-                    <td>
+                    <td class="text-center align-middle">
                       <input type="checkbox" :id="`room-checkbox-${room.id}`" :value="room.id"
                         v-model="selectedAvailableRoomIds">
                     </td>

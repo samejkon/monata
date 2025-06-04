@@ -16,12 +16,14 @@ class BookingDetailResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'room_id' => $this->room_id,
-            'room_name' => $this->rooms->name,
-            'checkin_at' => Carbon::parse($this->checkin_at)->format('Y-m-d H:i'),
-            'checkout_at' => Carbon::parse($this->checkout_at)->format('Y-m-d H:i'),
+            'id'            => $this->id,
+            'room_id'       => $this->room_id,
+            'room_name'     => optional($this->room)->name ?? 'N/A',
+            'room_type'     => optional(optional($this->room)->roomType)->name ?? 'N/A',
+            'checkin_at'    => $this->checkin_at ? Carbon::parse($this->checkin_at)->format('Y-m-d H:i') : null,
+            'checkout_at'   => $this->checkout_at ? Carbon::parse($this->checkout_at)->format('Y-m-d H:i') : null,
             'price_per_day' => $this->price_per_day,
-            'id' => $this->id,
+            'status'        => $this->status,
         ];
     }
 }

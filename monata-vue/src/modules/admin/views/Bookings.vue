@@ -9,6 +9,7 @@ const toast = useToast();
 
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
 import CreateBookingModal from '../components/modals/Booking/CreateBookingModal.vue';
+import EditBookingModal from '../components/modals/Booking/EditBookingModal.vue';
 import InvoiceServiceModal from '../components/modals/InvoiceServiceModal.vue';
 import ViewInvoiceModal from '../components/modals/ViewInvoiceModal.vue';
 
@@ -207,8 +208,18 @@ const closeBookingDetailModal = () => {
   selectedBookingDetail.value = null;
 };
 
-const handleBookingConfirmed = () => {
-  fetchBookings(); 
+const handleBookingConfirmed = async () => {
+  const currentBookingId = selectedBookingDetail.value?.id;
+  await fetchBookings();
+  if (currentBookingId) {
+    const updatedBooking = rawBookings.value.find(b => b.id === currentBookingId);
+    if (updatedBooking) {
+      selectedBookingDetail.value = updatedBooking;
+    } else {
+      // If booking not found (e.g. deleted or status changed drastically), close modal
+      closeBookingDetailModal();
+    }
+  }
 };
 
 const openEditBookingModal = (booking) => {
@@ -249,7 +260,7 @@ const closeInvoiceServiceModal = () => {
 };
 
 const handleInvoiceUpdated = () => {
-  fetchBookings(); 
+  fetchBookings();
 };
 
 const openViewInvoiceModal = (booking) => {
@@ -270,7 +281,7 @@ const checkInBooking = async (bookingId) => {
   try {
     const response = await api.post(`/bookings/${bookingId}/check-in`);
     toast.success('Check-in successful!');
-    await fetchBookings(); 
+    await fetchBookings();
   } catch (error) {
     console.error('Error during check-in:', error);
     toast.error('Failed to check-in booking. Please try again.');
@@ -333,7 +344,7 @@ const checkInBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
                   <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
                     @click="checkInBooking(booking.id)">Check In</button>
@@ -342,8 +353,8 @@ const checkInBooking = async (bookingId) => {
                   <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
-                  <button v-if="booking.status === 3 || booking.status === 4" type="button"
-                    class="btn btn-info btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
+                  <button v-if="booking.status === 4" type=" button" class="btn btn-info btn-sm ms-2"
+                    @click="openViewInvoiceModal(booking)">Invoice</button>
                 </div>
               </div>
             </div>
@@ -359,6 +370,9 @@ const checkInBooking = async (bookingId) => {
 
   <CreateBookingModal :show="showCreateBookingModal" :initial-checkin-date="selectedDate"
     @close="closeCreateBookingModal" @booking-created="handleBookingCreated" />
+
+  <EditBookingModal :show="showEditBookingModal" :booking="bookingToEdit" @close="closeEditBookingModal"
+    @booking-updated="handleBookingUpdated" />
 
   <InvoiceServiceModal :show="showInvoiceServiceModal" :booking="selectedBookingForInvoice"
     @close="closeInvoiceServiceModal" @invoice-updated="handleInvoiceUpdated" />

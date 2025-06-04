@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BookingDetailStatus;
 use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\BookingDetail;
@@ -95,7 +96,7 @@ class BookingService
     public function findById($id): Booking
     {
         $booking = $this->model->with([
-            'bookingDetails.rooms.roomType',
+            'bookingDetails.room.roomType',
         ])->findOrFail($id);
 
         return $booking;
@@ -133,11 +134,24 @@ class BookingService
                 'note'           => Arr::get($data, 'note'),
             ];
 
-            $idBookingDetails = collect($data['booking_details'])->pluck('id')->toArray();
+            $idBookingDetails = collect($data['booking_details'])->pluck('id')->filter()->toArray();
 
-            BookingDetail::where('booking_id', $booking->id)
-                ->whereNotIn('id', $idBookingDetails)
-                ->delete();
+            // Check if any booking detail to be removed is already checked in
+            $detailsToRemoveQuery = BookingDetail::where('booking_id', $booking->id);
+            if (!empty($idBookingDetails)) { // If $idBookingDetails is empty, it means all details are to be removed
+                $detailsToRemoveQuery->whereNotIn('id', $idBookingDetails);
+            }
+
+            $checkedInDetailExistsForRemoval = (clone $detailsToRemoveQuery)
+                ->where('status', BookingDetailStatus::CHECK_IN)
+                ->exists();
+
+            if ($checkedInDetailExistsForRemoval) {
+                throw new \Exception("Không thể xóa phòng đã được check-in.");
+            }
+
+            // Proceed with deletion if no checked-in rooms are affected
+            $detailsToRemoveQuery->delete();
 
             $rooms = $this->getRoomsByBookingDetails($data['booking_details']);
 
@@ -196,7 +210,7 @@ class BookingService
             ->pluck('room_id')
             ->unique();
 
-        $availableRooms = $this->room->whereNotIn('id', $occupiedRoomIds)->get();
+        $availableRooms = $this->room->with('roomType')->whereNotIn('id', $occupiedRoomIds)->get();
 
         return $availableRooms;
     }
@@ -391,14 +405,31 @@ class BookingService
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
-    public function checkInGuest($id): bool
+    public function checkInGuest(int $idBooking, array $detailIds): bool
     {
-        $booking = $this->model->where('status', BookingStatus::CONFIRMED)->findOrFail($id);
+        $booking = $this->model
+            ->where('status', BookingStatus::CONFIRMED)
+            ->findOrFail($idBooking);
 
-        $booking->status = BookingStatus::CHECK_IN;
-        $booking->check_in = Carbon::now();
+        $this->bookingDetail
+            ->whereIn('id', $detailIds)
+            ->update([
+                'checkin' => Carbon::now(),
+                'status' => BookingDetailStatus::CHECK_IN,
+            ]);
 
-        return $booking->save();
+        $pendingRooms = $this->bookingDetail
+            ->where('booking_id', $idBooking)
+            ->where('status', '<>', BookingDetailStatus::CHECK_IN)
+            ->exists();
+
+        if (!$pendingRooms) {
+            $booking->status = BookingStatus::CHECK_IN;
+            $booking->check_in = Carbon::now();
+            return $booking->save();
+        }
+
+        return true;
     }
 
     /**
