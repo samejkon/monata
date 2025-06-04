@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
+import ViewInvoiceModal from '../ViewInvoiceModal.vue';
 
 const toast = useToast();
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -21,6 +22,8 @@ const props = defineProps({
 const emit = defineEmits(['close', 'bookingConfirmed', 'editBooking']);
 
 const selectedBookingDetail = ref(props.booking);
+const isViewInvoiceModalVisible = ref(false);
+const bookingDataForInvoice = ref(null);
 
 watch(() => props.booking, (newVal) => {
   selectedBookingDetail.value = newVal;
@@ -65,7 +68,7 @@ const confirmBooking = async (bookingId) => {
     try {
       await api.post(`/bookings/${bookingId}/confirm`);
       toast.success('Booking confirmed successfully!');
-      emit('bookingConfirmed'); // Emit an event to parent to refetch data
+      emit('bookingConfirmed');
       close();
     } catch (error) {
       console.error('Error confirming booking:', error.response?.data || error.message);
@@ -77,6 +80,20 @@ const confirmBooking = async (bookingId) => {
 const editBooking = () => {
   emit('editBooking', selectedBookingDetail.value);
   close();
+};
+
+const openViewInvoice = () => {
+  if (selectedBookingDetail.value && (selectedBookingDetail.value.status === 3 || selectedBookingDetail.value.status === 4)) {
+    bookingDataForInvoice.value = selectedBookingDetail.value;
+    isViewInvoiceModalVisible.value = true;
+  } else {
+    toast.warn('Error');
+  }
+};
+
+const closeViewInvoiceModal = () => {
+  isViewInvoiceModalVisible.value = false;
+  bookingDataForInvoice.value = null;
 };
 </script>
 
@@ -123,14 +140,17 @@ const editBooking = () => {
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-success"
             @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
           <button type="button" class="btn btn-primary" @click="editBooking">Edit</button>
+          <button v-if="selectedBookingDetail?.status === 3 || selectedBookingDetail?.status === 4" type="button"
+            class="btn btn-info" @click="openViewInvoice">Invoice</button>
         </div>
       </div>
     </div>
   </div>
+  <ViewInvoiceModal :show="isViewInvoiceModalVisible" :booking-data="bookingDataForInvoice"
+    @close="closeViewInvoiceModal" />
 </template>
 
 <style scoped>
-/* Copy modal-overlay, modal-dialog, modal-content, etc. styles from original component */
 .modal-overlay {
   position: fixed;
   top: 0;

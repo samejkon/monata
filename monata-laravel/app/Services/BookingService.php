@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\BookingDetail;
+use App\Models\InvoiceDetail;
 use App\Models\Room;
 use App\Models\User;
 use Carbon\Carbon;
@@ -93,7 +94,9 @@ class BookingService
      */
     public function findById($id): Booking
     {
-        $booking = $this->model->findOrFail($id);
+        $booking = $this->model->with([
+            'bookingDetails.rooms.roomType',
+        ])->findOrFail($id);
 
         return $booking;
     }
@@ -306,20 +309,21 @@ class BookingService
     /**
      * Scope a query to only include overlapping time ranges.
      *
-     * This scope is used to check if a booking overlaps with another booking.
-     * It takes two dates, a start and an end date, and queries the database
-     * to find any bookings whose check-in date is before the given end date
-     * and whose check-out date is after the given start date.
+     * This scope takes a start and end time, and returns a query that only
+     * includes records that have a check-in time before the end time and a
+     * check-out time after the start time.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  string  $start  The start date.
-     * @param  string  $end  The end date.
+     * @param  string  $start  The start time.
+     * @param  string  $end  The end time.
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function scopeTimeOverlap($query, $start, $end)
     {
-        return $query->where('checkin_at', '<', $end)
-            ->where('checkout_at', '>', $start);
+        return $query->where(function ($q) use ($start, $end) {
+            $q->where('checkin_at', '<', $end)
+                ->where('checkout_at', '>', $start);
+        });
     }
 
     /**
@@ -395,5 +399,40 @@ class BookingService
         $booking->check_in = Carbon::now();
 
         return $booking->save();
+    }
+
+    /**
+     * Check out a booking and update its total payment and status.
+     *
+     * This method retrieves a booking by its ID, calculates the total service cost
+     * from the invoice details table, and then updates the booking's total payment
+     * and status. The new status is set to 'checked_out', and the total payment
+     * is set to the calculated total service cost.
+     *
+     * @param  int  $bookingId  The ID of the booking to be checked out.
+     * @return \App\Models\Booking  The updated booking instance.
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
+     */
+    public function checkout(int $bookingId): Booking
+    {
+        return DB::transaction(function () use ($bookingId) {
+            $booking = Booking::findOrFail($bookingId);
+
+            $priceRoom = $booking->total_payment;
+
+            $priceService = InvoiceDetail::where('booking_id', $bookingId)
+                ->select(DB::raw('SUM(price * quantity) as total'))
+                ->value('total');
+
+            $totalPayment = $priceRoom + $priceService;
+
+            $booking->update([
+                'total_payment' => $totalPayment,
+                'status' => BookingStatus::CHECK_OUT,
+            ]);
+
+            return $booking;
+        });
     }
 }

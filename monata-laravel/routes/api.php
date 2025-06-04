@@ -25,6 +25,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
     Route::post('/bookings/{booking}/confirm', [AdminBookingController::class, 'confirm']);
     Route::post('/bookings/{booking}/check-in', [AdminBookingController::class, 'checkInGuest']);
+    Route::post('/bookings/{booking}/check-out', [AdminBookingController::class, 'checkOutGuest']);
 
     Route::get('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'index']);
     Route::post('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'editSave']);
@@ -40,7 +41,7 @@ Route::prefix('admin')->group(function () {
     Route::apiResource('contacts', ContactController::class);
     Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);
     Route::post('contacts/{id}/send-mail', [ContactController::class, 'sendMail']);
-  //
+    //
 });
 
 Route::middleware('auth:sanctum')->group(function () {
