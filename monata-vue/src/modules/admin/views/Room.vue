@@ -415,19 +415,19 @@ onUnmounted(() => {
             </div>
             <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
               class="img-fluid mb-3 rounded-2 shadow-sm room-single-thumbnail">
-            <p v-if="roomDetails.price"><strong>Giá:</strong> {{ roomDetails.price }}</p>
-            <p><strong>Trạng thái:</strong>
+            <p v-if="roomDetails.price"><strong>Price:</strong> {{ roomDetails.price }}</p>
+            <p><strong>Status:</strong>
               <span
                 :class="{ 'badge bg-success text-white': roomDetails.status === 1, 'badge bg-secondary text-white': roomDetails.status !== 1 }">
                 {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
               </span>
             </p>
-            <p v-if="roomDetails.description"><strong>Mô tả:</strong> {{ roomDetails.description }}</p>
+            <p v-if="roomDetails.description"><strong>Description:</strong> {{ roomDetails.description }}</p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-              @click="closeRoomDetailsModal">Đóng</button>
+              @click="closeRoomDetailsModal">Close</button>
           </div>
         </div>
       </div>
