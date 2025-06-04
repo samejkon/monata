@@ -48,9 +48,9 @@ onMounted(async () => {
 const fetchRoomTypes = async () => {
   loadingRoomTypes.value = true
   errorRoomTypes.value = null
-  
+
   try {
-    const response = await api.get('admin/room-types')
+    const response = await api.get('/room-types')
     roomTypes.value = response.data.data
   } catch (error) {
     console.error('Error fetching room types:', error)
@@ -110,7 +110,7 @@ const submitForm = async () => {
   })
 
   try {
-    const response = await api.post('admin/rooms', formData, {
+    const response = await api.post('/rooms', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -148,7 +148,7 @@ const submitForm = async () => {
           <form @submit.prevent="submitForm">
             <div class="mb-3">
               <label for="name" class="form-label">Name:</label>
-              <input type="text" class="form-control" id="name" v-model="room.name" >
+              <input type="text" class="form-control" id="name" v-model="room.name">
               <div v-if="validationErrors.name" class="invalid-feedback d-block">
                 {{ validationErrors.name[0] }}
               </div>
@@ -157,7 +157,7 @@ const submitForm = async () => {
             <div class="mb-3 row">
               <div class="col-md-6">
                 <label for="room_type" class="form-label">Type:</label>
-                <select class="form-select" id="room_type" v-model="room.room_type" >
+                <select class="form-select" id="room_type" v-model="room.room_type">
                   <option v-for="type in roomTypes" :key="type.id" :value="type.id">{{ type.name }}
                   </option>
                 </select>
@@ -200,7 +200,7 @@ const submitForm = async () => {
               <label for="images" class="form-label">Add Room Images (Select Multiple):</label>
               <input type="file" class="form-control" id="images" @change="addImages" accept="image/*" multiple>
               <div v-if="validationErrors.images" class="invalid-feedback d-block">
-                 {{ validationErrors.images[0] }}
+                {{ validationErrors.images[0] }}
               </div>
             </div>
 

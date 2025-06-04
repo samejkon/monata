@@ -22,6 +22,7 @@ class RoomResource extends JsonResource
             'room_type' => $this->roomType->name,
             'thumbnail_path' => asset('storage/' . $this->thumbnail_path),
             'status' => $this->status,
+            'properties' => $this->roomType->properties,
         ];
     }
 }
