@@ -68,9 +68,12 @@ async function logout() {
           <router-link to="/login" class="nav-item text-decor-none text-light" v-if="!authStore.authenticated">
             Sign in to your account
           </router-link>
-          <form @submit.prevent="logout()" v-if="authStore.authenticated">
-            <button type="submit" class="btn btn-danger">Logout</button>
-          </form>
+          <router-link to="/profile" class="text-light" v-if="authStore.authenticated">
+            Profile /
+          </router-link>
+          <a href="#" @click.prevent="logout()" class="text-light" v-if="authStore.authenticated">
+            &nbsp; Logout
+          </a>
           <button class="nav-booking" onclick="toggleModal()">
             Book A Room
           </button>
