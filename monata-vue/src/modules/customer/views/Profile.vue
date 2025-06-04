@@ -4,6 +4,9 @@ import { ref, onMounted } from 'vue';
 import { api } from '../lib/axios';
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import Footer from '@/modules/customer/components/layouts/Footer.vue'
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 
 interface User {
   name: string;
@@ -45,7 +48,6 @@ const currentPassword = ref('');
 const newPassword = ref('');
 const confirmPassword = ref('');
 const isSubmittingPassword = ref(false);
-const passwordChangeMessage = ref<string | null>(null);
 const passwordChangeError = ref<string | null>(null);
 const currentPasswordError = ref<string | null>(null);
 const newPasswordError = ref<string | null>(null);
@@ -166,7 +168,6 @@ const resetPasswordForm = (): void => {
   currentPassword.value = '';
   newPassword.value = '';
   confirmPassword.value = '';
-  passwordChangeMessage.value = null;
   passwordChangeError.value = null;
   currentPasswordError.value = null;
   newPasswordError.value = null;
@@ -187,7 +188,6 @@ const toggleChangePasswordForm = (): void => {
 };
 
 const resetErrors = (): void => {
-  passwordChangeMessage.value = null;
   passwordChangeError.value = null;
   currentPasswordError.value = null;
   newPasswordError.value = null;
@@ -205,7 +205,7 @@ const handleChangePassword = async (): Promise<void> => {
       new_password_confirmation: confirmPassword.value
     });
 
-    passwordChangeMessage.value = 'Password changed successfully!';
+    toast.success("Change password successfully!")
     resetPasswordForm();
   } catch (err: any) {
     console.error('Error changing password:', err);
@@ -423,9 +423,6 @@ onMounted(() => {
                 <div v-if="passwordChangeError && !currentPasswordError && !newPasswordError && !confirmPasswordError"
                   class="alert alert-danger" role="alert">
                   {{ passwordChangeError }}
-                </div>
-                <div v-if="passwordChangeMessage" class="alert alert-success" role="alert">
-                  {{ passwordChangeMessage }}
                 </div>
                 <button type="submit" class="btn btn-primary me-2" :disabled="isSubmittingPassword">
                   <span v-if="isSubmittingPassword" class="spinner-border spinner-border-sm" role="status"
