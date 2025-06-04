@@ -142,7 +142,7 @@
                                         </div>
                                     </template>
                                     <template v-else>
-                                        {{ service.price }}
+                                        {{ formatCurrency(service.price)}}
                                     </template>
                                 </td>
                                 <td class="col-lg-3 col-md-3 col-sm-3">
@@ -226,6 +226,7 @@ const {
     startCreate,
     cancelCreate,
     handleCreate,
+    formatCurrency
 } = useService();
 
 watch(() => route.query, (newQuery) => {

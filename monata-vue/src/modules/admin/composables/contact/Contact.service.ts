@@ -33,9 +33,7 @@ export const useContact = () => {
                 params.status = Number(status);
             }
 
-            console.log('Fetching services with params:', params);
             const response = await getContacts(params);
-            console.log('Services response:', response);
 
             if (response && response.data) {
                 contacts.value = response.data;
@@ -67,7 +65,6 @@ export const useContact = () => {
         if (searchForm.guest_email) query.guest_email = searchForm.guest_email;
         if (searchForm.status !== '') query.status = searchForm.status;
 
-        console.log('Search query:', query);
         router.push({ query });
     };
     
@@ -79,7 +76,6 @@ export const useContact = () => {
         searchForm.status = status !== undefined ? String(status) : '';
         searchForm.per_page = per_page ? String(per_page) : '10';
         
-        console.log('Synced form values:', searchForm);
     };
 
     const isContactModalOpen = ref(false);
