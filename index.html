@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            margin-top: 20px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-header {
+            background-color: #0d6efd;
+            /* Primary blue */
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .form-label {
+            font-weight: 500;
+        }
+
+        .table thead {
+            background-color: #e9ecef;
+        }
+        /* Optional: Hide the room availability section by default */
+        #roomAvailabilitySection {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container py-4">
+        <div class="card">
+            <div class="card-header">
+    Cập Nhật Booking
+            </div>
+            <div class="card-body">
+                <form id="updateBookingForm">
+                    <h5 class="mb-3">Thông tin Khách hàng</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="guestName" class="form-label">Khách hàng</label>
+                            <input type="text" class="form-control" id="guestName" value="Lê Quốc Phải">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="guestEmail" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="guestEmail" value="lequocphaikl@gmail.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="guestPhone" class="form-label">Điện thoại</label>
+                            <input type="tel" class="form-control" id="guestPhone" value="0375616574">
+                        </div>
+                    </div>
+
+                    <h5 class="mb-3">Thông tin Booking</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="totalPrice" class="form-label">Tổng giá</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="totalPrice" value="5150000" disabled>
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="deposit" class="form-label">Tiền đặt cọc</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="deposit" value="">
+                                <span class="input-group-text">VNĐ</span>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label for="bookingNote" class="form-label">Ghi chú</label>
+                            <textarea class="form-control" id="bookingNote" rows="3"></textarea>
+                        </div>
+                    
+                    </div>
+
+                    <h5 class="mb-3">Phòng đã đặt</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Phòng</th>
+                                    <th scope="col">Loại phòng</th>
+                                    <th scope="col">Check-in</th>
+                                    <th scope="col">Check-out</th>
+                                    <th scope="col">Giá nửa ngày</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookedRoomsTableBody">
+                                <tr>
+                                    <td>201</td>
+                                    <td>Luxury</td>
+                                    <td>2025-06-04 12:00</td>
+                                    <td>2025-06-06 00:00</td>
+                                    <td>1,500,000 VNĐ</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-danger remove-booked-room-btn">Xóa</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mb-4">
+                        <button type="button" class="btn btn-primary" id="toggleAddRoomSection">Thêm/Thay đổi phòng</button>
+                    </div>
+
+                    <div id="roomAvailabilitySection" class="p-3 border rounded bg-light mb-4">
+                        <h5 class="mb-3">Kiểm tra phòng khả dụng</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="checkInTime" class="form-label">Check-in Time:</label>
+                                <input type="datetime-local" class="form-control" id="checkInTime" value="2025-06-08T00:00">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="checkOutTime" class="form-label">Check-out Time:</label>
+                                <input type="datetime-local" class="form-control" id="checkOutTime" value="2025-06-09T00:00">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button type="button" class="btn btn-info" id="checkAvailabilityBtn">Check Availability</button>
+                        </div>
+
+                        <h6 class="mb-3">Chọn phòng cho Booking này:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered align-middle">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Chọn</th>
+                                        <th scope="col">Tên phòng</th>
+                                        <th scope="col">Loại phòng</th>
+                                        <th scope="col">Giá nửa ngày của phòng</th>
+                                        <th scope="col">Check-in</th>
+                                        <th scope="col">Check-out</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="availableRoomsTableBody">
+                                    </tbody>
+                            </table>
+                        </div>
+                        <p class="mt-2 mb-0">Bạn đã chọn <span id="selectedRoomsCount">0</span> phòng.</p>
+                        <button type="button" class="btn btn-success mt-3" id="addSelectedRoomsToBooking">Thêm phòng đã chọn</button>
+                    </div>
+
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary">Hủy</button>
+                        <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script>
+        const bookedRoomsTableBody = document.getElementById('bookedRoomsTableBody');
+        const availableRoomsTableBody = document.getElementById('availableRoomsTableBody');
+        const checkAvailabilityBtn = document.getElementById('checkAvailabilityBtn');
+        const addSelectedRoomsToBookingBtn = document.getElementById('addSelectedRoomsToBooking');
+        const checkInTimeInput = document.getElementById('checkInTime');
+        const checkOutTimeInput = document.getElementById('checkOutTime');
+        const selectedRoomsCountSpan = document.getElementById('selectedRoomsCount');
+        const roomAvailabilitySection = document.getElementById('roomAvailabilitySection');
+        const toggleAddRoomSectionBtn = document.getElementById('toggleAddRoomSection');
+
+        let selectedRooms = []; // To keep track of rooms selected from the availability list
+
+        // --- Initial setup for existing booked rooms ---
+        // Function to update the count of selected rooms
+        function updateSelectedRoomsCount() {
+            selectedRoomsCountSpan.textContent = document.querySelectorAll('#availableRoomsTableBody input[type="checkbox"]:checked').length;
+        }
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        // --- Handling pre-existing booked rooms (can be from your backend) ---
+        // Attach event listeners to existing "Xóa" buttons in the booked rooms table
+        function attachRemoveBookedRoomListeners() {
+            document.querySelectorAll('.remove-booked-room-btn').forEach(button => {
+                button.onclick = function() {
+                    this.closest('tr').remove();
+                    // In a real app, you'd also remove this from a data structure
+                    // and potentially recalculate total price.
+                };
+            });
+        }
+        attachRemoveBookedRoomListeners(); // Call on page load for initial rooms
+
+        // --- Toggle Room Availability Section ---
+        toggleAddRoomSectionBtn.addEventListener('click', function() {
+            roomAvailabilitySection.style.display = roomAvailabilitySection.style.display === 'none' ? 'block' : 'none';
+            // You might want to clear previous availability search results here if the section was hidden.
+            if (roomAvailabilitySection.style.display === 'block') {
+                availableRoomsTableBody.innerHTML = ''; // Clear previous results
+                selectedRooms = []; // Reset selected rooms
+                updateSelectedRoomsCount(); // Reset count
+            }
+        });
+
+
+        // --- Check Availability Logic (Simulated) ---
+        checkAvailabilityBtn.addEventListener('click', function() {
+            const checkIn = checkInTimeInput.value;
+            const checkOut = checkOutTimeInput.value;
+
+            if (!checkIn || !checkOut) {
+                alert('Vui lòng chọn thời gian Check-in và Check-out.');
+                return;
+            }
+
+            // Simulate fetching available rooms from an API
+            // In a real application, you'd send an AJAX request to your backend here
+            // e.g., fetch(`/api/available_rooms?check_in=${checkIn}&check_out=${checkOut}`)
+            const simulatedAvailableRooms = [
+                { id: '201', name: '201', type: 'Luxury', halfDayPrice: 1500000, checkIn: checkIn, checkOut: checkOut },
+                { id: '302', name: '302', type: 'Luxury', halfDayPrice: 1500000, checkIn: checkIn, checkOut: checkOut },
+                { id: '405', name: '405', type: 'Couple', halfDayPrice: 800000, checkIn: checkIn, checkOut: checkOut },
+                { id: '101', name: '101', type: 'Standard', halfDayPrice: 500000, checkIn: checkIn, checkOut: checkOut }
+            ];
+
+            availableRoomsTableBody.innerHTML = ''; // Clear previous results
+            selectedRooms = []; // Reset selected rooms array
+
+            simulatedAvailableRooms.forEach(room => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="checkbox" class="form-check-input select-room-checkbox" data-room-id="${room.id}"
+                        data-room-name="${room.name}"
+                        data-room-type="${room.type}"
+                        data-room-price="${room.halfDayPrice}"
+                        data-room-checkin="${room.checkIn}"
+                        data-room-checkout="${room.checkOut}"></td>
+                    <td>${room.name}</td>
+                    <td>${room.type}</td>
+                    <td>${formatCurrency(room.halfDayPrice)}</td>
+                    <td><input type="datetime-local" class="form-control" value="${room.checkIn}" readonly></td>
+                    <td><input type="datetime-local" class="form-control" value="${room.checkOut}" readonly></td>
+                `;
+                availableRoomsTableBody.appendChild(row);
+            });
+
+            // Add event listeners to the new checkboxes
+            document.querySelectorAll('.select-room-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const roomId = this.dataset.roomId;
+                    if (this.checked) {
+                        selectedRooms.push({
+                            id: roomId,
+                            name: this.dataset.roomName,
+                            type: this.dataset.roomType,
+                            halfDayPrice: parseFloat(this.dataset.roomPrice),
+                            checkIn: this.dataset.roomCheckin,
+                            checkOut: this.dataset.roomCheckout
+                        });
+                    } else {
+                        selectedRooms = selectedRooms.filter(room => room.id !== roomId);
+                    }
+                    updateSelectedRoomsCount();
+                });
+            });
+            updateSelectedRoomsCount(); // Initial count after loading
+        });
+
+        // --- Add Selected Rooms to Booked Rooms Table ---
+        addSelectedRoomsToBookingBtn.addEventListener('click', function() {
+            selectedRooms.forEach(room => {
+                // Check if the room is already in the bookedRoomsTableBody to avoid duplicates
+                const existingRoomRow = Array.from(bookedRoomsTableBody.children).find(row =>
+                    row.cells[0].textContent.trim() === room.name // Assuming room name is unique for simplicity
+                );
+
+                if (!existingRoomRow) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${room.name}</td>
+                        <td>${room.type}</td>
+                        <td>${room.checkIn.replace('T', ' ')}</td>
+                        <td>${room.checkOut.replace('T', ' ')}</td>
+                        <td>${formatCurrency(room.halfDayPrice)}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-booked-room-btn">Xóa</button>
+                        </td>
+                    `;
+                    bookedRoomsTableBody.appendChild(row);
+                    // Re-attach listeners for the new "Xóa" button
+                    row.querySelector('.remove-booked-room-btn').addEventListener('click', function() {
+                        row.remove();
+                    });
+                }
+            });
+
+            // Clear selected rooms from the availability table and hide the section
+            availableRoomsTableBody.innerHTML = '';
+            selectedRooms = [];
+            updateSelectedRoomsCount();
+            roomAvailabilitySection.style.display = 'none';
+
+            // In a real application, you might also recalculate the total price here
+            // based on the rooms added/removed.
+        });
+
+        // Event listener for "Hủy" button (optional: reset form or navigate back)
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            // Implement logic to cancel changes, e.g., reset the form or redirect
+            if (confirm('Bạn có chắc muốn hủy các thay đổi?')) {
+                location.reload(); // Simple refresh to discard changes
+                // Or: window.history.back();
+            }
+        });
+
+        // Event listener for form submission (Lưu thay đổi)
+        document.getElementById('updateBookingForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            // Here you would collect all data from the form:
+            const guestName = document.getElementById('guestName').value;
+            const guestEmail = document.getElementById('guestEmail').value;
+            const guestPhone = document.getElementById('guestPhone').value;
+            const deposit = document.getElementById('deposit').value;
+            const bookingNote = document.getElementById('bookingNote').value;
+            const bookingStatus = document.getElementById('bookingStatus').value;
+
+            // Collect all booked rooms data
+            const finalBookedRooms = [];
+            document.querySelectorAll('#bookedRoomsTableBody tr').forEach(row => {
+                const cells = row.cells;
+                finalBookedRooms.push({
+                    name: cells[0].textContent.trim(),
+                    type: cells[1].textContent.trim(),
+                    checkIn: cells[2].textContent.trim(),
+                    checkOut: cells[3].textContent.trim(),
+                    halfDayPrice: cells[4].textContent.trim() // You might need to parse this back to number
+                });
+            });
+
+            const formData = {
+                guestName,
+                guestEmail,
+                guestPhone,
+                deposit,
+                bookingNote,
+                bookingStatus,
+                bookedRooms: finalBookedRooms
+            };
+
+            console.log('Dữ liệu Booking đã cập nhật:', formData);
+            alert('Booking đã được lưu (thực tế sẽ gửi lên server)! Xem console để biết dữ liệu.');
+
+            // In a real application, you would send this formData to your backend API
+            // e.g., fetch('/api/update_booking', { method: 'POST', body: JSON.stringify(formData), headers: { 'Content-Type': 'application/json' }})
+            // .then(response => response.json())
+            // .then(data => console.log('Success:', data))
+            // .catch((error) => console.error('Error:', error));
+        });
+
+    </script>
+</body>
+
+</html>
