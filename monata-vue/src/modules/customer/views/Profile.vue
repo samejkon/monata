@@ -2,8 +2,8 @@
 import '../assets/scss/main.scss';
 import { ref, onMounted } from 'vue';
 import { api } from '../lib/axios';
-import Header from '../components/layouts/Header.vue'
-import Footer from '../components/layouts/Footer.vue'
+import Header from '@/modules/customer/components/layouts/Header.vue'
+import Footer from '@/modules/customer/components/layouts/Footer.vue'
 
 interface User {
   name: string;
@@ -246,8 +246,10 @@ onMounted(() => {
 </script>
 
 <template>
+  <Header bgClass="4  " title="" description="" />
+
   <main class="bg-light">
-    <div class="container py-5 text-dark">
+    <div class="container my-5 text-dark">
       <div class="row">
         <div class="col-lg-4">
           <div class="card mb-4">
@@ -257,11 +259,6 @@ onMounted(() => {
               <h5 class="my-3">{{ user.name }}</h5>
               <p class="text-muted mb-1">{{ user.email }}</p>
               <p class="text-muted mb-4">{{ user.phone }}</p>
-              <div class="d-flex justify-content-center mb-2">
-                <button type="button" class="btn btn-primary" @click="">
-                  Logout
-                </button>
-              </div>
             </div>
           </div>
           <div class="card mb-4 mb-lg-0">

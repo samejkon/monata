@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useModal, provideModal } from '../../composables/useModal'
+import { useModal } from '../../composables/useModal'
 import { ref, onMounted } from 'vue'
 import { api } from '../../lib/axios'
 

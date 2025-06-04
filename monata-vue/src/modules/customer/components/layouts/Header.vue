@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
-import { provideModal } from '../../composables/useModal'
+import { useModal } from '../../composables/useModal'
 import CheckAvailable from '../forms/CheckAvailable.vue'
 
 const props = defineProps({
@@ -20,7 +20,7 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
-const { openModal } = provideModal()
+const { openModal } = useModal()
 
 async function logout() {
   try {
@@ -71,9 +71,12 @@ async function logout() {
           <router-link to="/login" class="nav-item text-decor-none text-light" v-if="!authStore.authenticated">
             Sign in to your account
           </router-link>
-          <form @submit.prevent="logout()" v-if="authStore.authenticated">
-            <button type="submit" class="btn btn-danger">Logout</button>
-          </form>
+          <router-link to="/profile" class="text-light" v-if="authStore.authenticated">
+            Profile /
+          </router-link>
+          <a href="#" @click.prevent="logout()" class="text-light" v-if="authStore.authenticated">
+            &nbsp; Logout
+          </a>
           <button class="nav-booking" @click="openModal">
             Book A Room
           </button>
