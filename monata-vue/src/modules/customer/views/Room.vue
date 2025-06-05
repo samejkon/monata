@@ -1,25 +1,46 @@
 <script setup>
 import Header from '@/modules/customer/components/layouts/Header.vue';
 import Footer from '@/modules/customer/components/layouts/Footer.vue';
-import { ref } from 'vue';
-import { onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { api } from '@/modules/customer/lib/axios';
 
+const route = useRoute();
 const rooms = ref([]);
+const isLoading = ref(false);
+const error = ref(null);
 
 const fetchRooms = async () => {
+  isLoading.value = true;
+  error.value = null;
+  
   try {
-    const response = await api.get('/rooms')
-    return response.data.data
-  } catch (error) {
-    console.error('Error fetching rooms:', error)
-    return []
+    const { checkin_at, checkout_at, roomType } = route.query;
+    
+    const params = {};
+    if (checkin_at) params.checkin_at = checkin_at;
+    if (checkout_at) params.checkout_at = checkout_at;
+    if (roomType) params.room_type_id = roomType;
+
+    const response = await api.get('/rooms', { params });
+    rooms.value = response.data.data;
+  } catch (err) {
+    console.error('Error fetching rooms:', err);
+    error.value = 'Không thể tải danh sách phòng. Vui lòng thử lại sau!';
+    rooms.value = [];
+  } finally {
+    isLoading.value = false;
   }
 };
 
-onMounted(async () => {
-  rooms.value = await fetchRooms();
-});
+watch(
+  () => route.query,
+  () => {
+    fetchRooms();
+  },
+  { immediate: true }
+);
+
 </script>
 
 <template>

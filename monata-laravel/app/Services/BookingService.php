@@ -13,7 +13,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Auth;
 
 class BookingService
 {
@@ -220,19 +219,19 @@ class BookingService
             })
             ->pluck('room_id')
             ->unique();
+   
+            $roomTypeId = Arr::get($data, 'roomType');
+            $roomId = Arr::get($data,'roomId');
+            
+            $query = $this->room->whereNotIn('id', $occupiedRoomIds);
     
-        $roomTypeId = Arr::get($data, 'roomType');
-        $roomId = Arr::get($data,'roomId');
-        
-        $query = $this->room->whereNotIn('id', $occupiedRoomIds);
-
-        if ($roomId) {
-            $availableRooms = new Collection([$query->findOrFail($roomId)]);
-        } elseif ($roomTypeId) {
-            $availableRooms = $query->where('room_type_id', $roomTypeId)->get();
-        } else {
-            $availableRooms = $query->get();
-        }
+            if ($roomId) {
+                $availableRooms = new Collection([$query->findOrFail($roomId)]);
+            } elseif ($roomTypeId) {
+                $availableRooms = $query->where('room_type_id', $roomTypeId)->get();
+            } else {
+                $availableRooms = $query->get();
+            }
 
         return $availableRooms;
     }

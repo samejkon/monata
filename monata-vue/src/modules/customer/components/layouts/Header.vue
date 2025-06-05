@@ -90,7 +90,7 @@ async function logout() {
           <button class="nav-booking" @click="openModal">
             Book A Room
           </button>
-          <router-link to="/booking" class="text-light" v-if="authStore.authenticated">
+          <router-link to="/booking-client" class="text-light" v-if="authStore.authenticated">
             <ShoppingBasket />
           </router-link>
         </div>

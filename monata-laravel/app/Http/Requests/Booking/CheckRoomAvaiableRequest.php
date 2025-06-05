@@ -14,8 +14,8 @@ class CheckRoomAvaiableRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'roomType' => 'nullable',
-            'roomId' => 'nullable',
+            'roomType' => ['nullable', 'integer'],
+            'roomId' => ['nullable', 'integer'],
             'checkin_at' => ['required', 'date_format:Y-m-d H:i'],
             'checkout_at' => ['required', 'date_format:Y-m-d H:i', 'after:checkin_at'],
         ];

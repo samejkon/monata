@@ -60,6 +60,3 @@ Route::get('/rooms', [RoomClientController::class, 'index']);
 
 Route::apiResource('bookings', AdminBookingController::class);
 Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
-Route::post('/bookings/{booking}/confirm', [AdminBookingController::class, 'confirm']);
-Route::post('/bookings/{booking}/check-in', [AdminBookingController::class, 'checkInGuest']);
-Route::post('/bookings/{booking}/check-out', [AdminBookingController::class, 'checkOutGuest']);

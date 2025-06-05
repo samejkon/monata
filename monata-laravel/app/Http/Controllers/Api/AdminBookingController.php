@@ -69,6 +69,7 @@ class AdminBookingController extends Controller
     public function checkRoomAvailability(CheckRoomAvaiableRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->service->checkRoom($request->validated());
+        
         return RoomResource::collection($data);
     }
 
@@ -151,4 +152,5 @@ class AdminBookingController extends Controller
 
         return response()->noContent();
     }
+
 }
