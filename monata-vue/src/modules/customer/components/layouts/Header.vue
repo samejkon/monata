@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/modules/customer/stores/auth'
 import { api } from '@/modules/customer/lib/axios'
+import { ref } from 'vue'
+import CheckAvailable from '../forms/CheckAvailable.vue'
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const props = defineProps({
   bgClass: {
     type: String,
@@ -18,18 +22,22 @@ const props = defineProps({
 })
 
 const authStore = useAuthStore()
+const showModal = ref(false)
+
+const openModal = () => {
+  showModal.value = true
+}
 
 async function logout() {
   try {
     await api.post(`/logout`)
     authStore.logout()
-    alert('Logout successful!')
+    toast.success("You had logout!")
   } catch (error: any) {
     console.error('Logout failed:', error.message)
     alert('Logout failed!')
   }
 }
-
 </script>
 
 <template>
@@ -45,7 +53,7 @@ async function logout() {
           <li class="menu-toogle-item">Pages</li>
           <li class="menu-toogle-item">Contact</li>
           <li class="menu-toogle-item">
-            <a href="#" class="menu-toogle-item-link text-decor-none" onclick="toggleModal()">Book A Room</a>
+            <a href="#" class="menu-toogle-item-link text-decor-none" @click.prevent="openModal">Book A Room</a>
           </li>
         </ul>
       </div>
@@ -68,10 +76,13 @@ async function logout() {
           <router-link to="/login" class="nav-item text-decor-none text-light" v-if="!authStore.authenticated">
             Sign in to your account
           </router-link>
-          <form @submit.prevent="logout()" v-if="authStore.authenticated">
-            <button type="submit" class="btn btn-danger">Logout</button>
-          </form>
-          <button class="nav-booking" onclick="toggleModal()">
+          <router-link to="/profile" class="text-light" v-if="authStore.authenticated">
+            Profile /
+          </router-link>
+          <a href="#" @click.prevent="logout()" class="text-light" v-if="authStore.authenticated">
+            &nbsp; Logout
+          </a>
+          <button class="nav-booking" @click="openModal">
             Book A Room
           </button>
         </div>
@@ -83,5 +94,12 @@ async function logout() {
         </div>
       </div>
     </section>
+    <CheckAvailable v-model="showModal" />
   </header>
 </template>
+
+<style scoped>
+.nav-booking {
+  cursor: pointer;
+}
+</style>

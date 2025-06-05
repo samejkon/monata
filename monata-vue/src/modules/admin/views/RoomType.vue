@@ -1,9 +1,9 @@
 <script setup>
-import { api } from '../lib/axios';
 import { ref, onMounted } from 'vue';
 import { Modal } from 'bootstrap';
 import { Plus, SquarePen, Trash2, X } from 'lucide-vue-next';
 import { useToast } from 'vue-toastification'
+import { api } from '@/modules/customer/lib/axios'
 
 const url = import.meta.env.VITE_API_URL;
 const toast = useToast()
@@ -22,7 +22,7 @@ const propertiesList = ref([]);
 
 const fetchProperties = async () => {
   try {
-    const response = await api.get(`/properties`, { params: { per_page: 1000 } });
+    const response = await api.get(`${url}/admin/properties`, { params: { per_page: 1000 } });
     propertiesList.value = response.data?.data || [];
   } catch (error) {
     propertiesList.value = [];
@@ -31,7 +31,7 @@ const fetchProperties = async () => {
 
 const fetchRoomTypes = async () => {
   try {
-    const response = await api.get(`/room-types`);
+    const response = await api.get(`${url}/admin/room-types`);
     roomTypes.value = (response.data?.data || []).map(item => ({
       ...item,
       price: parseFloat(item.price),
@@ -102,9 +102,9 @@ const saveRoomType = async () => {
         }))
     };
     if (isEditing.value) {
-      await api.put(`/room-types/${currentRoomType.value.id}`, payload);
+      await api.put(`${url}/admin/room-types/${currentRoomType.value.id}`, payload);
     } else {
-      await api.post(`/room-types`, payload);
+      await api.post(`${url}/admin/room-types`, payload);
     }
     await fetchRoomTypes();
     roomTypeModal.hide();
@@ -117,7 +117,7 @@ const saveRoomType = async () => {
 const deleteRoomType = async (id) => {
   if (confirm('Are you sure you want to delete this room type?')) {
     try {
-      await api.delete(`/room-types/${id}`);
+      await api.delete(`${url}/admin/room-types/${id}`);
       await fetchRoomTypes();
       toast.success('Room type deleted successfully!');
     } catch (error) {

@@ -229,7 +229,7 @@ const createBooking = async () => {
       booking_details: finalBookingDetails
     };
 
-    const response = await api.post(`/bookings`, payload);
+    const response = await axios.post(`${apiUrl}/admin/bookings`, payload);
     toast.success('Booking created successfully!');
     emit('bookingCreated');
     close();

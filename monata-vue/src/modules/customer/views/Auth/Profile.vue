@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { api } from '../../lib/axios';
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 
 interface User {
   name: string;

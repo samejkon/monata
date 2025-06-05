@@ -1,4 +1,4 @@
-import { api, csrf } from "@/modules/customer/lib/axios";
+import { api, csrf } from "@/modules/admin/lib/axios";
 import type { Contact } from "../../stores/model/Contact.model";
 
 interface Meta {
@@ -15,7 +15,7 @@ export const getContacts = async (params: { page?: number }): Promise<{
   data: Contact[]; 
   meta: Meta;
 }> => {
-  const response = await api.get('/admin/contacts', {
+  const response = await api.get('/contacts', {
       params: {
           ...params,
           page: params.page
@@ -29,13 +29,13 @@ export const getContacts = async (params: { page?: number }): Promise<{
 };
 
 export const getContactById = async (id: number): Promise<Contact> => {
-    const response = await api.get(`/admin/contacts/${id}`);
+    const response = await api.get(`/contacts/${id}`);
 
     return response.data.data;
 };
 
 export const sendMail = async (data: Partial<Contact>, id: number) => {
-  const response = await api.post(`/admin/contacts/${id}/send-mail`, data);
+  const response = await api.post(`/contacts/${id}/send-mail`, data);
 
   return response.data.data;
 };

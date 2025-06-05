@@ -44,4 +44,15 @@ class RoomType extends Model
     {
         return $this->hasMany(Room::class);
     }
+
+    /**
+     * Get limited room properties for each room type
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function roomPropertiesLimited()
+    {
+        return $this->hasMany(RoomProperty::class)
+            ->orderBy('property_id', 'desc')
+            ->limit(3);
+    }
 }

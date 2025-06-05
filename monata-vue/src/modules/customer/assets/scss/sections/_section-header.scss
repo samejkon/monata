@@ -203,3 +203,25 @@
     }
   }
 }
+
+.section-header_4 {
+  height: 150px;
+  background-color: $color-black;
+  display: flex;
+  justify-content: center;
+
+  .nav-bar {
+    padding: 20px 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .logo {
+      width: 100px;
+    }
+
+    @include responsive(pc) {
+      width: 1280px;
+    }
+  }
+}

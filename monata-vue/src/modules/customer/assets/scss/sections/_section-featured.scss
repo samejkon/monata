@@ -1,4 +1,8 @@
 .section-featured {
+  padding-top: 93px;
+  display: block;
+  overflow: hidden;
+
   .section-featured-head {
     .section-featured-title {
       font-size: $fs-14;
@@ -17,13 +21,122 @@
     }
   }
 
-  .section-featured-offers {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+  .single_rooms {
+    position: relative;
+    width: 50%;
+    float: left;
+    overflow: hidden;
 
-    .section-featured-offer {
+    &:before {
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
+      height: 100%;
+      content: "";
+      background: $color-white;
+      background: -moz-linear-gradient(top, $color-white 0%, $color-black 77%);
+      background: -webkit-linear-gradient(top, $color-white 0%, $color-black 77%);
+      background: linear-gradient(to bottom, $color-white 0%, $color-black 77%);
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#000000',GradientType=0 );
+      z-index: 1;
+      opacity: .5;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      &:before {
+        opacity: 0.7;
+      }
+
+      .room_thumb {
+        img {
+          transform: scale(1.1);
+        }
+
+        .room_heading {
+          a {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+
+    .room_thumb {
+      position: relative;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        transform: scale(1);
+        transition: transform 0.5s ease;
+      }
+
+      .room_heading {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0px;
+        padding: 60px 60px 47px 60px;
+        z-index: 2;
+
+        span {
+          font-size: $fs-14;
+          color: $text-color-white;
+          margin-bottom: 9px;
+          display: block;
+          position: relative;
+          z-index: 8;
+        }
+
+        h3 {
+          font-size: $fs-30;
+          color: $text-color-white;
+          position: relative;
+          z-index: 8;
+        }
+        
+        a {
+          color: $text-color-white;
+          text-transform: capitalize;
+          font-weight: $fw-600;
+          position: relative;
+          z-index: 8;
+          transform: translateY(-40px);
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          text-decoration: none;
+
+          &:hover {
+            color: darken($text-color-white, 10%);
+          }
+        }
+
+        .line-button {
+          font-size: $fs-16;
+          display: inline-block;
+          padding-right: 5px;
+          padding-bottom: 2px;
+
+          &:before {
+            position: absolute;
+            content: "";
+            background: #919191;
+            width: 100%;
+            height: 1px;
+            bottom: 0;
+            left: 0;
+            transition: background-color 0.3s ease;
+          }
+
+          &:hover:before {
+            background: $text-color-white;
+          }
+        }
+      }
     }
   }
 }
