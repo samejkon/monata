@@ -32,7 +32,7 @@ const fetchAvailableServices = async () => {
     availableServices.value = response.data?.data || [];
   } catch (error) {
     console.error('Error fetching available services:', error);
-    toast.error('Không thể tải danh sách dịch vụ.');
+    toast.error('Don\'t have available services.');
   }
 };
 
@@ -43,8 +43,13 @@ const fetchInvoiceDetails = async (bookingId) => {
     const response = await api.get(`/bookings/${bookingId}/invoice-details`);
     invoiceDetails.value = response.data?.data || [];
   } catch (error) {
-    console.error('Error fetching invoice details:', error);
-    invoiceDetails.value = [];
+    if (error.response && error.response.status === 404) {
+      invoiceDetails.value = [];
+    } else {
+      console.error('Error fetching invoice details:', error);
+      invoiceDetails.value = [];
+      toast.error('Don\'t have available services.');
+    }
   } finally {
     isLoading.value = false;
   }
@@ -73,7 +78,7 @@ watch(() => props.show, (newVal) => {
 
 const addServiceToInvoice = () => {
   if (!selectedServiceId.value) {
-    toast.warn('Vui lòng chọn một dịch vụ.');
+    toast.warn('Please select a service.');
     return;
   }
   const serviceToAdd = availableServices.value.find(s => s.id === selectedServiceId.value);
@@ -92,28 +97,28 @@ const addServiceToInvoice = () => {
 };
 
 const removeServiceFromInvoice = async (detail, index) => {
-  const confirmation = confirm(`Bạn có chắc muốn xóa dịch vụ "${detail.name}" khỏi hóa đơn?`);
+  const confirmation = confirm(`Are you sure you want to remove "${detail.name}" from the invoice?`);
   if (!confirmation) return;
 
   if (detail.id) {
     try {
       await api.delete(`/bookings/${props.booking.id}/invoice-details/${detail.id}`);
-      toast.success(`Đã xóa dịch vụ "${detail.name}".`);
+      toast.success(`Deleted "${detail.name}".`);
       invoiceDetails.value.splice(index, 1);
       emit('invoice-updated');
     } catch (error) {
       console.error('Error deleting service from invoice:', error);
-      toast.error(`Không thể xóa dịch vụ "${detail.name}".`);
+      toast.error(`Failed to delete "${detail.name}".`);
     }
   } else {
     invoiceDetails.value.splice(index, 1);
-    toast.info(`Đã xóa dịch vụ "${detail.name}" (chưa lưu).`);
+    toast.info(`Removed "${detail.name}" (chưa lưu).`);
   }
 };
 
 const saveInvoice = async () => {
   if (!props.booking || !props.booking.id) {
-    toast.error('Không có thông tin đặt phòng.');
+    toast.error('No booking found.');
     return;
   }
   isLoading.value = true;
@@ -127,12 +132,12 @@ const saveInvoice = async () => {
     };
     const response = await api.post(`/bookings/${props.booking.id}/invoice-details`, payload);
     invoiceDetails.value = response.data?.invoice_details || [];
-    toast.success('Đã cập nhật hóa đơn thành công!');
+    toast.success('Invoice saved!');
     emit('invoice-updated');
     closeModal();
   } catch (error) {
     console.error('Error saving invoice:', error);
-    const errorMessage = error.response?.data?.message || 'Không thể lưu hóa đơn.';
+    const errorMessage = error.response?.data?.message || 'Failed to save invoice.';
     toast.error(errorMessage);
   } finally {
     isLoading.value = false;
@@ -160,7 +165,17 @@ onMounted(() => {
 
 const handleCheckout = async () => {
   if (!props.booking || !props.booking.id) {
-    toast.error('Không có thông tin đặt phòng để thanh toán.');
+    toast.error('No booking found.');
+    return;
+  }
+
+  if (props.booking.status !== 3) {
+    toast.error('Booking is not checked out.');
+    return;
+  }
+
+  const confirmation = confirm('Are you sure you want to check out?');
+  if (!confirmation) {
     return;
   }
 
@@ -178,13 +193,13 @@ const handleCheckout = async () => {
 
     await api.post(`/bookings/${props.booking.id}/check-out`);
 
-    toast.success('Thanh toán thành công và hóa đơn đã được cập nhật!');
+    toast.success('Checkout successful!');
     emit('invoice-updated');
     closeModal();
 
   } catch (error) {
-    console.error('Lỗi trong quá trình thanh toán:', error);
-    const errorMessage = error.response?.data?.message || 'Thanh toán thất bại. Vui lòng thử lại.';
+    console.error('Error checking out:', error);
+    const errorMessage = error.response?.data?.message || 'Failed to check out.';
     toast.error(errorMessage);
   } finally {
     isLoading.value = false;
@@ -292,7 +307,7 @@ const handleCheckout = async () => {
             Save
           </button>
           <button type="button" class="btn btn-success" @click="handleCheckout"
-            :disabled="isLoading || invoiceDetails.length === 0">
+            :disabled="isLoading || !props.booking || props.booking.status !== 3">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Check out
           </button>

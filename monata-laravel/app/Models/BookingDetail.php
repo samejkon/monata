@@ -29,7 +29,7 @@ class BookingDetail extends Model
         return $this->belongsTo(Booking::class, 'booking_id');
     }
 
-    public function rooms()
+    public function room()
     {
         return $this->belongsTo(Room::class, 'room_id');
     }

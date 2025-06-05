@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Booking\CheckRoomAvaiableRequest;
 use App\Http\Requests\Booking\CreateBookingRequest;
+use App\Http\Requests\Booking\IdsRequest;
 use App\Http\Requests\Booking\UpdateBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Http\Resources\RoomResource;
@@ -104,7 +105,7 @@ class AdminBookingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function confirm($id): \Illuminate\Http\Response
+    public function confirm(int $id): \Illuminate\Http\Response
     {
         $this->service->confirm($id);
 
@@ -124,9 +125,9 @@ class AdminBookingController extends Controller
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
-    public function checkInGuest($id): \Illuminate\Http\Response
+    public function checkInGuest(int $idBooking, IdsRequest $ids): \Illuminate\Http\Response
     {
-        $this->service->checkInGuest($id);
+        $this->service->checkInGuest($idBooking, $ids->validated()['ids']);
 
         return response()->noContent();
     }
@@ -144,7 +145,7 @@ class AdminBookingController extends Controller
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
-    public function checkOutGuest($id): \Illuminate\Http\Response
+    public function checkOutGuest(int $id): \Illuminate\Http\Response
     {
         $this->service->checkout($id);
 
