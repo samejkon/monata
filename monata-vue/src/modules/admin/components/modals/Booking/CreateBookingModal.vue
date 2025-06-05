@@ -8,7 +8,6 @@ import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
 
 const toast = useToast();
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const props = defineProps({
   show: {
@@ -229,7 +228,7 @@ const createBooking = async () => {
       booking_details: finalBookingDetails
     };
 
-    const response = await axios.post(`${apiUrl}/admin/bookings`, payload);
+    const response = await api.post(`/bookings`, payload);
     toast.success('Booking created successfully!');
     emit('bookingCreated');
     close();

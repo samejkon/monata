@@ -114,6 +114,7 @@ class InvoiceDetailService
         return $this->booking->whereIn('status', [
             BookingStatus::CONFIRMED,
             BookingStatus::CHECK_IN,
+            BookingStatus::CHECK_OUT,
         ])->where('id', $id)->firstOrFail();
     }
 }

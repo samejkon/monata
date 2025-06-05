@@ -14,7 +14,7 @@ class InvoiceDetailRequest extends FormRequest
     public function rules()
     {
         return [
-            "invoice_details" => ['required', 'array'],
+            "invoice_details" => ['nullable', 'array'],
             "invoice_details.*.id" => ['nullable', 'numeric', 'exists:invoice_details,id'],
             'invoice_details.*.service_id' => ['required', 'exists:services,id'],
             'invoice_details.*.quantity' => ['required', 'numeric', 'min:1'],

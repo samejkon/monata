@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'moment/locale/en-gb';
 moment.locale('en-gb');
 import { useToast } from 'vue-toastification';
+
 const toast = useToast();
 
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
@@ -12,8 +13,6 @@ import CreateBookingModal from '../components/modals/Booking/CreateBookingModal.
 import EditBookingModal from '../components/modals/Booking/EditBookingModal.vue';
 import InvoiceServiceModal from '../components/modals/InvoiceServiceModal.vue';
 import ViewInvoiceModal from '../components/modals/ViewInvoiceModal.vue';
-
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const rawBookings = ref([]);
 const dailyRoomBookings = ref({});

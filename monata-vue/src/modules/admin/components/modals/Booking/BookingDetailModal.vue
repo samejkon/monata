@@ -3,10 +3,9 @@ import { ref, computed, watch } from 'vue';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
 import ViewInvoiceModal from '../ViewInvoiceModal.vue';
-import { api } from '@/modules/customer/lib/axios';
+import { api } from '@/modules/admin/lib/axios';
 
 const toast = useToast();
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const props = defineProps({
     show: {

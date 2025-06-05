@@ -64,6 +64,7 @@ class BookingService
 
                 $duration = config('room.duration');
                 $unitHours = config('room.unit_hours');
+                $cleanRoom = config('room.clean_room');
 
                 $duration = $this->calculateDuration($item['checkin_at'], $item['checkout_at'], $unitHours);
 
@@ -71,7 +72,7 @@ class BookingService
                 $total += $itemTotal;
 
                 $item['price_per_day'] = $price;
-
+                $item['checkout_at'] = Carbon::parse($item['checkout_at'])->addMinutes($cleanRoom);
                 $item['id'] = Arr::get($item, 'id');
 
                 return $item;
@@ -149,7 +150,7 @@ class BookingService
                 ->exists();
 
             if ($checkedInDetailExistsForRemoval) {
-                throw new \Exception("Không thể xóa phòng đã được check-in.");
+                throw new \Exception("Not delete room that is checked-in.");
             }
 
             // Proceed with deletion if no checked-in rooms are affected
@@ -472,6 +473,7 @@ class BookingService
             $booking->update([
                 'total_payment' => $totalPayment,
                 'status' => BookingStatus::CHECK_OUT,
+                'check_out' => Carbon::now(),
             ]);
 
             return $booking;

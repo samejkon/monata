@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Modal } from 'bootstrap';
 import { Plus, SquarePen, Trash2, X } from 'lucide-vue-next';
 import { useToast } from 'vue-toastification'
-import { api } from '@/modules/customer/lib/axios'
+import { api } from '../lib/axios'
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 
-const url = import.meta.env.VITE_API_URL;
 const toast = useToast()
 const roomTypes = ref([]);
 const isEditing = ref(false);
@@ -18,11 +19,13 @@ const currentRoomType = ref({
 });
 let roomTypeModal = null;
 
+const propertyToAdd = ref(null);
+
 const propertiesList = ref([]);
 
 const fetchProperties = async () => {
   try {
-    const response = await api.get(`${url}/admin/properties`, { params: { per_page: 1000 } });
+    const response = await api.get(`/properties`, { params: { per_page: 1000 } });
     propertiesList.value = response.data?.data || [];
   } catch (error) {
     propertiesList.value = [];
@@ -31,7 +34,7 @@ const fetchProperties = async () => {
 
 const fetchRoomTypes = async () => {
   try {
-    const response = await api.get(`${url}/admin/room-types`);
+    const response = await api.get(`/room-types`);
     roomTypes.value = (response.data?.data || []).map(item => ({
       ...item,
       price: parseFloat(item.price),
@@ -45,7 +48,10 @@ const fetchRoomTypes = async () => {
 onMounted(() => {
   fetchRoomTypes();
   fetchProperties();
-  roomTypeModal = new Modal(document.getElementById('roomTypeModal'));
+  roomTypeModal = new Modal(document.getElementById('roomTypeModal'), {
+    backdrop: 'static',
+    keyboard: false
+  });
 });
 
 const formatCurrency = (value) => {
@@ -102,9 +108,9 @@ const saveRoomType = async () => {
         }))
     };
     if (isEditing.value) {
-      await api.put(`${url}/admin/room-types/${currentRoomType.value.id}`, payload);
+      await api.put(`/room-types/${currentRoomType.value.id}`, payload);
     } else {
-      await api.post(`${url}/admin/room-types`, payload);
+      await api.post(`/room-types`, payload);
     }
     await fetchRoomTypes();
     roomTypeModal.hide();
@@ -117,7 +123,7 @@ const saveRoomType = async () => {
 const deleteRoomType = async (id) => {
   if (confirm('Are you sure you want to delete this room type?')) {
     try {
-      await api.delete(`${url}/admin/room-types/${id}`);
+      await api.delete(`/room-types/${id}`);
       await fetchRoomTypes();
       toast.success('Room type deleted successfully!');
     } catch (error) {
@@ -127,24 +133,26 @@ const deleteRoomType = async (id) => {
   }
 };
 
-const addProperty = () => {
-  const selectedIds = currentRoomType.value.properties.map(p => p.property_id);
-  const available = propertiesList.value.find(p => !selectedIds.includes(p.id));
-  if (available) {
-    currentRoomType.value.properties.push({ property_id: available.id, value: '' });
-  }
-};
+const selectableProperties = computed(() => {
+  if (!propertiesList.value || !currentRoomType.value) return [];
+  const addedPropertyIds = new Set(currentRoomType.value.properties.map(p => p.property_id));
+  return propertiesList.value.filter(p => !addedPropertyIds.has(p.id));
+});
 
-const onPropertyChange = (index) => {
-  const prop = currentRoomType.value.properties[index];
-  const count = currentRoomType.value.properties.filter(p => p.property_id === prop.property_id).length;
-  if (count > 1) {
-    prop.property_id = '';
-    prop.value = '';
+const handlePropertySelected = (selectedPropertyId) => {
+  if (selectedPropertyId) {
+    const propertyExists = currentRoomType.value.properties.some(p => p.property_id === selectedPropertyId);
+    if (!propertyExists) {
+      currentRoomType.value.properties.push({ property_id: selectedPropertyId, value: '' });
+    }
+    propertyToAdd.value = null;
   }
 };
 
 const removeProperty = (index) => {
+  const confirmation = confirm(`Are you sure you want to remove this property?`);
+  if (!confirmation) return;
+
   currentRoomType.value.properties.splice(index, 1);
 };
 
@@ -225,33 +233,52 @@ const closeModal = () => {
                   min="0">
               </div>
 
-              <h6 class="mt-4 mb-2">Properties of room type:</h6>
-              <div v-for="(prop, index) in currentRoomType.properties" :key="index"
-                class="row g-2 mb-2 align-items-center border p-2 rounded">
-                <div class="col-md-5">
-                  <select class="form-select form-select-sm" v-model="prop.property_id" required
-                    @change="onPropertyChange(index)">
-                    <option value="" disabled>Select property</option>
-                    <option v-for="property in propertiesList" :key="property.id" :value="property.id"
-                      :disabled="currentRoomType.properties.some((p, idx) => p.property_id === property.id && idx !== index)">
-                      {{ property.name }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-md-5">
-                  <input type="text" class="form-control form-control-sm" v-model="prop.value" placeholder="value"
-                    required>
-                </div>
-                <div class="col-md-2 text-end">
-                  <button type="button" class="btn btn-outline-danger btn-sm" @click="removeProperty(index)">
-                    <X />
-                  </button>
-                </div>
+              <h6 class="mt-4 mb-3">Properties of room type:</h6>
+
+              <!-- New v-select for adding properties -->
+              <div class="mb-3">
+                <label class="form-label mb-1">Add Property</label>
+                <v-select class="bg-white" v-model="propertyToAdd" :options="selectableProperties" label="name"
+                  :reduce="property => property.id" placeholder="Search and add a property..."
+                  @update:modelValue="handlePropertySelected" :clearable="true"
+                  :disabled="selectableProperties.length === 0">
+                  <template #no-options>
+                    <div>All properties have been added.</div>
+                  </template>
+                </v-select>
               </div>
-              <button type="button" class="btn btn-outline-secondary btn-sm mt-2" @click="addProperty"
-                :disabled="currentRoomType.properties.length >= propertiesList.length">
-                <i class="bi bi-plus-circle"></i> Add property
-              </button>
+
+              <!-- List of added properties - Table format -->
+              <div v-if="currentRoomType.properties.length > 0" class="mt-3 table-responsive">
+                <table class="table table-sm table-bordered table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">Property Name</th>
+                      <th scope="col">Value</th>
+                      <th scope="col" class="text-center" style="width: 10%;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(prop, index) in currentRoomType.properties" :key="prop.property_id">
+                      <td>
+                        {{propertiesList.find(p => p.id === prop.property_id)?.name || 'Property'}}
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" v-model="prop.value"
+                          placeholder="Enter value" required>
+                      </td>
+                      <td class="text-center">
+                        <button type="button" class="btn btn-danger btn-sm p-1" @click="removeProperty(index)">
+                          <Trash2 />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-else class="text-muted mt-3 text-center p-3 border rounded">
+                No properties added yet. Select a property from the dropdown above to add it.
+              </div>
 
               <div class="modal-footer mt-4">
                 <button type="button" class="btn btn-secondary" @click="closeModal">Close</button>
@@ -267,31 +294,4 @@ const closeModal = () => {
   </div>
 </template>
 
-<style scoped>
-.form-select {
-  background-color: #fff;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1;
-  color: #495057;
-  cursor: pointer;
-  width: 100%;
-}
-
-.form-select:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
-}
-
-.form-select:disabled {
-  background-color: #e9ecef;
-  opacity: 1;
-}
-
-.form-select:not(:disabled):hover {
-  border-color: #6c757d;
-}
-</style>
+<style scoped></style>
