@@ -11,6 +11,7 @@ const authStore = useAuthStore()
 
 const props = defineProps<{
   modelValue: boolean
+  initialRoomType?: number | null
 }>()
 
 const emit = defineEmits<{
@@ -301,6 +302,15 @@ watch(
       }
     } else {
       user.value = null
+    }
+  }
+)
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue && props.initialRoomType) {
+      formData.value.roomType = props.initialRoomType
     }
   }
 )

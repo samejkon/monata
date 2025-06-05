@@ -42,10 +42,13 @@
             {{ offer.name }}
           </h3>
           <ul class="offer-descriptions gray">
-            <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">{{
-              property.name }}: {{ property.value }}</li>
+            <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">
+              {{ property.name }}: {{ property.value }}
+            </li>
           </ul>
-          <a class="section-ouroffer-booking text-decor-none" href="#">Book Now</a>
+          <a class="section-ouroffer-booking text-decor-none" href="#" @click.prevent="handleBookNow(offer.id)">
+            Book Now
+          </a>
         </div>
       </div>
     </div>
@@ -102,7 +105,7 @@
                   <span>From {{ formatPrice(roomType.price) }}/night</span>
                   <h3>{{ roomType.name }}</h3>
                 </div>
-                <a href="#" class="line-button">book now</a>
+                <a href="#" class="line-button" @click.prevent="handleBookNow(roomType.id)">book now</a>
               </div>
             </div>
           </div>
@@ -123,11 +126,16 @@
     <img class="section-other-img" src="@/modules/customer/assets/img/instagram/4.png" alt="other" />
     <img class="section-other-img" src="@/modules/customer/assets/img/instagram/5.png" alt="other" />
   </section>
+  <CheckAvailable 
+    v-model="showCheckAvailable"
+    :initial-room-type="selectedRoomType"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { api } from '../../lib/axios'
+import CheckAvailable from '../forms/CheckAvailable.vue'
 
 interface Property {
   property_id: number
@@ -152,6 +160,8 @@ const roomTypeBetters = ref<RoomType[]>([])
 const roomTypeOffers = ref<RoomType[]>([])
 const isLoading = ref(false)
 const error = ref<string | null>(null)
+const showCheckAvailable = ref(false)
+const selectedRoomType = ref<number | null>(null)
 
 const formatPrice = (price: string) => {
   return new Intl.NumberFormat('vi-VN', {
@@ -175,24 +185,15 @@ const fetchRoomTypes = async () => {
   }
 }
 
+const handleBookNow = (roomTypeId: number) => {
+  selectedRoomType.value = roomTypeId
+  showCheckAvailable.value = true
+}
+
 onMounted(() => {
   fetchRoomTypes()
 })
 
-const props = defineProps({
-  bgClass: {
-    type: String,
-    default: '1'
-  },
-  title: {
-    type: String,
-    default: 'Montana Resort'
-  },
-  description: {
-    type: String,
-    default: 'Unlock to enjoy the view of Martine'
-  }
-})
 const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', import.meta.url).href
 
 </script>
@@ -249,5 +250,25 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
 /* Các kiểu dáng khác */
 .nav-booking {
   cursor: pointer;
+}
+
+.section-ouroffer-booking,
+.line-button {
+  cursor: pointer;
+}
+
+.section-ouroffer-booking:hover,
+.line-button:hover {
+  opacity: 0.8;
+}
+
+.section-ouroffer-booking,
+.line-button {
+  cursor: pointer;
+}
+
+.section-ouroffer-booking:hover,
+.line-button:hover {
+  opacity: 0.8;
 }
 </style>
