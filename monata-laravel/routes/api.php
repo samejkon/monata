@@ -56,3 +56,4 @@ Route::post('/register', [AuthUserController::class, 'register']);
 Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);
 Route::get('/user-home', [UserHomeController::class, 'index']);
 Route::get('/rooms/{id}', [RoomClientController::class, 'show']);
+Route::get('/rooms', [RoomClientController::class, 'index']);

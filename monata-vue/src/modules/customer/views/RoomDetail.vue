@@ -6,8 +6,6 @@ import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/modules/customer/lib/axios' // Reusing admin axios instance for now, consider creating a customer-specific one if needed
 
 const route = useRoute()
-const router = useRouter()
-
 const roomDetails = ref(null)
 const currentLargeImage = ref(null)
 const currentImageIndex = ref(0)
@@ -23,8 +21,6 @@ const fetchRoomDetails = async (roomId) => {
   try {
     const response = await api.get(`/rooms/${roomId}`)
     const fetchedData = response.data.data
-
-    console.log("Response: ",fetchedData)
 
     if (fetchedData) {
       let displayImages = []
@@ -140,51 +136,54 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <Header bgClass="4" title="" description="" />
+  <Header bgClass="4" title="" description="" />
 
-    <main class="container mt-5 mb-5">
-        <div v-if="roomDetails" class="p-4">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h3 class=" text-center">{{ roomDetails.name }} <span class="text-muted">- {{ roomDetails.room_type }}</span></h3>
-                    
-                    <!-- Image Gallery -->
-                    <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container mb-4">
-                        <img :src="currentLargeImage" :alt="roomDetails.name" class="room-large-image img-fluid rounded shadow-sm mb-2">
-                        <div class="room-thumbnails">
-                            <img v-for="(image, index) in roomDetails.images" :key="image.id" :src="image.image_path"
-                                :alt="'Thumbnail ' + (index + 1)" class="room-thumbnail-item img-thumbnail rounded shadow-sm"
-                                @click="changeLargeImage(image.image_path)"
-                                :class="{ 'active-thumbnail': currentLargeImage === image.image_path }">
-                        </div>
-                    </div>
-                    <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
-                        class="img-fluid mb-3 rounded shadow-sm room-single-thumbnail">
-                    
-                    <p v-if="roomDetails.description" class="lead">{{ roomDetails.description }}</p>
-                </div>
-                <div class="col-lg-4">
-                    <div class="pt-5">
-                      <h4 class="card-text"><strong>{{ formatCurrency(roomDetails.price) }} Per night</strong></h4>
-                      <ul class="list-group list-group-flush">
-                          <li v-for="prop in roomDetails.properties" :key="prop.property_id" class="list-group-item d-flex justify-content-between align-items-center">
-                              {{ prop.name }}
-                              <span class="badge bg-primary rounded-pill">{{ prop.value }}</span>
-                          </li>
-                      </ul>
-                    </div>
-                    <div class="">
-                      <button class="btn btn-primary w-100">Book Now</button>
-                    </div>
-                </div>
+  <main class="container mt-5 mb-5">
+    <div v-if="roomDetails" class="p-4">
+      <div class="row">
+        <div class="col-lg-8">
+          <h3 class=" text-center">{{ roomDetails.name }} <span class="text-muted">- {{ roomDetails.room_type }}</span>
+          </h3>
+
+          <!-- Image Gallery -->
+          <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container mb-4">
+            <img :src="currentLargeImage" :alt="roomDetails.name"
+              class="room-large-image img-fluid rounded shadow-sm mb-2">
+            <div class="room-thumbnails">
+              <img v-for="(image, index) in roomDetails.images" :key="image.id" :src="image.image_path"
+                :alt="'Thumbnail ' + (index + 1)" class="room-thumbnail-item img-thumbnail rounded shadow-sm"
+                @click="changeLargeImage(image.image_path)"
+                :class="{ 'active-thumbnail': currentLargeImage === image.image_path }">
             </div>
-        </div>
-        <div v-else class="text-center py-5">
-            <p class="lead">Loading room details or room not found...</p>
-        </div>
-    </main>
+          </div>
+          <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
+            class="img-fluid mb-3 rounded shadow-sm room-single-thumbnail">
 
-    <Footer />
+          <p v-if="roomDetails.description" class="lead">{{ roomDetails.description }}</p>
+        </div>
+        <div class="col-lg-4">
+          <div class="pt-5">
+            <h4 class="card-text"><strong>{{ formatCurrency(roomDetails.price) }} Per night</strong></h4>
+            <ul class="list-group list-group-flush">
+              <li v-for="prop in roomDetails.properties" :key="prop.property_id"
+                class="list-group-item d-flex justify-content-between align-items-center">
+                {{ prop.name }}
+                <span class="badge bg-primary rounded-pill">{{ prop.value }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="">
+            <button class="btn btn-primary w-100">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-else class="text-center py-5">
+      <p class="lead">Loading room details or room not found...</p>
+    </div>
+  </main>
+
+  <Footer />
 </template>
 
 <style scoped>
@@ -194,7 +193,8 @@ onUnmounted(() => {
 
 .room-large-image {
   width: 100%;
-  height: 400px; /* Adjust height as needed */
+  height: 400px;
+  /* Adjust height as needed */
   object-fit: cover;
   opacity: 1;
   transform: scale(1);
@@ -210,12 +210,15 @@ onUnmounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: start; /* Center thumbnails */
+  justify-content: start;
+  /* Center thumbnails */
 }
 
 .room-thumbnail-item {
-  width: 100px; /* Adjust size as needed */
-  height: 75px; /* Adjust size as needed */
+  width: 100px;
+  /* Adjust size as needed */
+  height: 75px;
+  /* Adjust size as needed */
   object-fit: cover;
   cursor: pointer;
   border: 2px solid #dee2e6;
@@ -243,12 +246,13 @@ onUnmounted(() => {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .room-large-image {
-        height: 250px;
-    }
-    .room-thumbnail-item {
-        width: 80px;
-        height: 60px;
-    }
+  .room-large-image {
+    height: 250px;
+  }
+
+  .room-thumbnail-item {
+    width: 80px;
+    height: 60px;
+  }
 }
 </style>

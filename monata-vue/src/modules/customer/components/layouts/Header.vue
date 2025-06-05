@@ -4,7 +4,10 @@ import { api } from '@/modules/customer/lib/axios'
 import { ref } from 'vue'
 import CheckAvailable from '../forms/CheckAvailable.vue'
 import { useToast } from 'vue-toastification'
+import { useRoute, useRouter } from 'vue-router'
 
+const route = useRoute()
+const router = useRouter()
 const toast = useToast()
 const props = defineProps({
   bgClass: {
@@ -33,6 +36,7 @@ async function logout() {
     await api.post(`/logout`)
     authStore.logout()
     toast.success("You had logout!")
+    router.push('/')
   } catch (error: any) {
     console.error('Logout failed:', error.message)
     alert('Logout failed!')
@@ -46,11 +50,9 @@ async function logout() {
       <div class="menu-toogle-display d-none" id="menu-toogle">
         <i class="icon fa fa-menu" id="close-menu-icon" onclick="toggleMenu()"></i>
         <ul class="menu-toogle-list">
-          <li class="menu-toogle-item">Home</li>
-          <li class="menu-toogle-item">Rooms</li>
+          <li class="menu-toogle-item"><router-link to="/">Home</router-link></li>
+          <li class="menu-toogle-item"><router-link to="/rooms">Rooms</router-link></li>
           <li class="menu-toogle-item">About</li>
-          <li class="menu-toogle-item">Blog</li>
-          <li class="menu-toogle-item">Pages</li>
           <li class="menu-toogle-item">Contact</li>
           <li class="menu-toogle-item">
             <a href="#" class="menu-toogle-item-link text-decor-none" @click.prevent="openModal">Book A Room</a>
@@ -59,11 +61,13 @@ async function logout() {
       </div>
       <nav class="nav-bar">
         <div class="nav-start">
-          <a href="#" class="nav-item text-decor-none active-under">Home</a>
-          <a href="#" class="nav-item text-decor-none">Rooms</a>
+          <a href="#" class="nav-item text-decor-none" :class="{ 'active-under': route.name === 'home' }">
+            <router-link to="/" class="text-light">Home</router-link>
+          </a>
+          <a href="#" class="nav-item text-decor-none" :class="{ 'active-under': route.name === 'rooms' }">
+            <router-link to="/rooms" class="text-light">Rooms</router-link>
+          </a>
           <a href="#" class="nav-item text-decor-none">About</a>
-          <a href="#" class="nav-item text-decor-none">Blog</a>
-          <a href="#" class="nav-item text-decor-none">Pages</a>
           <a href="#" class="nav-item text-decor-none">Contact</a>
         </div>
         <div class="logo">
