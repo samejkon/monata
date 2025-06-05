@@ -17,7 +17,6 @@ class RoomClientService
         protected Room $model,
     ) {}
 
-
     /**
      * Search rooms by filters.
      *

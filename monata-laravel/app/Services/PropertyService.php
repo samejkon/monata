@@ -17,13 +17,13 @@ class PropertyService
      * @param  array  $keyword
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($payload): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function get($payload)
     {
         $query  = $this->model->where('name', 'like', '%' . Arr::get($payload, 'keyword') . '%')->orderBy('id', 'desc');
 
         $per_page = Arr::get($payload, 'per_page', 10);
 
-        return $query->paginate($per_page);
+        return $query->get();
     }
 
     /**

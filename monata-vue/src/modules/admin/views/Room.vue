@@ -318,116 +318,124 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <h3>Rooms</h3>
-    <div class="mb-3 d-flex justify-content-between flex-column flex-md-row">
-      <button class=" btn btn-primary" @click="openCreateRoomModal">New Room</button>
-      <form @submit.prevent="searchRooms"
-        class="d-md-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100  navbar-search">
-        <div class="input-group d-flex">
-          <div class="input-group-prepend">
-            <button class="btn btn-primary" type="submit">
-              <i class="fa-solid fa-filter"></i>
-            </button>
-          </div>
-          <select v-model="searchTerm.room_type_id" class="form-select">
-            <option value="">--All type--</option>
-            <option v-for="type in roomTypes" :key="type.id" :value="type.id">{{ type.name }}
-            </option>
-          </select>
-          <select class="form-select" id="status" v-model="searchTerm.status">
-            <option value="">--All status--</option>
-            <option value="1">Active</option>
-            <option value="2">Booked</option>
-            <option value="3">Occupied</option>
-            <option value="4">Cleaning</option>
-            <option value="5">Inactive</option>
-          </select>
-          <input v-model="searchTerm.name" type="text" class="form-control" placeholder="Name..." aria-label="Search"
-            aria-describedby="basic-addon2">
-          <button class="btn btn-outline-secondary" type="button" @click="resetFilter">
-            <i class="fa-solid fa-rotate-left"></i>
-          </button>
+    <div>
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Manage Rooms</h6>
         </div>
-      </form>
-    </div>
+        <div class="card-body">
+          <div class="mb-3 d-flex justify-content-between flex-column flex-md-row">
+            <button class=" btn btn-primary" @click="openCreateRoomModal">New Room</button>
+            <form @submit.prevent="searchRooms"
+              class="d-md-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100  navbar-search">
+              <div class="input-group d-flex">
+                <div class="input-group-prepend">
+                  <button class="btn btn-primary" type="submit">
+                    <i class="fa-solid fa-filter"></i>
+                  </button>
+                </div>
+                <select v-model="searchTerm.room_type_id" class="form-select">
+                  <option value="">--All type--</option>
+                  <option v-for="type in roomTypes" :key="type.id" :value="type.id">{{ type.name }}
+                  </option>
+                </select>
+                <select class="form-select" id="status" v-model="searchTerm.status">
+                  <option value="">--All status--</option>
+                  <option value="1">Active</option>
+                  <option value="2">Booked</option>
+                  <option value="3">Occupied</option>
+                  <option value="4">Cleaning</option>
+                  <option value="5">Inactive</option>
+                </select>
+                <input v-model="searchTerm.name" type="text" class="form-control" placeholder="Name..."
+                  aria-label="Search" aria-describedby="basic-addon2">
+                <button class="btn btn-outline-secondary" type="button" @click="resetFilter">
+                  <i class="fa-solid fa-rotate-left"></i>
+                </button>
+              </div>
+            </form>
+          </div>
 
-    <create-room-modal modalId="createRoomModal" modalTitle="New Room" @room-created="handleRoomCreated" />
-    <edit-room-modal v-if="roomToEdit" :modalId="'editRoomModal'" :modalTitle="'Edit Room'"
-      :initialRoomData="roomToEdit" @room-updated="handleRoomUpdated" :roomTypesApiUrl="'/room-types'" />
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
-      <div v-for="room in records" :key="room.id" class="col mb-4 room-card" @click="openRoomDetailsModal(room)">
-        <div class="card shadow-sm">
-          <div class="row g-0 flex-column flex-md-row">
-            <div class="col-md-7">
-              <img :src="room.thumbnail_path" :alt="room.name"
-                class="img-fluid rounded-start rounded-2 shadow-sm room-thumbnail"
-                style="object-fit: cover; height: 150px;">
-            </div>
-            <div class="col-md-5 p-0">
-              <div class="card-body pl-3">
-                <h5 class="card-title">{{ room.name }}</h5>
-                <p class="card-text">{{ room.room_type }}</p>
-                <p class="card-text">
-                  <span :class="{
-                    'badge bg-success text-white': room.status === 1,
-                    'badge bg-primary text-white': room.status === 2,
-                    'badge bg-warning text-dark': room.status === 3,
-                    'badge bg-info text-white': room.status === 4,
-                    'badge bg-secondary text-white': room.status === 5
-                  }">
-                    {{
-                      room.status === 1 ? 'Active' :
-                        room.status === 2 ? 'Booked' :
-                          room.status === 3 ? 'Occupied' :
-                            room.status === 4 ? 'Cleaning' :
-                              'Inactive'
-                    }}
-                  </span>
-                </p>
+          <create-room-modal modalId="createRoomModal" modalTitle="New Room" @room-created="handleRoomCreated" />
+          <edit-room-modal v-if="roomToEdit" :modalId="'editRoomModal'" :modalTitle="'Edit Room'"
+            :initialRoomData="roomToEdit" @room-updated="handleRoomUpdated" :roomTypesApiUrl="'/room-types'" />
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+            <div v-for="room in records" :key="room.id" class="col mb-4 room-card" @click="openRoomDetailsModal(room)">
+              <div class="card shadow-sm">
+                <div class="row g-0 flex-column flex-md-row">
+                  <div class="col-md-7">
+                    <img :src="room.thumbnail_path" :alt="room.name"
+                      class="img-fluid rounded-start rounded-2 shadow-sm room-thumbnail"
+                      style="object-fit: cover; height: 150px;">
+                  </div>
+                  <div class="col-md-5 p-0">
+                    <div class="card-body pl-3">
+                      <h5 class="card-title">{{ room.name }}</h5>
+                      <p class="card-text">{{ room.room_type }}</p>
+                      <p class="card-text">
+                        <span :class="{
+                          'badge bg-success text-white': room.status === 1,
+                          'badge bg-primary text-white': room.status === 2,
+                          'badge bg-warning text-dark': room.status === 3,
+                          'badge bg-info text-white': room.status === 4,
+                          'badge bg-secondary text-white': room.status === 5
+                        }">
+                          {{
+                            room.status === 1 ? 'Active' :
+                              room.status === 2 ? 'Booked' :
+                                room.status === 3 ? 'Occupied' :
+                                  room.status === 4 ? 'Cleaning' :
+                                    'Inactive'
+                          }}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <Pagination v-if="meta" v-model:currentPage="currentPage" :meta="meta" />
+          <Pagination v-if="meta" v-model:currentPage="currentPage" :meta="meta" />
 
-    <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
-      aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg w-100">
-        <div class="modal-content shadow">
-          <div class="modal-header justify-content-center">
-            <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">
-              Room {{ roomDetails.name }} - {{ displayedRoomTypeName }}
-            </h5>
-          </div>
-          <div class="modal-body" v-if="roomDetails">
-            <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container">
-              <img :src="currentLargeImage" :alt="roomDetails.name"
-                class="room-large-image img-fluid rounded-2 shadow-sm mb-2">
-              <div class="room-thumbnails">
-                <img v-for="(image, index) in roomDetails.images" :key="image.id" :src="image.image_path"
-                  :alt="'Thumbnail ' + (index + 1)" class="room-thumbnail-item img-thumbnail rounded-2 shadow-sm"
-                  @click="changeLargeImage(image.image_path)"
-                  :class="{ 'active-thumbnail': currentLargeImage === image.image_path }">
+          <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg w-100">
+              <div class="modal-content shadow">
+                <div class="modal-header justify-content-center">
+                  <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">
+                    Room {{ roomDetails.name }} - {{ displayedRoomTypeName }}
+                  </h5>
+                </div>
+                <div class="modal-body" v-if="roomDetails">
+                  <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container">
+                    <img :src="currentLargeImage" :alt="roomDetails.name"
+                      class="room-large-image img-fluid rounded-2 shadow-sm mb-2">
+                    <div class="room-thumbnails">
+                      <img v-for="(image, index) in roomDetails.images" :key="image.id" :src="image.image_path"
+                        :alt="'Thumbnail ' + (index + 1)" class="room-thumbnail-item img-thumbnail rounded-2 shadow-sm"
+                        @click="changeLargeImage(image.image_path)"
+                        :class="{ 'active-thumbnail': currentLargeImage === image.image_path }">
+                    </div>
+                  </div>
+                  <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
+                    class="img-fluid mb-3 rounded-2 shadow-sm room-single-thumbnail">
+                  <p v-if="roomDetails.price"><strong>Price:</strong> {{ roomDetails.price }}</p>
+                  <p><strong>Status:</strong>
+                    <span
+                      :class="{ 'badge bg-success text-white': roomDetails.status === 1, 'badge bg-secondary text-white': roomDetails.status !== 1 }">
+                      {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
+                    </span>
+                  </p>
+                  <p v-if="roomDetails.description"><strong>Description:</strong> {{ roomDetails.description }}</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                    @click="closeRoomDetailsModal">Close</button>
+                </div>
               </div>
             </div>
-            <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
-              class="img-fluid mb-3 rounded-2 shadow-sm room-single-thumbnail">
-            <p v-if="roomDetails.price"><strong>Price:</strong> {{ roomDetails.price }}</p>
-            <p><strong>Status:</strong>
-              <span
-                :class="{ 'badge bg-success text-white': roomDetails.status === 1, 'badge bg-secondary text-white': roomDetails.status !== 1 }">
-                {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
-              </span>
-            </p>
-            <p v-if="roomDetails.description"><strong>Description:</strong> {{ roomDetails.description }}</p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-              @click="closeRoomDetailsModal">Close</button>
           </div>
         </div>
       </div>
