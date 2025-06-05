@@ -95,10 +95,10 @@
                     Activity Log
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                  <router-link to="/admin/login" class="dropdown-item" @click="logout">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Logout
-                  </a>
+                  </router-link>
                 </div>
               </li>
             </ul>
@@ -118,14 +118,29 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { useRoute } from 'vue-router';  
+import { useRoute, useRouter } from 'vue-router';
+import { api } from '@/modules/admin/lib/axios';
+import { useToast } from 'vue-toastification'
 
-const route = useRoute(); 
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
 
 const isSidebarToggled = ref(false);
 const isCollapseTwoOpen = ref(false);
 const isUserDropdownOpen = ref(false);
 const isRoomsDropdownOpen = ref(false);
+
+const logout = async () => {
+  try {
+    await api.post('/logout');
+    router.push('/admin/login');
+    toast.success('You have been logged out');
+  } catch (error) {
+    console.error(error);
+    toast.error('Failed to logout');
+  }
+}
 
 const toggleSidebar = () => {
   isSidebarToggled.value = !isSidebarToggled.value;
