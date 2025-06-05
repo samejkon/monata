@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -19,19 +22,15 @@ class AuthController extends Controller
      * @param \Modules\ApiUserManager\Http\Controllers\Requests\Auth\LoginRequest $request
      *
      */
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         $user = $this->service->login($request->validated());
 
         if (! $user) {
-            return response()->json(['message' => 'Error'], 401);
+            return response()->json('Invalid credentials')->setStatusCode(401);
         }
 
-        $token = $user->createToken('admin-token', ['admin'])->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-        ]);
+        return response()->json('Logged in successfully')->setStatusCode(200);
     }
 
     /**
@@ -41,12 +40,14 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function logout(Request $request)
+    public function logout(Request $request): Response
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('admin')->logout();
 
-        return response()->json([
-            'message' => 'Logout successfully!'
-        ]);
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return response()->noContent();
     }
 }

@@ -81,6 +81,11 @@ const adminRoutes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: '/admin/login',
+    name: 'AdminLogin',
+    component: () => import('@/modules/admin/views/Auth/Login.vue'),
+  },
 ]
 
 export default adminRoutes
