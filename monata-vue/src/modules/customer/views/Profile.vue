@@ -230,7 +230,6 @@ const resetProfileForm = (): void => {
     createdAt: '',
     updatedAt: ''
   };
-
   profileUpdateError.value = null;
   nameError.value = null;
   emailError.value = null;
@@ -645,6 +644,10 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.hero {
+  height: 150px;
+  background-color: black;
+}
 /* Booking List Styles */
 .booking-list {
   display: grid;

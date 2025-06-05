@@ -42,9 +42,8 @@
             {{ offer.name }}
           </h3>
           <ul class="offer-descriptions gray">
-            <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">
-              {{ property.name }}: {{ property.value }}
-            </li>
+            <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">{{
+              property.name }}: {{ property.value }}</li>
           </ul>
           <a class="section-ouroffer-booking text-decor-none" href="#" @click.prevent="handleBookNow(offer.id)">
             Book Now
@@ -194,6 +193,20 @@ onMounted(() => {
   fetchRoomTypes()
 })
 
+const props = defineProps({
+  bgClass: {
+    type: String,
+    default: '1'
+  },
+  title: {
+    type: String,
+    default: 'Montana Resort'
+  },
+  description: {
+    type: String,
+    default: 'Unlock to enjoy the view of Martine'
+  }
+})
 const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', import.meta.url).href
 
 </script>
