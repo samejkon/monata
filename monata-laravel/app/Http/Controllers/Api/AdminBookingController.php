@@ -10,6 +10,7 @@ use App\Http\Requests\Booking\UpdateBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Http\Resources\RoomResource;
 use App\Services\BookingService;
+use App\Http\Requests\Booking\CheckRoomUserAvaiableRequest;
 
 class AdminBookingController extends Controller
 {
@@ -68,7 +69,6 @@ class AdminBookingController extends Controller
     public function checkRoomAvailability(CheckRoomAvaiableRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->service->checkRoom($request->validated());
-
         return RoomResource::collection($data);
     }
 

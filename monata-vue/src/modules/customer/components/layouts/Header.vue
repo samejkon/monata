@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import CheckAvailable from '../forms/CheckAvailable.vue'
 import { useToast } from 'vue-toastification'
 import { useRoute, useRouter } from 'vue-router'
+import { ShoppingBasket} from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -89,6 +90,9 @@ async function logout() {
           <button class="nav-booking" @click="openModal">
             Book A Room
           </button>
+          <router-link to="/booking" class="text-light" v-if="authStore.authenticated">
+            <ShoppingBasket />
+          </router-link>
         </div>
       </nav>
       <div class="text-overlay">
