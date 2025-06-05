@@ -27,8 +27,13 @@ export default [
     component: Contact,
   },
   {
-    path: '/room/:id',
-    name: 'room',
+    path: '/rooms/:id',
+    name: 'roomDetail',
     component: () => import('./views/RoomDetail.vue'),
-  }
+  },
+  {
+    path: '/rooms',
+    name: 'rooms',
+    component: () => import('./views/Room.vue'),
+  },
 ]
