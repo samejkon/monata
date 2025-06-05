@@ -165,8 +165,8 @@ const checkInRoom = async (bookingId, detailId) => {
                         @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
                     <button v-if="selectedBookingDetail?.status !== 4 && selectedBookingDetail?.status !== 5"
                         type="button" class="btn btn-primary" @click="editBooking">Edit</button>
-                    <button v-if="selectedBookingDetail?.status === 3 || selectedBookingDetail?.status === 4"
-                        type="button" class="btn btn-info" @click="openViewInvoice">Invoice</button>
+                    <button v-if="selectedBookingDetail?.status === 4" type="button" class="btn btn-info"
+                        @click="openViewInvoice">Invoice</button>
                 </div>
             </div>
         </div>

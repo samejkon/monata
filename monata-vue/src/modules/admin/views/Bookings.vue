@@ -346,11 +346,10 @@ const checkInBooking = async (bookingId) => {
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
                       }}</span>
                   </p>
-                  <button v-if="booking.status === 2" class="btn btn-success btn-sm mr-2"
-                    @click="checkInBooking(booking.id)">Check In</button>
+
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="openBookingDetailModal(booking)">Confirm</button>
-                  <button v-if="booking.status === 3" class="btn btn-warning btn-sm mr-2"
+                  <button v-if="booking.status === 2 || booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
                   <button v-if="booking.status === 4" type=" button" class="btn btn-info btn-sm ms-2"

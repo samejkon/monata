@@ -270,18 +270,20 @@ const createBooking = async () => {
                 </div>
               </div>
             </div>
-            <div class="mb-3">
-              <label for="guestPhone" class="form-label">Phone Number:</label>
-              <input type="text" class="form-control" id="guestPhone" v-model="newBooking.guest_phone" required>
-              <div v-if="validationErrors.guest_phone" class="text-danger small">
-                {{ validationErrors.guest_phone[0] }}
+            <div class="row">
+              <div class="mb-3 col-6">
+                <label for="guestPhone" class="form-label">Phone Number:</label>
+                <input type="text" class="form-control" id="guestPhone" v-model="newBooking.guest_phone" required>
+                <div v-if="validationErrors.guest_phone" class="text-danger small">
+                  {{ validationErrors.guest_phone[0] }}
+                </div>
               </div>
-            </div>
-            <div class="mb-3">
-              <label for="deposit" class="form-label">Deposit Amount:</label>
-              <input type="number" class="form-control" id="deposit" v-model="newBooking.deposit" min="0">
-              <div v-if="validationErrors.deposit" class="text-danger small">
-                {{ validationErrors.deposit[0] }}
+              <div class="mb-3 col-6">
+                <label for="deposit" class="form-label">Deposit Amount:</label>
+                <input type="number" class="form-control" id="deposit" v-model="newBooking.deposit" min="0">
+                <div v-if="validationErrors.deposit" class="text-danger small">
+                  {{ validationErrors.deposit[0] }}
+                </div>
               </div>
             </div>
             <div class="mb-3">

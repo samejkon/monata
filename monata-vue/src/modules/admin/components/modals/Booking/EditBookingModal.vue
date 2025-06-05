@@ -5,6 +5,7 @@ import moment from 'moment';
 import { useToast } from 'vue-toastification';
 import FlatPickr from 'vue-flatpickr-component';
 import 'flatpickr/dist/flatpickr.css';
+import { Trash2 } from 'lucide-vue-next';
 
 const toast = useToast();
 
@@ -131,7 +132,7 @@ const toggleAddRoomSection = () => {
 
 const checkAvailability = async () => {
   if (!searchCheckInTime.value || !searchCheckOutTime.value) {
-    toast.error('Vui lòng chọn thời gian check-in và check-out để tìm kiếm.');
+    toast.error('Select check-in and check-out times.');
     return;
   }
   try {
@@ -147,11 +148,11 @@ const checkAvailability = async () => {
       selected: false,
     }));
     if (availableRooms.value.length === 0) {
-      toast.info('Không có phòng trống trong khoảng thời gian đã chọn.');
+      toast.info('Don\'t have available rooms.');
     }
   } catch (error) {
     console.error('Error checking room availability:', error);
-    toast.error('Lỗi khi kiểm tra phòng trống: ' + (error.response?.data?.message || 'Unknown error.'));
+    toast.error('Error checking room availability: ' + (error.response?.data?.message || 'Unknown error.'));
     availableRooms.value = [];
   }
 };
@@ -163,7 +164,7 @@ const selectedRoomsCount = computed(() => {
 const addSelectedRoomsToBooking = () => {
   const roomsToAdd = availableRooms.value.filter(room => room.selected);
   if (roomsToAdd.length === 0) {
-    toast.warn('Vui lòng chọn ít nhất một phòng.');
+    toast.warn('Select at least one room.');
     return;
   }
 
@@ -185,14 +186,14 @@ const addSelectedRoomsToBooking = () => {
         price_per_day: room.price_from_api,
       });
     } else if (alreadyBooked) {
-      toast.info(`Phòng ${room.name} đã tồn tại trong danh sách phòng đã đặt.`);
+      toast.info(`Room ${room.name} is already booked.`);
     } else {
-      toast.info(`Phòng ${room.name} với thời gian này đã được chọn.`);
+      toast.info(`Room ${room.name} is already added.`);
     }
   });
 
   recalculateTotalPrice();
-  toast.success(`${roomsToAdd.length} phòng đã được thêm vào danh sách chờ.`);
+  toast.success(`${roomsToAdd.length} rooms added.`);
   availableRooms.value.forEach(room => room.selected = false);
 };
 
@@ -231,7 +232,7 @@ const recalculateTotalPrice = () => {
 
 const updateBooking = async () => {
   if (!bookingId.value) {
-    toast.error('Không tìm thấy ID booking.');
+    toast.error('Booking not found.');
     return;
   }
 
@@ -252,7 +253,7 @@ const updateBooking = async () => {
   ];
 
   if (allBookingDetailsPayload.length === 0) {
-    toast.error('Booking phải có ít nhất một phòng.');
+    toast.error('Please add at least one room.');
     return;
   }
 
@@ -275,15 +276,15 @@ const updateBooking = async () => {
 
   try {
     await api.put(`/bookings/${bookingId.value}`, payload);
-    toast.success('Booking đã được cập nhật thành công!');
+    toast.success('Booking updated successfull!');
     emit('bookingUpdated');
     closeModal();
   } catch (error) {
     console.error('Error updating booking:', error.response?.data || error.message);
     const errorMsg = error.response?.data?.errors
       ? Object.values(error.response.data.errors).flat().join(' ')
-      : (error.response?.data?.message || 'Lỗi không xác định.');
-    toast.error(`Cập nhật booking thất bại: ${errorMsg}`);
+      : (error.response?.data?.message || 'Unknown error.');
+    toast.error(`Failed to update booking: ${errorMsg}`);
   }
 };
 
@@ -306,15 +307,15 @@ onMounted(() => {
     <div class="modal-dialog modal-xl modal-dialog-scrollable" @click.stop="">
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title">Cập Nhật Booking</h5>
+          <h5 class="modal-title">Update Booking</h5>
           <button type="button" class="btn-close btn-close-white" @click="closeModal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form id="updateBookingForm" @submit.prevent="updateBooking">
-            <h5 class="mb-3">Thông tin Khách hàng</h5>
+            <h5 class="mb-3">Information</h5>
             <div class="row g-3 mb-4">
               <div class="col-md-6">
-                <label for="editGuestName" class="form-label">Khách hàng</label>
+                <label for="editGuestName" class="form-label">Guest</label>
                 <input type="text" class="form-control" id="editGuestName" v-model="guestName">
               </div>
               <div class="col-md-6">
@@ -322,22 +323,22 @@ onMounted(() => {
                 <input type="email" class="form-control" id="editGuestEmail" v-model="guestEmail">
               </div>
               <div class="col-md-6">
-                <label for="editGuestPhone" class="form-label">Điện thoại</label>
+                <label for="editGuestPhone" class="form-label">Phone number</label>
                 <input type="tel" class="form-control" id="editGuestPhone" v-model="guestPhone">
               </div>
             </div>
 
-            <h5 class="mb-3">Thông tin Booking</h5>
+            <h5 class="mb-3">Booking</h5>
             <div class="row g-3 mb-4">
               <div class="col-md-6">
-                <label for="editTotalPrice" class="form-label">Tổng giá</label>
+                <label for="editTotalPrice" class="form-label">Total</label>
                 <div class="input-group">
                   <input type="text" class="form-control" id="editTotalPrice" :value="formatCurrency(totalPrice)"
                     disabled>
                 </div>
               </div>
               <div class="col-md-6">
-                <label for="editDeposit" class="form-label">Tiền đặt cọc</label>
+                <label for="editDeposit" class="form-label">Deposit</label>
                 <div class="input-group">
                   <input type="number" class="form-control" id="editDeposit" v-model.number="deposit" min="0">
                   <span class="input-group-text">VNĐ</span>
@@ -345,22 +346,22 @@ onMounted(() => {
               </div>
 
               <div class="col-12">
-                <label for="editBookingNote" class="form-label">Ghi chú</label>
+                <label for="editBookingNote" class="form-label">Note</label>
                 <textarea class="form-control" id="editBookingNote" rows="3" v-model="bookingNote"></textarea>
               </div>
             </div>
 
-            <h5 class="mb-3">Phòng đã đặt</h5>
+            <h5 class="mb-3">Current Booked Rooms</h5>
             <div class="table-responsive mb-4">
               <table class="table table-bordered align-middle">
                 <thead>
                   <tr>
-                    <th scope="col">Phòng</th>
-                    <th scope="col">Loại phòng</th>
+                    <th scope="col">Room</th>
+                    <th scope="col">Room type</th>
                     <th scope="col">Check-in</th>
                     <th scope="col">Check-out</th>
-                    <th scope="col">Giá nửa ngày</th>
-                    <th scope="col">Thao tác</th>
+                    <th scope="col">Price half day</th>
+                    <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody id="currentBookedRoomsTableBody">
@@ -371,9 +372,10 @@ onMounted(() => {
                     <td>{{ formatDate(room.checkout_at) }}</td>
                     <td>{{ formatCurrency(room.price_per_day) }}</td>
                     <td>
-                      <button type="button" class="btn btn-sm btn-outline-danger"
-                        @click="removeBookedRoom(index, false)"
-                        :disabled="room.status !== 1 && room.status !== undefined">Xóa</button>
+                      <button type="button" class="btn btn-sm btn-danger" @click="removeBookedRoom(index, false)"
+                        :disabled="room.status !== 1 && room.status !== undefined">
+                        <Trash2 />
+                      </button>
                     </td>
                   </tr>
                   <tr v-for="(room, index) in newRoomsForBooking" :key="`new-${room.room_id}-${index}`">
@@ -384,11 +386,13 @@ onMounted(() => {
                     <td>{{ formatCurrency(room.price_per_day) }}</td>
                     <td>
                       <button type="button" class="btn btn-sm btn-outline-danger"
-                        @click="removeBookedRoom(index, true)">Xóa</button>
+                        @click="removeBookedRoom(index, true)">
+                        <Trash2 />
+                      </button>
                     </td>
                   </tr>
                   <tr v-if="bookedRooms.length === 0 && newRoomsForBooking.length === 0">
-                    <td colspan="6" class="text-center">Chưa có phòng nào được chọn.</td>
+                    <td colspan="6" class="text-center">No rooms selected.</td>
                   </tr>
                 </tbody>
               </table>
@@ -396,13 +400,13 @@ onMounted(() => {
 
             <div class="mb-4">
               <button type="button" class="btn btn-primary" @click="toggleAddRoomSection">
-                {{ showRoomAvailabilitySection ? 'Ẩn phần thêm phòng' : 'Thêm/Thay đổi phòng' }}
+                {{ showRoomAvailabilitySection ? 'Hide' : 'Add room' }}
               </button>
             </div>
 
             <div v-if="showRoomAvailabilitySection" id="roomAvailabilitySection"
               class="p-3 border rounded bg-light mb-4">
-              <h5 class="mb-3">Kiểm tra phòng khả dụng</h5>
+              <h5 class="mb-3">Check Availability</h5>
               <div class="row g-3 mb-3">
                 <div class="col-md-6">
                   <label for="searchCheckInTimeInput" class="form-label">Check-in Time:</label>
@@ -420,15 +424,15 @@ onMounted(() => {
               </div>
 
               <div v-if="availableRooms.length > 0">
-                <h6 class="mb-3">Chọn phòng cho Booking này:</h6>
+                <h6 class="mb-3">Available Rooms:</h6>
                 <div class="table-responsive">
                   <table class="table table-bordered align-middle">
                     <thead>
                       <tr>
                         <th width="80px"></th>
-                        <th scope="col">Tên phòng</th>
-                        <th scope="col">Loại phòng</th>
-                        <th scope="col">Giá nửa ngày</th>
+                        <th scope="col">Room</th>
+                        <th scope="col">Room type</th>
+                        <th scope="col">Price half day</th>
                       </tr>
                     </thead>
                     <tbody id="availableRoomsTableBody">
@@ -443,19 +447,19 @@ onMounted(() => {
                     </tbody>
                   </table>
                 </div>
-                <p class="mt-2 mb-0">Bạn đã chọn <span id="selectedRoomsCountSpan">{{ selectedRoomsCount }}</span>
-                  phòng.</p>
-                <button type="button" class="btn btn-success mt-3" @click="addSelectedRoomsToBooking">Thêm phòng đã
-                  chọn</button>
+                <p class="mt-2 mb-0">You have selected <span id="selectedRoomsCountSpan">{{ selectedRoomsCount }}</span>
+                  room.</p>
+                <button type="button" class="btn btn-success mt-3" @click="addSelectedRoomsToBooking">Add selected
+                  rooms</button>
               </div>
-              <p v-else-if="!searchCheckInTime || !searchCheckOutTime" class="text-muted">Vui lòng chọn thời gian để
-                kiểm tra phòng.</p>
-              <p v-else class="text-muted">Không có phòng nào trống hoặc chưa tìm kiếm.</p>
+              <p v-else-if="!searchCheckInTime || !searchCheckOutTime" class="text-muted">Select check-in and check-out.
+              </p>
+              <p v-else class="text-muted">No available rooms.</p>
             </div>
 
             <div class="modal-footer mt-4">
-              <button type="button" class="btn btn-secondary" @click="closeModal">Hủy</button>
-              <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+              <button type="button" class="btn btn-secondary" @click="closeModal">Cancel</button>
+              <button type="submit" class="btn btn-success">Save</button>
             </div>
           </form>
         </div>

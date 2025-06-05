@@ -457,6 +457,10 @@ class BookingService
         return DB::transaction(function () use ($bookingId) {
             $booking = Booking::findOrFail($bookingId);
 
+            if ($booking->status !== BookingStatus::CHECK_IN) {
+                throw new \Exception('Booking is not in CHECK_IN status.');
+            }
+
             $priceRoom = $booking->total_payment;
 
             $priceService = InvoiceDetail::where('booking_id', $bookingId)
