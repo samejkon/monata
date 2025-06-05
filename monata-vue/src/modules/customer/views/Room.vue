@@ -23,8 +23,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Header bgClass="4  " title="" description="" />
-
+  <div class="bg-dark">
+    <Header />
+  </div>
+  <div class="hero"> </div>
   <main class="">
     <div class="container my-3">
       <div class="row">
@@ -49,6 +51,11 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.hero {
+  height: 150px;
+  background-color: black;
+}
+
 .rom-thumbnail {
   width: 100%;
   aspect-ratio: 1 / 1;

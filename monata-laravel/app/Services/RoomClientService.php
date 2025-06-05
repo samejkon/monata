@@ -36,7 +36,7 @@ class RoomClientService
                 $q->where('name', 'like', '%' . $filters['name'] . '%');
             });
 
-        $perPage = $filters['per_page'] ?? 6;
+        $perPage = $filters['per_page'] ?? 100;
         $rooms = $rooms->paginate($perPage);
 
         return $rooms;
