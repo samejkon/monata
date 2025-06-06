@@ -28,7 +28,7 @@
                 <div class="col-lg-8">
                     <form class="form-contact contact_form" @submit.prevent="submitForm" id="contactForm">
                         <div class="row">
-                            <template v-if="!authStore.user">
+                            <template v-if="!(authStore.type === 'user')">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <input v-model="formData.guest_name" class="form-control"
