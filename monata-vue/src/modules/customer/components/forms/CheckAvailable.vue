@@ -3,7 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import { api } from '../../lib/axios'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
-import { useAuthStore } from '../../stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import LoginPopup from '../auth/LoginModal.vue'
 import RegisterModal from '../auth/RegisterModal.vue'
 
@@ -183,7 +183,7 @@ const bookSelectedRooms = async () => {
     return
   }
 
-  if (!authStore.authenticated) {
+  if (!authStore.user) {
     toast.info('Please login to book rooms')
     closeModal()
     localStorage.setItem('pendingBooking', JSON.stringify({
@@ -244,7 +244,7 @@ const bookSelectedRooms = async () => {
 
 const checkPendingBooking = () => {
   const pendingBooking = localStorage.getItem('pendingBooking')
-  if (pendingBooking && authStore.authenticated) {
+  if (pendingBooking && authStore.user) {
     const bookingData = JSON.parse(pendingBooking)
     formData.value = {
       checkin_at: bookingData.checkin_at,
@@ -264,7 +264,7 @@ const handleBookRooms = () => {
     return
   }
 
-  if (!authStore.authenticated) {
+  if (!authStore.user) {
     showLoginPopup.value = true
     showRegisterPopup.value = false
     return
@@ -305,7 +305,7 @@ const restoreBookingState = () => {
 }
 
 watch(
-  () => authStore.authenticated,
+  () => authStore.user,
   (isAuthenticated) => {
     if (isAuthenticated) {
       fetchUserData()
@@ -329,10 +329,10 @@ watch(
 
 onMounted(() => {
   fetchRoomTypes()
-  if (authStore.authenticated) {
+  if (authStore.user) {
     fetchUserData()
   }
-  if (authStore.authenticated && localStorage.getItem('pendingBooking')) {
+  if (authStore.user && localStorage.getItem('pendingBooking')) {
     restoreBookingState()
   }
 })

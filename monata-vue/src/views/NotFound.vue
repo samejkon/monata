@@ -1,0 +1,12 @@
+<template>
+    <div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light text-dark">
+      <h1 class="display-1 text-danger mb-3">404 Not found</h1>
+      <router-link to="/">Back to home</router-link>
+    </div>
+</template>
+  
+<script>
+export default {
+  name: 'Errors'
+}
+</script>

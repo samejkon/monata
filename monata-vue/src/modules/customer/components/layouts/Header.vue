@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // ... các import và props, store, hàm như bạn đã có
 import { computed } from 'vue'; // Import computed
-import { useAuthStore } from '@/modules/customer/stores/auth'
+import { useAuthStore } from '@/stores/auth';
 import { api } from '@/modules/customer/lib/axios'
 import { ref } from 'vue'
 import CheckAvailable from '../forms/CheckAvailable.vue'
@@ -51,8 +51,8 @@ const openRegisterModal = () => {
 async function logout() {
   try {
     await api.post(`/logout`)
-    authStore.logout()
     toast.success("You had logout!")
+    authStore.clearUser()
     router.push('/')
   } catch (error: any) {
     console.error('Logout failed:', error.message)
@@ -97,14 +97,14 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
 
         <div class="col-5 d-flex justify-content-center align-items-center">
           <div>
-            <a href="#" @click.prevent="openLoginModal" class="nav-item text-decoration-none text-light"
-              v-if="!authStore.authenticated">
-              Sign in to your account
-            </a>
-            <template v-if="authStore.authenticated">
+            <span v-if="authStore.type === 'user'">
               <router-link to="/profile" class="text-light">Profile /</router-link>
               <a href="#" @click.prevent="logout()" class="text-light">Logout</a>
-            </template>
+            </span>
+            <a href="#" @click.prevent="openLoginModal" class="nav-item text-decoration-none text-light"
+              v-else>
+              Sign in to your account
+            </a>
             <button class="nav-booking btn btn-primary ms-3" @click="openModal">
               Book A Room
             </button>

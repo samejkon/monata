@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -49,5 +50,15 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return response()->noContent();
+    }
+
+    /**
+     * Get the profile of the current admin user.
+     *
+     * @return \App\Http\Resources\UserResource
+     */
+    public function getProfile(): UserResource
+    {
+        return new UserResource(Auth::guard('admin')->user());
     }
 }

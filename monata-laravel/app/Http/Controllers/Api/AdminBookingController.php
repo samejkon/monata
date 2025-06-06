@@ -21,9 +21,9 @@ class AdminBookingController extends Controller
     /**
      * Get all bookings.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection | Null
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection | Null
     {
         $data = $this->service->get();
 

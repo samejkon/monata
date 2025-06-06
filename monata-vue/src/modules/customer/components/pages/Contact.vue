@@ -28,7 +28,7 @@
                 <div class="col-lg-8">
                     <form class="form-contact contact_form" @submit.prevent="submitForm" id="contactForm">
                         <div class="row">
-                            <template v-if="!authStore.authenticated">
+                            <template v-if="!authStore.user">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <input v-model="formData.guest_name" class="form-control"
@@ -111,7 +111,7 @@ import { reactive, ref } from 'vue'
 import type { Contact } from "../../../admin/stores/model/Contact.model"
 import { HouseIcon, PhoneIcon, MailIcon } from 'lucide-vue-next'
 import { csrf, api } from '../../lib/axios'
-import { useAuthStore } from '@/modules/customer/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const mapError = ref(false)
@@ -192,7 +192,7 @@ const submitForm = async () => {
             content: formData.content
         }
 
-        if (authStore.authenticated) {
+        if (authStore.user) {
             try {
                 const response = await api.get('/profile')
                 dataToSend.user_id = response.data.data.id
