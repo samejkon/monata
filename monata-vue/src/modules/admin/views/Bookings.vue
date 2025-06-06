@@ -65,26 +65,32 @@ const processBookings = (bookingsData) => {
         const checkinMoment = moment(detail.checkin_at);
         const checkoutMoment = moment(detail.checkout_at);
 
-        const startDateForBooking = checkinMoment.clone().startOf('day');
-        let endDateForBooking = checkoutMoment.clone().subtract(1, 'second').startOf('day');
+        const startDate = checkinMoment.clone().startOf('day');
+        const endDate = checkoutMoment.clone().startOf('day');
 
-        if (checkoutMoment.hour() > 0 || checkoutMoment.minute() > 0 || checkoutMoment.second() > 0) {
-          endDateForBooking = checkoutMoment.clone().startOf('day');
-        }
+        // A booking is considered to run up to the day before checkout,
+        // unless the checkout time is not midnight. In that case, the
+        // checkout day itself is included.
+        const isCheckoutAtMidnight = checkoutMoment.hour() === 0 && checkoutMoment.minute() === 0 && checkoutMoment.second() === 0;
+        const lastDayOfBooking = isCheckoutAtMidnight ? endDate.clone().subtract(1, 'day') : endDate;
 
-        let currentDate = moment(startDateForBooking);
-        while (currentDate.isSameOrBefore(endDateForBooking)) {
+        let currentDate = startDate.clone();
+        while (currentDate.isSameOrBefore(lastDayOfBooking)) {
           const dateKey = currentDate.toISOString();
           if (!processedBookings[dateKey]) {
             processedBookings[dateKey] = {};
           }
-          processedBookings[dateKey][detail.room_id] = {
+          if (!processedBookings[dateKey][detail.room_id]) {
+            processedBookings[dateKey][detail.room_id] = [];
+          }
+          processedBookings[dateKey][detail.room_id].push({
             booking_id: booking.id,
+            booking_detail_id: detail.id,
             guest_name: booking.guest_name,
             room_id: detail.room_id,
             room_name: detail.room_name,
             fullBooking: booking
-          };
+          });
           currentDate.add(1, 'day');
         }
       });
@@ -125,7 +131,7 @@ const getDailyBookedRooms = (date) => {
   if (!roomsBookedOnDate) {
     return [];
   }
-  return Object.values(roomsBookedOnDate).sort((a, b) => a.room_id - b.room_id);
+  return Object.values(roomsBookedOnDate).flat().sort((a, b) => a.room_id - b.room_id);
 };
 
 const isToday = (date) => {
@@ -312,7 +318,7 @@ const checkInBooking = async (bookingId) => {
                 @click="selectDay(day.date)">
                 <div class="day-number">{{ day.dayOfMonth }}</div>
                 <div class="room-summary mt-2">
-                  <span v-for="roomBooking in getDailyBookedRooms(day.date)" :key="roomBooking.room_id"
+                  <span v-for="roomBooking in getDailyBookedRooms(day.date)" :key="roomBooking.booking_detail_id"
                     class="badge text-white me-1" :class="getBadgeClass(roomBooking.fullBooking?.status)"
                     :title="`Room ${roomBooking.room_name} (${roomBooking.guest_name})`"
                     @click.stop="openBookingDetailModal(roomBooking.fullBooking)">
@@ -343,7 +349,7 @@ const checkInBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                      }}</span>
+                    }}</span>
                   </p>
 
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"

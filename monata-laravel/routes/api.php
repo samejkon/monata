@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\RoomTypeController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\RoomController;
 use App\Http\Controllers\Api\AuthUserController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoomClientController;
@@ -47,6 +48,8 @@ Route::prefix('admin')->group(function () {
 
         Route::apiResource('users', UserController::class);
         Route::post('users/{id}/restore', [UserController::class, 'restore']);
+
+        Route::get('/revenue', [DashboardController::class, 'revenue']);
     });
 });
 
