@@ -155,11 +155,7 @@ onUnmounted(() => {
 
 <template>
   <Header />
-<<<<<<< Updated upstream
   <div class="hero"></div>
-=======
-  <div class="hero-overlay"></div>
->>>>>>> Stashed changes
   <main class="container mt-5 mb-5">
     <div v-if="roomDetails">
       <div class="row">
@@ -386,10 +382,11 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.hero{
+.hero {
   background-color: black;
   height: 150px;
 }
+
 /* Transition for Floating Button */
 .fade-slide-up-enter-active,
 .fade-slide-up-leave-active {

@@ -97,7 +97,7 @@ const formatDateTime = (dateTimeStr: string): string => {
   const year = date.getFullYear();
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
-  
+
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 };
 
@@ -119,14 +119,14 @@ const formatCurrency = (value: string | number | null | undefined): string => {
 
 const getStatusBadgeClass = (status: number) => {
   if (!status) return 'bg-secondary';
-  
+
   const statusLower = String(status).toLowerCase();
   switch (status) {
     case 1:
       return 'bg-warning text-dark';
     case 2:
       return 'bg-primary text-white';
-    case 3: 
+    case 3:
     case 4:
       return 'bg-info text-white';
     case 5:
@@ -138,7 +138,7 @@ const getStatusBadgeClass = (status: number) => {
 
 const getStatusText = (status: number): string => {
   if (!status) return 'Unknown';
-  
+
   switch (status) {
     case 1:
       return 'pending';
@@ -558,9 +558,9 @@ onMounted(() => {
                   <div class="card h-100">
                     <div class="card-body d-flex flex-column">
                       <div class="d-flex justify-content-between align-items-center mb-3">
-                         <span class="status-badge" :class="getStatusBadgeClass(booking.status)">
-                            {{ getStatusText(booking.status) }}
-                         </span>
+                        <span class="status-badge" :class="getStatusBadgeClass(booking.status)">
+                          {{ getStatusText(booking.status) }}
+                        </span>
                         <button class="btn btn-outline-primary btn-sm" @click="showBookingDetails(booking)">
                           <i class="fas fa-eye me-1"></i>
                           View details
@@ -570,12 +570,13 @@ onMounted(() => {
                       <div class="flex-grow-1">
                         <p class="mb-1"><strong>Booking Code:</strong> #{{ booking.id }}</p>
                         <p class="mb-0"><strong>Room number:</strong> {{ booking.booking_details.length }}</p>
-                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{ formatCurrency(booking.deposit) }}</p>
+                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{
+                          formatCurrency(booking.deposit) }}</p>
                         <p class="mb-0"><strong>Total Payment:</strong> {{ formatCurrency(booking.total_payment) }}</p>
                       </div>
-                       <div class="mt-2 text-muted small">
-                         <i class="far fa-calendar-alt me-1"></i> Booking date: {{ formatDateTime(booking.created_at) }}
-                       </div>
+                      <div class="mt-2 text-muted small">
+                        <i class="far fa-calendar-alt me-1"></i> Booking date: {{ formatDateTime(booking.created_at) }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -648,7 +649,7 @@ onMounted(() => {
   height: 150px;
   background-color: black;
 }
-<<<<<<< Updated upstream
+
 /* Booking List Styles */
 .booking-list {
   display: grid;
@@ -665,7 +666,7 @@ onMounted(() => {
 }
 
 .booking-item .card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .booking-item .card-body {
@@ -802,28 +803,29 @@ onMounted(() => {
 
 .table-responsive {
   border-radius: 8px;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 @media (max-width: 768px) {
   .booking-list {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-content {
     width: 95%;
     margin: 1rem;
   }
-  
+
   .modal-body {
     padding: 0.75rem;
   }
-  
+
   .booking-details {
     padding: 1rem;
   }
-  
-  .table th, .table td {
+
+  .table th,
+  .table td {
     padding: 0.5rem;
     font-size: 0.85rem;
   }
@@ -831,17 +833,5 @@ onMounted(() => {
   .booking-item p strong {
     min-width: 80px;
   }
-}
-</style>
-
-<style scoped>
-.hero {
-  height: 150px;
-  background-color: black;
-=======
-
-.bg-body-tertiary {
-  min-height: 350px;
->>>>>>> Stashed changes
 }
 </style>
