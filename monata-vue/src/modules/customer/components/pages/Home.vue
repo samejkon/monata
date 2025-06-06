@@ -7,7 +7,9 @@
   </header>
   <section class="section-about container mt-5">
     <div class="section-about-start">
-      <p class="section-about-title blue">About us</p>
+      <a class="section-about-title blue">
+        <router-link to="/about">About me</router-link>
+      </a>
       <h3 class="section-about-heading black">
         A Luxuries Hotel with Nature
       </h3>

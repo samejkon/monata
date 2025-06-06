@@ -36,4 +36,10 @@ export default [
     name: 'rooms',
     component: () => import('./views/Room.vue'),
   }
+  ,
+  {
+    path: '/about',
+    name: 'about',
+    component: () => import('./views/About.vue'),
+  }
 ]

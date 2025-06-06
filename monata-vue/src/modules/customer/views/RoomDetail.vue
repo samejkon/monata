@@ -3,7 +3,7 @@ import Footer from '@/modules/customer/components/layouts/Footer.vue'
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { api } from '@/modules/customer/lib/axios' // Reusing admin axios instance for now, consider creating a customer-specific one if needed
+import { api } from '@/modules/customer/lib/axios'
 
 const route = useRoute()
 const roomDetails = ref(null)
@@ -12,7 +12,6 @@ const currentImageIndex = ref(0)
 const isTransitioning = ref(false)
 let intervalId = null
 
-// Ref để tham chiếu đến phần tử sticky booking card
 const bookingCardRef = ref(null)
 
 const formatCurrency = (value) => {
@@ -125,13 +124,10 @@ const stopImageSlider = () => {
   }
 }
 
-// Logic cho nút "Book Now" nổi
 const showFloatingBookButton = ref(false)
 const handleScroll = () => {
   const scrollPosition = window.scrollY || document.documentElement.scrollTop
-  // Hiển thị nút khi cuộn quá một ngưỡng nhất định (ví dụ 300px)
-  // và khi màn hình không phải là desktop (để tránh trùng lặp với sticky card)
-  const isDesktop = window.innerWidth >= 992; // Bootstrap 'lg' breakpoint
+  const isDesktop = window.innerWidth >= 992;
   showFloatingBookButton.value = scrollPosition > 300 && !isDesktop;
 }
 
@@ -153,6 +149,8 @@ onUnmounted(() => {
   stopImageSlider()
   window.removeEventListener('scroll', handleScroll)
 })
+
+
 </script>
 
 <template>
@@ -222,6 +220,11 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.hero-overlay {
+  height: 150px;
+  background-color: black;
+}
+
 /* Ensure HTML and Body are not restricting scroll */
 html,
 body {
@@ -379,10 +382,11 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.hero{
+.hero {
   background-color: black;
   height: 150px;
 }
+
 /* Transition for Floating Button */
 .fade-slide-up-enter-active,
 .fade-slide-up-leave-active {

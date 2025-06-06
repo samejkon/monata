@@ -63,7 +63,7 @@ watch(() => props.show, async (newValue) => {
       availabilityCheck.value.checkin_at = moment(props.initialCheckinDate).startOf('day').format('YYYY-MM-DDTHH:mm');
       availabilityCheck.value.checkout_at = moment(props.initialCheckinDate).add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm');
     }
-    await checkRoomAvailability();
+    // await checkRoomAvailability();
   } else {
     document.body.classList.remove('modal-open-custom');
   }
@@ -197,7 +197,7 @@ const createBooking = async () => {
 
   for (const selectedId of selectedRoomIdsSet) {
     if (!currentlyAvailableRoomIdsSet.has(selectedId)) {
-      toast.error(`Room ID ${selectedId} is no longer available for the selected period. Please check again!`);
+      toast.error(`Room ${selectedId} is no longer available for the selected period. Please check again!`);
       return;
     }
   }
@@ -299,15 +299,15 @@ const createBooking = async () => {
               <div class="col-md-6 mb-3">
                 <label for="checkinAvailability" class="form-label">Check-in Time:</label>
                 <FlatPickr id="checkinAvailability" v-model="availabilityCheck.checkin_at" :config="flatpickrConfig"
-                  class="form-control" @on-change="checkRoomAvailability" required />
+                  class="form-control" required />
                 <div v-if="validationErrors.checkin_at" class="text-danger small">
                   {{ validationErrors.checkin_at[0] }}
                 </div>
               </div>
               <div class="col-md-6 mb-3">
                 <label for="checkoutAvailability" class="form-label">Check-out Time:</label>
-                <FlatPickr id="checkoutAvailability" v-model="availabilityCheck.checkout_at" :config="flatpickrConfig"
-                  class="form-control" @on-change="checkRoomAvailability" required />
+                <FlatPickr id="checkoutAvailability" @on-change="checkRoomAvailability"
+                  v-model="availabilityCheck.checkout_at" :config="flatpickrConfig" class="form-control" required />
                 <div v-if="validationErrors.checkout_at" class="text-danger small">
                   {{ validationErrors.checkout_at[0] }}
                 </div>

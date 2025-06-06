@@ -374,7 +374,7 @@ onUnmounted(() => {
                       <p class="card-text">{{ room.room_type }}</p>
                       <p class="card-text">
                         <span :class="{
-                          'badge bg-success text-white': room.status === 1,
+                          'status-label badge bg-success text-white': room.status === 1,
                           'badge bg-primary text-white': room.status === 2,
                           'badge bg-warning text-dark': room.status === 3,
                           'badge bg-info text-white': room.status === 4,
@@ -398,9 +398,9 @@ onUnmounted(() => {
 
           <Pagination v-if="meta" v-model:currentPage="currentPage" :meta="meta" />
 
-          <div class="modal fade" id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
+          <div class="modal fade " id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg w-100">
+            <div class="modal-dialog modal-dialog-centered modal-xl-custom">
               <div class="modal-content shadow">
                 <div class="modal-header justify-content-center">
                   <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">
@@ -427,8 +427,8 @@ onUnmounted(() => {
                       {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
                     </span>
                   </p>
-                  <h3>Mô tả phòng:</h3>
-                  <div v-html="roomDetails.description"></div>
+                  <h3>Description</h3>
+                  <div v-html="roomDetails.description" class="room-description"></div>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
@@ -449,9 +449,31 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
+.room-description {
+  margin-top: 2rem;
+}
+
+/* Fix for images inside v-html content */
+.room-description :deep(img) {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 0.375rem;
+  /* Bootstrap's .rounded */
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  /* Subtle shadow */
+}
+
 .room-thumbnail {
   object-fit: contain;
   height: 100%;
+  width: 100%;
+}
+
+.modal-xl-custom {
+  max-width: 1200px;
+  /* hoặc bao nhiêu bạn muốn */
   width: 100%;
 }
 
@@ -461,11 +483,49 @@ onUnmounted(() => {
 
 .room-large-image {
   width: 100%;
-  height: 300px;
+  height: 600px;
   object-fit: cover;
   opacity: 1;
   transform: scale(1);
   transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  /* Adjust these values as needed */
+  /* You can also add other styling like border-radius if you want rounded corners */
+  border-radius: 0.25rem;
+}
+
+/* Your existing status-specific styles */
+.status-label.bg-success {
+  background-color: #198754 !important;
+  /* Example color for success */
+  color: white;
+}
+
+.badge.bg-primary {
+  background-color: #0d6efd !important;
+  /* Example color for primary */
+  color: white;
+}
+
+.badge.bg-warning {
+  background-color: #ffc107 !important;
+  /* Example color for warning */
+  color: black;
+}
+
+.badge.bg-info {
+  background-color: #0dcaf0 !important;
+  /* Example color for info */
+  color: white;
+}
+
+.badge.bg-secondary {
+  background-color: #6c757d !important;
+  /* Example color for secondary */
+  color: white;
 }
 
 .room-large-image.fade-out {
@@ -480,8 +540,8 @@ onUnmounted(() => {
 }
 
 .room-thumbnail-item {
-  width: 80px;
-  height: 60px;
+  width: 160px;
+  height: 90px;
   object-fit: cover;
   cursor: pointer;
   border: 1px solid #dee2e6;

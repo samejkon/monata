@@ -9,7 +9,7 @@ import LoginModal from '@/modules/customer/components/auth/LoginModal.vue'
 import RegisterModal from '@/modules/customer/components/auth/RegisterModal.vue'
 import { useToast } from 'vue-toastification'
 import { useRoute, useRouter } from 'vue-router'
-import { ShoppingBasket} from 'lucide-vue-next'
+import { ShoppingBasket } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -67,6 +67,7 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
 <template>
   <nav class="main-navbar navbar-absolute">
     <div class="container-fluid">
+      
       <div class="row align-items-center">
         <div class="col-5 d-flex justify-content-center">
           <ul class="navbar-nav d-flex flex-row">
@@ -81,7 +82,9 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
               </a>
             </li>
             <li class="nav-item mx-2" :class="{ 'active-under': route.name === 'about' }">
-              <a class="nav-link">About</a>
+              <a class="nav-link">
+                <router-link to="/about" class="text-light">About</router-link>
+              </a>
             </li>
             <li class="nav-item mx-2" :class="{ 'active-under': route.name === 'contact' }">
               <a class="nav-link">
