@@ -6,6 +6,7 @@ import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 import LoginPopup from '../auth/LoginModal.vue'
 import RegisterModal from '../auth/RegisterModal.vue'
+import BookingConfirmationModal from './BookingConfirmationModal.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -27,12 +28,14 @@ const isModalOpen = computed({
 
 const showLoginPopup = ref(false)
 const showRegisterPopup = ref(false)
+const showBookingConfirmation = ref(false)
 
 const closeModal = () => {
   isModalOpen.value = false
   resetForm()
   showLoginPopup.value = false
   showRegisterPopup.value = false
+  showBookingConfirmation.value = false
 }
 
 interface RoomType {
@@ -183,17 +186,7 @@ const bookSelectedRooms = async () => {
     return
   }
 
-  if (!authStore.user) {
-    toast.info('Please login to book rooms')
-    closeModal()
-    localStorage.setItem('pendingBooking', JSON.stringify({
-      rooms: selectedRooms.value,
-      checkin_at: formatDateTime(formData.value.checkin_at),
-      checkout_at: formatDateTime(formData.value.checkout_at)
-    }))
-    router.push('/login')
-    return
-  }
+  showBookingConfirmation.value = false
 
   isLoading.value = true
   try {
@@ -203,13 +196,15 @@ const bookSelectedRooms = async () => {
       checkout_at: formatDateTime(formData.value.checkout_at)
     }))
 
+    const selectedRoomObjects = availableRooms.value.filter(room => selectedRooms.value.includes(room.id))
+
     const response = await api.post('/bookings', {
       user_id: user.value.id,
       guest_name: user.value.name,
       guest_email: user.value.email,
       guest_phone: user.value.phone,
       note: '',
-      booking_details: bookingDetails
+      booking_details: bookingDetails,
     })
 
     toast.success('Booking successful!')
@@ -270,13 +265,13 @@ const handleBookRooms = () => {
     return
   }
 
-  bookSelectedRooms()
+  showBookingConfirmation.value = true
 }
 
 const handleLoginSuccess = () => {
   showLoginPopup.value = false
   fetchUserData()
-  bookSelectedRooms()
+  showBookingConfirmation.value = true
 }
 
 const handleSwitchToRegister = () => {
@@ -495,6 +490,13 @@ onMounted(() => {
   <RegisterModal
     v-model="showRegisterPopup"
     @switchToLogin="handleSwitchToLogin"
+  />
+
+  <BookingConfirmationModal
+    v-model="showBookingConfirmation"
+    :selected-rooms="availableRooms.filter(room => selectedRooms.includes(room.id))"
+    :form-data="formData"
+    @confirm-booking="bookSelectedRooms"
   />
 </template>
 

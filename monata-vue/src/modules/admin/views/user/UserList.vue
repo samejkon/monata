@@ -138,9 +138,9 @@
                                         </span>
                                     </template>
                                 </td>
-                                <td class="col-lg-1 col-md-1 col-sm-1 d-flex gap-2">
+                                <td>
                                     <template v-if="editingUser?.id === user.id">
-                                        <button class="btn btn-success btn-sm" @click="handleUpdateUser">
+                                        <button class="btn btn-success btn-sm me-1" @click="handleUpdateUser">
                                             <Check />
                                         </button>
                                         <button class="btn btn-secondary btn-sm" @click="cancelEdit">
@@ -148,10 +148,10 @@
                                         </button>
                                     </template>
                                     <template v-else>
-                                        <button class="btn btn-warning btn-sm" @click="startEdit(user)">
+                                        <button class="btn btn-warning btn-sm me-1" @click="startEdit(user)">
                                             <SquarePen />
                                         </button>
-                                        <button class="btn btn-danger btn-sm" @click="actionDeleteService(user.id)">
+                                        <button class="btn btn-danger btn-sm" @click="actionDeleteUser(user.id)">
                                             <Trash2 />
                                         </button>
                                     </template>
@@ -188,7 +188,7 @@ const {
         onSearch,
         syncFormWithQuery,
         fetchUsers,
-        actionDeleteService,
+        actionDeleteUser,
         errors,
         updateUser,
         editingUser,

@@ -568,11 +568,10 @@ onMounted(() => {
                       </div>
 
                       <div class="flex-grow-1">
-                        <p class="mb-1"><strong>Booking Code:</strong> #{{ booking.id }}</p>
-                        <p class="mb-0"><strong>Room number:</strong> {{ booking.booking_details.length }}</p>
-                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{
-                          formatCurrency(booking.deposit) }}</p>
-                        <p class="mb-0"><strong>Total Payment:</strong> {{ formatCurrency(booking.total_payment) }}</p>
+                        <p class="mb-1"><strong>Booking code:</strong> #{{ booking.id }}</p>
+                        <p class="mb-0"><strong>Rooms booked:</strong> {{ booking.booking_details.length }}</p>
+                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{ formatCurrency(booking.deposit) }}</p>
+                        <p class="mb-0"><strong>Total payment:</strong> {{ formatCurrency(booking.total_payment) }}</p>
                       </div>
                       <div class="mt-2 text-muted small">
                         <i class="far fa-calendar-alt me-1"></i> Booking date: {{ formatDateTime(booking.created_at) }}

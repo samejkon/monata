@@ -80,7 +80,7 @@ export const useService = () => {
                     return;
                 }
                 console.error(error);
-                alert('Có lỗi xảy ra khi cập nhật service');
+                alert('An error occurred while updating the user.');
             }
         }
     };
@@ -132,7 +132,7 @@ export const useService = () => {
                 Object.assign(errors, error.response.data.errors);
             } else {
                 console.error(error);
-                alert('Có lỗi xảy ra khi tạo service');
+                alert('An error occurred while creating the user.');
             }
         }
     };

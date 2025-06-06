@@ -89,7 +89,7 @@ export const useUser = () => {
                     return;
                 }
                 console.error(error);
-                alert('Có lỗi xảy ra khi cập nhật service');
+                alert('An error occurred while updateting the user.');
             }
         }
     };
@@ -114,12 +114,12 @@ export const useUser = () => {
                 Object.assign(errors, error.response.data.errors);
             } else {
                 console.error(error);
-                alert('Có lỗi xảy ra khi tạo service');
+                alert('An error occurred while creating the user.');
             }
         }
     };
 
-    const actionDeleteService = async (id: number) => {
+    const actionDeleteUser = async (id: number) => {
         const confirmDelete = confirm('Are you sure you want to delete this user?');
         if (!confirmDelete) return;
 
@@ -166,7 +166,7 @@ export const useUser = () => {
         onSearch,
         syncFormWithQuery,
         fetchUsers,
-        actionDeleteService,
+        actionDeleteUser,
         formCreate,
         errors,
         updateUser,

@@ -34,7 +34,7 @@ class BookingService
         $user = Auth::user();
 
         if($user)
-            $query  = $this->model->where('user_id', $user->id); 
+            $query  = $this->model->where('user_id', $user->id)->orderBy('id', 'desc'); 
         else
             $query  = $this->model->query();
 
