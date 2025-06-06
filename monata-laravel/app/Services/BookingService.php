@@ -38,7 +38,7 @@ class BookingService
         else
             $query  = $this->model->query();
 
-        return $query->get();
+        return $query->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -225,19 +225,19 @@ class BookingService
             })
             ->pluck('room_id')
             ->unique();
-   
-            $roomTypeId = Arr::get($data, 'roomType');
-            $roomId = Arr::get($data,'roomId');
-            
-            $query = $this->room->whereNotIn('id', $occupiedRoomIds);
-    
-            if ($roomId) {
-                $availableRooms = new Collection([$query->findOrFail($roomId)]);
-            } elseif ($roomTypeId) {
-                $availableRooms = $query->where('room_type_id', $roomTypeId)->get();
-            } else {
-                $availableRooms = $query->get();
-            }
+
+        $roomTypeId = Arr::get($data, 'roomType');
+        $roomId = Arr::get($data, 'roomId');
+
+        $query = $this->room->whereNotIn('id', $occupiedRoomIds);
+
+        if ($roomId) {
+            $availableRooms = new Collection([$query->findOrFail($roomId)]);
+        } elseif ($roomTypeId) {
+            $availableRooms = $query->where('room_type_id', $roomTypeId)->get();
+        } else {
+            $availableRooms = $query->get();
+        }
 
         return $availableRooms;
     }
@@ -498,5 +498,4 @@ class BookingService
             return $booking;
         });
     }
-
 }

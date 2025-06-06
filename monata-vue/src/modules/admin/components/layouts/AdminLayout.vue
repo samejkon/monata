@@ -1,121 +1,3 @@
-<template>
-  <div id="page-top">
-    <div id="wrapper">
-      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
-          <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-laugh-wink"></i>
-          </div>
-          <div class="sidebar-brand-text mx-3">Monata <sup>Admin</sup></div>
-        </a>
-
-        <hr class="sidebar-divider my-0">
-
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/dashboard') }">
-          <router-link class="nav-link" to="/admin/dashboard">
-            <i class="fas fa-fw fa-tachometer-alt"></i>
-            <span>Dashboard</span>
-          </router-link>
-        </li>
-
-        <hr class="sidebar-divider">
-
-        <li class="nav-item" :class="{ 'active': isRoomsDropdownActive || isRoomsDropdownOpen }">
-          <a class="nav-link collapsed" href="#" @click.prevent="toggleRoomsDropdown"
-            :aria-expanded="isRoomsDropdownOpen">
-            <i class="fas fa-fw fa-home"></i>
-            <span>Rooms & Properties</span>
-            <i class="fas fa-angle-down dropdown-arrow" :class="{ 'rotate-180': isRoomsDropdownOpen }"></i>
-          </a>
-          <div id="collapseRooms" :class="{ 'collapse': true, 'show': isRoomsDropdownOpen }"
-            aria-labelledby="headingRooms" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              <h6 class="collapse-header">Room Management:</h6>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/rooms') }"
-                to="/admin/rooms">Rooms</router-link>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/properties') }"
-                to="/admin/properties">Properties</router-link>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/room-types') }"
-                to="/admin/room-types">Room Types</router-link>
-            </div>
-          </div>
-        </li>
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/bookings') }">
-          <router-link class="nav-link" to="/admin/bookings">
-            <span>Booking</span>
-          </router-link>
-        </li>
-
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/services') }">
-          <router-link class="nav-link" to="/admin/services">
-            <span>Service</span>
-          </router-link>
-        </li>
-
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/contacts') }">
-          <router-link class="nav-link" to="/admin/contacts">
-            <span>Contact</span>
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/admin/users">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Users</span>
-          </router-link>
-        </li>
-      </ul>
-      <div id="content-wrapper" class="d-flex flex-column">
-        <div id="content">
-          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" @click="toggleSidebar">
-              <i class="fa fa-bars"></i>
-            </button>
-
-            <ul class="navbar-nav ml-auto">
-              <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                  @click.prevent="toggleUserDropdown" :aria-expanded="isUserDropdownOpen">
-                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
-                  <img class="img-profile rounded-circle" src="@/modules/admin/assets/img/undraw_profile.svg">
-                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right shadow"
-                  :class="{ 'animated--grow-in': isUserDropdownOpen, 'show': isUserDropdownOpen }"
-                  aria-labelledby="userDropdown">
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Profile
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <router-link to="/admin/login" class="dropdown-item" @click="logout">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Logout
-                  </router-link>
-                </div>
-              </li>
-            </ul>
-          </nav>
-          <div class="container-fluid">
-            <router-view></router-view>
-          </div>
-        </div>
-      </div>
-    </div>
-    <a class="scroll-to-top rounded" href="#page-top">
-      <i class="fas fa-angle-up"></i>
-    </a>
-
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -236,6 +118,119 @@ watch(() => route.path, (newPath, oldPath) => {
   }
 });
 </script>
+
+<template>
+  <div id="page-top">
+    <div id="wrapper">
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+          <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-fw fa-home"></i>
+          </div>
+          <div class="sidebar-brand-text mx-3">Monata <sup>Admin</sup></div>
+        </a>
+
+        <hr class="sidebar-divider">
+
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/dashboard') }">
+          <router-link class="nav-link" to="/admin/dashboard">
+            <span>Dashboard</span>
+          </router-link>
+        </li>
+
+        <li class="nav-item" :class="{ 'active': isRoomsDropdownActive || isRoomsDropdownOpen }">
+          <a class="nav-link collapsed" href="#" @click.prevent="toggleRoomsDropdown"
+            :aria-expanded="isRoomsDropdownOpen">
+            <span>Rooms & Properties</span>
+            <i class="fas fa-angle-down dropdown-arrow" :class="{ 'rotate-180': isRoomsDropdownOpen }"></i>
+          </a>
+          <div id="collapseRooms" :class="{ 'collapse': true, 'show': isRoomsDropdownOpen }"
+            aria-labelledby="headingRooms" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Room Management:</h6>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/rooms') }"
+                to="/admin/rooms">Rooms</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/properties') }"
+                to="/admin/properties">Properties</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/room-types') }"
+                to="/admin/room-types">Room Types</router-link>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/bookings') }">
+          <router-link class="nav-link" to="/admin/bookings">
+            <span>Booking</span>
+          </router-link>
+        </li>
+
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/services') }">
+          <router-link class="nav-link" to="/admin/services">
+            <span>Service</span>
+          </router-link>
+        </li>
+
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/contacts') }">
+          <router-link class="nav-link" to="/admin/contacts">
+            <span>Contact</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/admin/users">
+            <span>Users</span>
+          </router-link>
+        </li>
+      </ul>
+      <div id="content-wrapper" class="d-flex flex-column">
+        <div id="content">
+          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" @click="toggleSidebar">
+              <i class="fa fa-bars"></i>
+            </button>
+
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                  @click.prevent="toggleUserDropdown" :aria-expanded="isUserDropdownOpen">
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                  <img class="img-profile rounded-circle" src="@/modules/admin/assets/img/undraw_profile.svg">
+                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow"
+                  :class="{ 'animated--grow-in': isUserDropdownOpen, 'show': isUserDropdownOpen }"
+                  aria-labelledby="userDropdown">
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Profile
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Settings
+                  </a>
+                  <a class="dropdown-item" href="#">
+                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Activity Log
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <router-link to="/admin/login" class="dropdown-item" @click="logout">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Logout
+                  </router-link>
+                </div>
+              </li>
+            </ul>
+          </nav>
+          <div class="container-fluid">
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
+
+  </div>
+</template>
 
 <style>
 @import '@/modules/admin/assets/css/sb-admin-2.min.css';

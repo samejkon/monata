@@ -67,7 +67,7 @@ const fetchUserData = async (): Promise<void> => {
     };
   } catch (err) {
     console.error('Error fetching user data:', err);
-    error.value = 'Could not fetch user data. Please try again later.';
+    error.value = 'Login to see your profile.';
   } finally {
     loading.value = false;
   }

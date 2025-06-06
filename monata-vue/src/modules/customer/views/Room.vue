@@ -13,10 +13,10 @@ const error = ref(null);
 const fetchRooms = async () => {
   isLoading.value = true;
   error.value = null;
-  
+
   try {
     const { checkin_at, checkout_at, roomType } = route.query;
-    
+
     const params = {};
     if (checkin_at) params.checkin_at = checkin_at;
     if (checkout_at) params.checkout_at = checkout_at;
@@ -40,14 +40,14 @@ watch(
   },
   { immediate: true }
 );
-
+const heroImage = new URL('@/modules/customer/assets/img/slide/room.png', import.meta.url).href
 </script>
 
 <template>
   <div class="bg-dark">
     <Header />
   </div>
-  <div class="hero"> </div>
+  <div class="hero" :style="{ backgroundImage: 'url(' + heroImage + ')' }"></div>
   <main class="">
     <div class="container my-3">
       <div class="row">
@@ -73,8 +73,11 @@ watch(
 
 <style scoped>
 .hero {
-  height: 150px;
-  background-color: black;
+  min-height: 500px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .rom-thumbnail {

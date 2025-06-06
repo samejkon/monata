@@ -174,7 +174,7 @@ const fetchUserData = async (): Promise<void> => {
     };
   } catch (err) {
     console.error('Error fetching user data:', err);
-    error.value = 'Could not fetch user data. Please try again later.';
+    error.value = 'Login to see your profile.';
   } finally {
     loading.value = false;
   }
@@ -648,6 +648,7 @@ onMounted(() => {
   height: 150px;
   background-color: black;
 }
+<<<<<<< Updated upstream
 /* Booking List Styles */
 .booking-list {
   display: grid;
@@ -837,5 +838,10 @@ onMounted(() => {
 .hero {
   height: 150px;
   background-color: black;
+=======
+
+.bg-body-tertiary {
+  min-height: 350px;
+>>>>>>> Stashed changes
 }
 </style>
