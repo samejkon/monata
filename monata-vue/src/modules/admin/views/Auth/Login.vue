@@ -1,56 +1,75 @@
-<template>
-  <div class="admin-login-container">
-    <h2>Admin Login</h2>
-    <form @submit.prevent="handleLogin">
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="email" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required>
-      </div>
-      <button type="submit">Login</button>
-    </form>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { api, csrf } from '@/modules/admin/lib/axios'
+import { ValidationErrors } from '@/modules/customer/types/auth'
+import { useAuthStore } from '@/stores/auth';
 
 const email = ref('');
 const password = ref('');
 const router = useRouter();
+const errors = ref<ValidationErrors>({})
+const authStore = useAuthStore()
 
 const handleLogin = async () => {
-  // Here you would typically send the login credentials to your backend
-  // For now, let's just simulate a successful login and redirect
-  // console.log('Admin login attempt:', email.value, password.value);
-    try {
-        await csrf.get('/sanctum/csrf-cookie'); // Fetch CSRF cookie
-        const response = await api.post('/login', {
-            email: email.value,
-            password: password.value
-        })
-        if (response.status === 200) {
-            router.push({ name: 'AdminDashboard' });
-        }
-    } catch (error: any) {
-        console.error('Login failed:', error)
-        // Display error message to the user
-        if (error.response && error.response.status === 401) {
-          alert('Invalid credentials'); // Or use a more sophisticated notification system
-        } else {
-          alert('An error occurred during login. Please try again.');
-        }
+  try {
+    await csrf.get('/sanctum/csrf-cookie');
+    await api.post('/login', {
+      email: email.value,
+      password: password.value
+    })
+
+    await authStore.fetchUser()
+    router.push({ name: 'AdminDashboard' });
+  } catch (error: any) {
+    if (error.response && error.status === 422) {
+      errors.value = error.response.data.errors
     }
-  // In a real application, you'd make an API call here
-  // If login is successful, redirect to admin dashboard
-  // router.push({ name: 'AdminDashboard' });
+    else if (error.response && error.response.status === 401) {
+      alert('Invalid credentials');
+    } else {
+      alert('An error occurred during login. Please try again.');
+    }
+  }
 };
 </script>
+
+<template>
+  <main>
+    <div class="container mt-5 text-dark">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header text-center">
+              <h3>Login</h3>
+            </div>
+            <div class="card-body p-0">
+              <form @submit.prevent="handleLogin()" class="w-100">
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email address</label>
+                  <input type="text" class="form-control" id="email" placeholder="Enter your email" v-model="email" />
+                  <div v-if="errors.email" class="text-danger small">
+                    {{ errors.email[0] }}
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" class="form-control" id="password" placeholder="Enter your password"
+                    v-model="password" />
+                  <div v-if="errors.password" class="text-danger small">
+                    {{ errors.password[0] }}
+                  </div>
+                </div>
+                <button type="submit" class="mb-3 btn btn-primary w-100">Login</button>
+                <router-link to="/" class="btn btn-danger w-100">Back</router-link>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</template>
 
 <style scoped>
 .admin-login-container {
@@ -92,7 +111,8 @@ input[type="password"] {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
-  box-sizing: border-box; /* Ensures padding doesn't affect overall width */
+  box-sizing: border-box;
+  /* Ensures padding doesn't affect overall width */
 }
 
 button {
@@ -109,4 +129,4 @@ button {
 button:hover {
   background-color: #0056b3;
 }
-</style> 
+</style>

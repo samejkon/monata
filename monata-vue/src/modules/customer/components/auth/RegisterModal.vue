@@ -2,7 +2,6 @@
 import { reactive, ref } from 'vue'
 import { api, csrf } from '@/modules/customer/lib/axios'
 import type { RegisterForm, ValidationErrors } from '@/modules/customer/types/auth'
-import { useAuthStore } from '@/modules/customer/stores/auth'
 import { useToast } from 'vue-toastification'
 
 defineProps({
@@ -15,7 +14,6 @@ defineProps({
 const emit = defineEmits(['update:modelValue', 'switchToLogin'])
 
 const toast = useToast()
-const authStore = useAuthStore()
 const errors = ref<ValidationErrors>({})
 const registerForm = reactive<RegisterForm>({
   name: '',
@@ -34,7 +32,6 @@ async function register() {
   try {
     await csrf.get('/sanctum/csrf-cookie')
     await api.post(`/register`, registerForm)
-    authStore.login()
 
     toast.success('Register succsessfully!')
     closeModal()

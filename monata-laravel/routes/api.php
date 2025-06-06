@@ -18,6 +18,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
 
     Route::middleware('admin')->group(function () {
+        Route::get('/profile', [AuthController::class, 'getProfile']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::apiResource('properties', PropertyController::class);
@@ -54,6 +55,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthUserController::class, 'getProfile']);
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
+    Route::apiResource('bookings', AdminBookingController::class);
 });
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);
@@ -62,5 +64,4 @@ Route::get('/user-home', [UserHomeController::class, 'index']);
 Route::get('/rooms/{id}', [RoomClientController::class, 'show']);
 Route::get('/rooms', [RoomClientController::class, 'index']);
 
-Route::apiResource('bookings', AdminBookingController::class);
 Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);

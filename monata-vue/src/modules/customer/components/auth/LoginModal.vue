@@ -2,8 +2,13 @@
 import { reactive, ref } from 'vue'
 import { api, csrf } from '@/modules/customer/lib/axios'
 import type { LoginForm, ValidationErrors } from '@/modules/customer/types/auth'
-import { useAuthStore } from '@/modules/customer/stores/auth'
 import { useToast } from 'vue-toastification'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth';
+
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
 
 defineProps({
   modelValue: {
@@ -19,7 +24,6 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
-const authStore = useAuthStore()
 const errors = ref<ValidationErrors>({})
 const loginForm = reactive<LoginForm>({
   email: '',
@@ -36,8 +40,8 @@ async function login() {
   try {
     await csrf.get('/sanctum/csrf-cookie')
     await api.post(`/login`, loginForm)
-    authStore.login()
 
+    await authStore.fetchUser()
     toast.success('Login successfully!')
     closeModal()
   } catch (error: any) {
