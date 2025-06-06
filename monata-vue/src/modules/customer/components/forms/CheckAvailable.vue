@@ -4,6 +4,7 @@ import { api } from '../../lib/axios'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '../../stores/auth'
+import LoginPopup from './LoginPopup.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -23,7 +24,7 @@ const isModalOpen = computed({
   set: (value) => emit('update:modelValue', value)
 })
 
-const showLoginConfirm = ref(false)
+const showLoginPopup = ref(false)
 
 const closeModal = () => {
   isModalOpen.value = false
@@ -225,12 +226,12 @@ const bookSelectedRooms = async () => {
           }
         })
       } else {
-        toast.error(error.response.data.message || 'Dữ liệu không hợp lệ')
+        toast.error(error.response.data.message || 'The data provided is invalid')
       }
     } else if (error.response?.data?.message) {
       toast.error(error.response.data.message)
     } else {
-      toast.error('Đặt phòng thất bại. Vui lòng thử lại sau!')
+      toast.error('Booking failed. Please try again later!')
     }
   } finally {
     isLoading.value = false
@@ -255,25 +256,20 @@ const checkPendingBooking = () => {
 
 const handleBookRooms = () => {
   if (selectedRooms.value.length === 0) {
-    toast.warning('Please select at least one room to book')
+    toast.warning('Please select at least one room to book.')
     return
   }
 
   if (!authStore.authenticated) {
-    if (confirm('You need to login to book rooms. Would you like to login now?')) {
-      localStorage.setItem('pendingBooking', JSON.stringify({
-        rooms: selectedRooms.value,
-        checkin_at: formatDateTime(formData.value.checkin_at),
-        checkout_at: formatDateTime(formData.value.checkout_at),
-        roomType: formData.value.roomType,
-        availableRooms: availableRooms.value
-      }))
-      router.push('/login')
-      return
-    }
+    showLoginPopup.value = true
     return
   }
 
+  bookSelectedRooms()
+}
+
+const handleLoginSuccess = () => {
+  fetchUserData()
   bookSelectedRooms()
 }
 
@@ -337,10 +333,8 @@ onMounted(() => {
         <i class="fas fa-times"></i>
       </button>
 
-      <!-- Form tìm kiếm -->
-      <div class="modal-body" v-if="availableRooms.length === 0">
+      <div class="modal-body">
         <div class="row g-3">
-          <!-- Check-in Date -->
           <div class="col-md-6">
             <label class="form-label">Check-in date</label>
             <input 
@@ -356,7 +350,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Check-out Date -->
           <div class="col-md-6">
             <label class="form-label">Check-out date</label>
             <input 
@@ -372,7 +365,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Room Type -->
           <div class="col-12">
             <label class="form-label">Room Type</label>
             <select 
@@ -390,7 +382,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- General Error -->
           <div v-if="errors.general || errors.availability" class="col-12">
             <div class="alert alert-danger">
               <div v-if="errors.general">{{ errors.general[0] }}</div>
@@ -398,7 +389,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Submit Button -->
           <div class="col-12">
             <button 
               type="submit" 
@@ -409,85 +399,81 @@ onMounted(() => {
               {{ isChecking ? 'Checking...' : 'Check Availability' }}
             </button>
           </div>
-        </div>
-      </div>
 
-      <div class="modal-body" v-else>
-        <div class="row g-3">
-          <div class="col-12">
-            <div class="alert alert-info">
-              {{ availableRooms.length }} available rooms found
-            </div>
-          </div>
-
-          <div v-for="room in availableRooms" 
-            :key="room.id" 
-            class="col-md-4"
-          >
-            <div class="card h-100 room-card" 
-              :class="{ 'border-primary': selectedRooms.includes(room.id) }"
-              @click="toggleRoomSelection(room.id)"
-            >
-              <img :src="room.thumbnail_path" 
-                :alt="room.name" 
-                class="card-img-top room-thumbnail"
-              >
-              <div class="card-body">
-                <h5 class="card-title">Room {{ room.name }}</h5>
-                <p class="card-text text-muted small">{{ room.room_type }}</p>
-                <p class="card-text">
-                  <strong>{{ formatPrice(room.price) }}</strong> / night
-                </p>
-                <ul class="list-unstyled small">
-                  <li v-for="property in room.properties" 
-                    :key="property.property_id"
-                    class="mb-1"
-                  >
-                    <i class="fas fa-check text-success me-2"></i>
-                    {{ property.name }}: {{ property.value }}
-                  </li>
-                </ul>
+          <div v-if="availableRooms.length > 0" class="col-12 mt-4">
+            <div class="search-results">
+              <div class="alert alert-info mb-3">
+                {{ availableRooms.length }} available rooms found
               </div>
-              <div class="card-footer bg-transparent py-2">
-                <div class="form-check">
-                  <input 
-                    class="form-check-input" 
-                    type="checkbox" 
-                    :checked="selectedRooms.includes(room.id)"
-                    @click.stop
-                    @change="toggleRoomSelection(room.id)"
+
+              <div class="row g-3">
+                <div v-for="room in availableRooms" 
+                  :key="room.id" 
+                  class="col-md-4"
+                >
+                  <div class="card h-100 room-card" 
+                    :class="{ 'border-primary': selectedRooms.includes(room.id) }"
+                    @click="toggleRoomSelection(room.id)"
                   >
-                  <label class="form-check-label small">
-                    Choose this room
-                  </label>
+                    <img :src="room.thumbnail_path" 
+                      :alt="room.name" 
+                      class="card-img-top room-thumbnail"
+                    >
+                    <div class="card-body">
+                      <h5 class="card-title">Room {{ room.name }}</h5>
+                      <p class="card-text text-muted small">{{ room.room_type }}</p>
+                      <p class="card-text">
+                        <strong>{{ formatPrice(room.price) }}</strong> / night
+                      </p>
+                      <ul class="list-unstyled small">
+                        <li v-for="property in room.properties" 
+                          :key="property.property_id"
+                          class="mb-1"
+                        >
+                          <i class="fas fa-check text-success me-2"></i>
+                          {{ property.name }}: {{ property.value }}
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="card-footer bg-transparent py-2">
+                      <div class="form-check">
+                        <input 
+                          class="form-check-input" 
+                          type="checkbox" 
+                          :checked="selectedRooms.includes(room.id)"
+                          @click.stop
+                          @change="toggleRoomSelection(room.id)"
+                        >
+                        <label class="form-check-label small">
+                          Choose this room
+                        </label>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div class="col-12 mt-3">
-            <div class="d-flex gap-2">
-              <button 
-                type="button" 
-                class="btn btn-secondary flex-grow-1" 
-                @click="availableRooms = []"
-              >
-                Back to search
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-primary flex-grow-1" 
-                @click="handleBookRooms"
-                :disabled="isLoading || selectedRooms.length === 0"
-              >
+              <div class="mt-4">
+                <button 
+                  type="button" 
+                  class="btn btn-primary w-100" 
+                  @click="handleBookRooms"
+                  :disabled="isLoading || selectedRooms.length === 0"
+                >
                 {{ isLoading ? 'Please wait...' : `Proceed to book ${selectedRooms.length} selected rooms` }}
-              </button>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </form>
   </div>
+
+  <LoginPopup
+    v-model="showLoginPopup"
+    @login-success="handleLoginSuccess"
+  />
 </template>
 
 <style scoped>
@@ -522,6 +508,8 @@ onMounted(() => {
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
+  max-height: 85vh;
+  overflow-y: auto;
 }
 
 .form-label {
@@ -689,5 +677,11 @@ onMounted(() => {
 
 .card.border-primary {
   border-width: 2px !important;
+}
+
+.search-results {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1.5rem;
+  margin-top: 1rem;
 }
 </style>

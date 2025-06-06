@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class BookingService
 {
@@ -30,7 +31,12 @@ class BookingService
      */
     public function get(): Collection
     {
-        $query  = $this->model->query();
+        $user = Auth::user();
+
+        if($user)
+            $query  = $this->model->where('user_id', $user->id); 
+        else
+            $query  = $this->model->query();
 
         return $query->get();
     }

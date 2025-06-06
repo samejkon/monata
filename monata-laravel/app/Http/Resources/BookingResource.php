@@ -27,6 +27,7 @@ class BookingResource extends JsonResource
             'deposit' => $this->deposit,
             'total_payment' => $this->total_payment,
             'status' => $this->status,
+            'created_at' =>  $this->created_at ? Carbon::parse($this->created_at)->format('Y-m-d H:i') : null,
             'booking_details' => BookingDetailResource::collection($this->bookingDetails),
         ];
     }
