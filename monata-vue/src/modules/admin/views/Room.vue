@@ -427,7 +427,8 @@ onUnmounted(() => {
                       {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
                     </span>
                   </p>
-                  <p v-if="roomDetails.description"><strong>Description:</strong> {{ roomDetails.description }}</p>
+                  <h3>Mô tả phòng:</h3>
+                  <div v-html="roomDetails.description"></div>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
@@ -495,7 +496,7 @@ onUnmounted(() => {
   border-color: #007bff;
 }
 
-.active-thumbnail {
+a .active-thumbnail {
   border-color: #007bff !important;
   opacity: 0.9;
 }

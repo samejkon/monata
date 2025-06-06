@@ -7,15 +7,10 @@ import CheckAvailable from '../components/forms/CheckAvailable.vue'
 </script>
 
 <template>
-  <Header bgClass="1" 
-  title="Montana Resort" 
-  description="Unlock to enjoy the view of Martine" />
-
+  <Header />
   <main>
     <Home />
   </main>
-
   <Footer />
 
-  <CheckAvailable />
 </template>

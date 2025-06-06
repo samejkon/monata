@@ -36,7 +36,6 @@ const editUser = ref<User>({
   updatedAt: ''
 });
 const isSubmittingProfile = ref(false);
-const profileUpdateMessage = ref<string | null>(null);
 const profileUpdateError = ref<string | null>(null);
 const nameError = ref<string | null>(null);
 const emailError = ref<string | null>(null);
@@ -98,7 +97,6 @@ const resetProfileForm = (): void => {
     createdAt: '',
     updatedAt: ''
   };
-  profileUpdateMessage.value = null;
   profileUpdateError.value = null;
   nameError.value = null;
   emailError.value = null;
@@ -106,7 +104,6 @@ const resetProfileForm = (): void => {
 };
 
 const resetProfileErrors = (): void => {
-  profileUpdateMessage.value = null;
   profileUpdateError.value = null;
   nameError.value = null;
   emailError.value = null;
@@ -124,7 +121,7 @@ const handleUpdateProfile = async (): Promise<void> => {
       phone: editUser.value.phone
     });
 
-    profileUpdateMessage.value = 'Profile updated successfully!';
+    toast.success('Profile updated successfully!');
 
     user.value = {
       ...user.value,
@@ -133,6 +130,7 @@ const handleUpdateProfile = async (): Promise<void> => {
       phone: editUser.value.phone,
       updatedAt: new Date().toISOString()
     };
+    toggleEditProfileForm();
 
   } catch (err: any) {
     console.error('Error updating profile:', err);
@@ -206,7 +204,7 @@ const handleChangePassword = async (): Promise<void> => {
     });
 
     toast.success("Change password successfully!")
-    resetPasswordForm();
+    toggleChangePasswordForm();
   } catch (err: any) {
     console.error('Error changing password:', err);
 
@@ -246,108 +244,37 @@ onMounted(() => {
 </script>
 
 <template>
-  <Header bgClass="4  " title="" description="" />
-
-  <main class="bg-light">
-    <div class="container my-5 text-dark">
-      <div class="row">
+  <Header />
+  <div class="hero"></div>
+  <main class="bg-body-tertiary">
+    <div class="container py-5">
+      <div v-if="loading" class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div v-else-if="error" class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+      <div v-else class="row">
         <div class="col-lg-4">
-          <div class="card mb-4">
+          <div class="card mb-4 shadow-sm">
             <div class="card-body text-center">
               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
-                class="rounded-circle img-fluid">
+                class="rounded-circle img-fluid" style="width: 150px;">
               <h5 class="my-3">{{ user.name }}</h5>
               <p class="text-muted mb-1">{{ user.email }}</p>
               <p class="text-muted mb-4">{{ user.phone }}</p>
             </div>
           </div>
-          <div class="card mb-4 mb-lg-0">
-            <div class="card-body p-0">
-              <ul class="list-group list-group-flush rounded-3">
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-github fa-lg text-body"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-twitter fa-lg text-info"></i>
-                  <p class="mb-0">@mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-instagram fa-lg text-danger"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                  <i class="fab fa-facebook-f fa-lg text-primary"></i>
-                  <p class="mb-0">mdbootstrap</p>
-                </li>
-              </ul>
-            </div>
-          </div>
         </div>
         <div class="col-lg-8">
-          <div class="card mb-4">
-            <div class="card-body">
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Full Name</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.name }}</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Email</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.email }}</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Phone</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.phone }}</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Creation date</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.createdAt }}</p>
-                </div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-3">
-                  <p class="mb-0">Updation date</p>
-                </div>
-                <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{ user.updatedAt }}</p>
-                </div>
-              </div>
-              <hr>
-              <div class="d-flex justify-content-center mb-2">
-                <button type="button" class="btn btn-primary mr-2" @click="toggleEditProfileForm">
-                  Edit Profile
-                </button>
-                <button type="button" class="btn btn-outline-primary ms-1" @click="toggleChangePasswordForm">
-                  Change Password
-                </button>
-              </div>
-            </div>
-          </div>
-
           <!-- Edit Profile Form -->
-          <div v-if="showEditProfileForm" class="card mb-4">
+          <div v-if="showEditProfileForm" class="card mb-4 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">Edit Profile Information</h5>
-              <form @submit.prevent="handleUpdateProfile">
+              <hr>
+              <form @submit.prevent="handleUpdateProfile" novalidate>
                 <div class="mb-3">
                   <label for="name" class="form-label">Full Name</label>
                   <input type="text" class="form-control" :class="{ 'is-invalid': nameError }" id="name"
@@ -372,30 +299,30 @@ onMounted(() => {
                     {{ phoneError }}
                   </div>
                 </div>
-                <div v-if="profileUpdateError && !nameError && !emailError && !phoneError" class="alert alert-danger"
-                  role="alert">
+                <div v-if="profileUpdateError && !nameError && !emailError && !phoneError"
+                  class="alert alert-danger mt-3" role="alert">
                   {{ profileUpdateError }}
                 </div>
-                <div v-if="profileUpdateMessage" class="alert alert-success" role="alert">
-                  {{ profileUpdateMessage }}
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-primary me-2" :disabled="isSubmittingProfile">
+                    <span v-if="isSubmittingProfile" class="spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>
+                    {{ isSubmittingProfile ? 'Updating...' : 'Update Profile' }}
+                  </button>
+                  <button type="button" @click="toggleEditProfileForm" class="btn btn-outline-secondary">
+                    Cancel
+                  </button>
                 </div>
-                <button type="submit" class="btn btn-primary me-2" :disabled="isSubmittingProfile">
-                  <span v-if="isSubmittingProfile" class="spinner-border spinner-border-sm" role="status"
-                    aria-hidden="true"></span>
-                  {{ isSubmittingProfile ? 'Updating...' : 'Update Profile' }}
-                </button>
-                <button type="button" @click="toggleEditProfileForm" class="btn btn-outline-secondary">
-                  Cancel
-                </button>
               </form>
             </div>
           </div>
 
           <!-- Change Password Form -->
-          <div v-if="showChangePasswordForm" class="card mb-4">
+          <div v-else-if="showChangePasswordForm" class="card mb-4 shadow-sm">
             <div class="card-body">
               <h5 class="card-title">Change Password</h5>
-              <form @submit.prevent="handleChangePassword">
+              <hr>
+              <form @submit.prevent="handleChangePassword" novalidate>
                 <div class="mb-3">
                   <label for="currentPassword" class="form-label">Current Password</label>
                   <input type="password" class="form-control" :class="{ 'is-invalid': currentPasswordError }"
@@ -421,18 +348,61 @@ onMounted(() => {
                   </div>
                 </div>
                 <div v-if="passwordChangeError && !currentPasswordError && !newPasswordError && !confirmPasswordError"
-                  class="alert alert-danger" role="alert">
+                  class="alert alert-danger mt-3" role="alert">
                   {{ passwordChangeError }}
                 </div>
-                <button type="submit" class="btn btn-primary me-2" :disabled="isSubmittingPassword">
-                  <span v-if="isSubmittingPassword" class="spinner-border spinner-border-sm" role="status"
-                    aria-hidden="true"></span>
-                  {{ isSubmittingPassword ? 'Submitting...' : 'Submit Change' }}
-                </button>
-                <button type="button" @click="toggleChangePasswordForm" class="btn btn-outline-secondary">
-                  Cancel
-                </button>
+                <div class="mt-3">
+                  <button type="submit" class="btn btn-primary me-2" :disabled="isSubmittingPassword">
+                    <span v-if="isSubmittingPassword" class="spinner-border spinner-border-sm" role="status"
+                      aria-hidden="true"></span>
+                    {{ isSubmittingPassword ? 'Submitting...' : 'Submit Change' }}
+                  </button>
+                  <button type="button" @click="toggleChangePasswordForm" class="btn btn-outline-secondary">
+                    Cancel
+                  </button>
+                </div>
               </form>
+            </div>
+          </div>
+
+          <!-- Profile Details -->
+          <div v-else class="card mb-4 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="card-title mb-0">Profile Details</h5>
+                <div>
+                  <button type="button" class="btn btn-primary btn-sm me-1" @click="toggleEditProfileForm">
+                    Edit Profile
+                  </button>
+                  <button type="button" class="btn btn-outline-primary btn-sm" @click="toggleChangePasswordForm">
+                    Change Password
+                  </button>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-3">
+                  <p class="mb-0">Full Name</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{ user.name }}</p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-3">
+                  <p class="mb-0">Email</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{ user.email }}</p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-sm-3">
+                  <p class="mb-0">Phone</p>
+                </div>
+                <div class="col-sm-9">
+                  <p class="text-muted mb-0">{{ user.phone }}</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -442,3 +412,10 @@ onMounted(() => {
 
   <Footer />
 </template>
+
+<style scoped>
+.hero {
+  height: 150px;
+  background-color: black;
+}
+</style>
