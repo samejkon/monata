@@ -9,6 +9,7 @@ import LoginModal from '@/modules/customer/components/auth/LoginModal.vue'
 import RegisterModal from '@/modules/customer/components/auth/RegisterModal.vue'
 import { useToast } from 'vue-toastification'
 import { useRoute, useRouter } from 'vue-router'
+import { ShoppingBasket} from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()

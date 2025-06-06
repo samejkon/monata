@@ -10,7 +10,8 @@ import Rooms from './views/Room.vue'
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
 import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue'
 import ContactList from '@/modules/admin/views/contact/ContactList.vue'
-import Room from './views/Room.vue'
+import UserList from '@/modules/admin/views/user/UserList.vue'
+import UserCreate from '@/modules/admin/views/user/UserCreate.vue'
 
 const adminRoutes: Array<RouteRecordRaw> = [
   {
@@ -66,7 +67,24 @@ const adminRoutes: Array<RouteRecordRaw> = [
         component: Rooms,
         meta: { requiresAuth: true },
       },
+      {
+        path: 'users',
+        name: 'AdminUserList',
+        component: UserList,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: 'users/create',
+        name: 'AdminUserCreate',
+        component: UserCreate,
+        meta: { requiresAuth: true },
+      },
     ],
+  },
+  {
+    path: '/admin/login',
+    name: 'AdminLogin',
+    component: () => import('@/modules/admin/views/Auth/Login.vue'),
   },
 ]
 

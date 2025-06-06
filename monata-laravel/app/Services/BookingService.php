@@ -12,6 +12,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class BookingService
 {
@@ -27,7 +28,7 @@ class BookingService
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get(): \Illuminate\Database\Eloquent\Collection
+    public function get(): Collection
     {
         $query  = $this->model->query();
 
@@ -45,13 +46,14 @@ class BookingService
         $this->validateRoomAvailability($data['booking_details']);
 
         return DB::transaction(function () use ($data) {
+            $status = Arr::has($data, 'user_id') && $data['user_id'] ? BookingStatus::PENDING : BookingStatus::CONFIRMED;
             $booking = [
-                'user_id'        => Arr::get($data, 'booker_id'),
+                'user_id'        => Arr::get($data, 'user_id'),
                 'guest_name'     => Arr::get($data, 'guest_name'),
                 'guest_email'    => Arr::get($data, 'guest_email'),
                 'guest_phone'    => Arr::get($data, 'guest_phone'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status'         => BookingStatus::CONFIRMED,
+                'status'         => $status,
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -200,7 +202,7 @@ class BookingService
      * @param  array  $data  The input data.
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function checkRoom($data): \Illuminate\Database\Eloquent\Collection
+    public function checkRoom($data): Collection
     {
         $newCheckIn = $data['checkin_at'];
         $newCheckOut = $data['checkout_at'];
@@ -217,8 +219,19 @@ class BookingService
             })
             ->pluck('room_id')
             ->unique();
-
-        $availableRooms = $this->room->with('roomType')->whereNotIn('id', $occupiedRoomIds)->get();
+   
+            $roomTypeId = Arr::get($data, 'roomType');
+            $roomId = Arr::get($data,'roomId');
+            
+            $query = $this->room->whereNotIn('id', $occupiedRoomIds);
+    
+            if ($roomId) {
+                $availableRooms = new Collection([$query->findOrFail($roomId)]);
+            } elseif ($roomTypeId) {
+                $availableRooms = $query->where('room_type_id', $roomTypeId)->get();
+            } else {
+                $availableRooms = $query->get();
+            }
 
         return $availableRooms;
     }
@@ -479,4 +492,5 @@ class BookingService
             return $booking;
         });
     }
+
 }

@@ -35,5 +35,5 @@ export default [
     path: '/rooms',
     name: 'rooms',
     component: () => import('./views/Room.vue'),
-  },
+  }
 ]

@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuthService
 {
@@ -16,16 +18,14 @@ class AuthService
      * @param  array  $data
      * @return \App\Models\Admin|false
      */
-    public function login($data): Admin|false
+    public function login($data): bool
     {
-        $admin = $this->model
-            ->where('email', $data['email'])
-            ->first();
-
-        if (! $admin || ! Hash::check($data['password'], $admin->password)) {
+        if (!Auth::guard('admin')->attempt($data)) {
             return false;
         }
 
-        return $admin;
+        session()->regenerate();
+
+        return true;
     }
 }
