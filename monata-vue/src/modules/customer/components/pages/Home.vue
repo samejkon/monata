@@ -177,8 +177,8 @@ const fetchRoomTypes = async () => {
     roomTypeBetters.value = response.data.roomTypeBetters
     roomTypeOffers.value = response.data.roomTypeOffers
   } catch (err: any) {
-    console.error('Lỗi khi lấy dữ liệu phòng:', err)
-    error.value = 'Không thể tải dữ liệu phòng. Vui lòng thử lại sau!'
+    console.error('Error fetching room data:', err)
+    error.value = 'Unable to load room data. Please try again later!'
   } finally {
     isLoading.value = false
   }

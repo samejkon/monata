@@ -12,7 +12,11 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue', 'switchToRegister'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'login-success'): void
+  (e: 'switchToRegister'): void
+}>()
 
 const toast = useToast()
 const authStore = useAuthStore()

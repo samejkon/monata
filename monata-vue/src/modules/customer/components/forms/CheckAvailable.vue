@@ -4,7 +4,8 @@ import { api } from '../../lib/axios'
 import { useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '../../stores/auth'
-import LoginPopup from './LoginPopup.vue'
+import LoginPopup from '../auth/LoginModal.vue'
+import RegisterModal from '../auth/RegisterModal.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -25,10 +26,13 @@ const isModalOpen = computed({
 })
 
 const showLoginPopup = ref(false)
+const showRegisterPopup = ref(false)
 
 const closeModal = () => {
   isModalOpen.value = false
   resetForm()
+  showLoginPopup.value = false
+  showRegisterPopup.value = false
 }
 
 interface RoomType {
@@ -262,6 +266,7 @@ const handleBookRooms = () => {
 
   if (!authStore.authenticated) {
     showLoginPopup.value = true
+    showRegisterPopup.value = false
     return
   }
 
@@ -269,8 +274,19 @@ const handleBookRooms = () => {
 }
 
 const handleLoginSuccess = () => {
+  showLoginPopup.value = false
   fetchUserData()
   bookSelectedRooms()
+}
+
+const handleSwitchToRegister = () => {
+  showLoginPopup.value = false
+  showRegisterPopup.value = true
+}
+
+const handleSwitchToLogin = () => {
+  showRegisterPopup.value = false
+  showLoginPopup.value = true
 }
 
 const restoreBookingState = () => {
@@ -473,6 +489,12 @@ onMounted(() => {
   <LoginPopup
     v-model="showLoginPopup"
     @login-success="handleLoginSuccess"
+    @switchToRegister="handleSwitchToRegister"
+  />
+
+  <RegisterModal
+    v-model="showRegisterPopup"
+    @switchToLogin="handleSwitchToLogin"
   />
 </template>
 
