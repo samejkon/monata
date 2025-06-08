@@ -9,7 +9,20 @@ class Admin extends Authenticatable
 {
     use HasApiTokens;
     protected $table = 'admins';
-    protected $fillable = ['name', 'email', 'password', 'phone', 'status'];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'phone',
+        'status',
+        'role',
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
