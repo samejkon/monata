@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\RoomStatus;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use App\Services\Utils\FileService;
@@ -82,7 +83,7 @@ class RoomService
             $room->name = $data['name'];
             $room->room_type_id = $data['room_type_id'];
             $room->description = $data['description'];
-            $room->status = $data['status'];
+            $room->status = RoomStatus::ACTIVE;
             $room->thumbnail_path = $thumbnailPath;
             $room->save();
 
@@ -146,12 +147,15 @@ class RoomService
      * @return null
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function delete(int $id): null
+    public function delete(int $id): bool
     {
         $room = Room::findOrFail($id);
-        $room->delete();
 
-        return null;
+        if ($room->bookingDetails()->exists()) {
+            throw new \Exception('Room is exists Image.');
+        }
+
+        return $room->delete();
     }
 
     /**

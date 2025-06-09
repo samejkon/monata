@@ -24,11 +24,20 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('admins')->insert([
-            'name' => 'Admin',
-            'email' => 'admin@tomosia.com',
-            'password' => Hash::make('123456')
-        ]);
+        DB::table('admins')->insert(
+            [
+                'name' => 'Admin',
+                'email' => 'admin@tomosia.com',
+                'password' => Hash::make('123456'),
+                'role' => 'superadmin'
+            ],
+            [
+                'name' => 'Staff',
+                'email' => 'staff@tomosia.com',
+                'password' => Hash::make('123456'),
+                'role' => 'staff'
+            ],
+        );
     }
 
     public function down(): void

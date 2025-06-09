@@ -62,4 +62,14 @@ class Room extends Model
     {
         return $this->belongsTo(RoomType::class, 'room_type_id');
     }
+
+    /**
+     * Get all booking details associated with the room.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function bookingDetails()
+    {
+        return $this->hasMany(BookingDetail::class);
+    }
 }
