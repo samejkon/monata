@@ -37,7 +37,7 @@ class AdminBookingController extends Controller
      */
     public function indexCustomer(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
-        $data = $this->service->getCusomer();
+        $data = $this->service->getCustomer();
 
         return BookingResource::collection($data);
     }

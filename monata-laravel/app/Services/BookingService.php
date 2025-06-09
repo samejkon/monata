@@ -41,7 +41,7 @@ class BookingService
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getCusomer(): Collection
+    public function getCustomer(): Collection
     {
         $user = Auth::user();
 
