@@ -37,7 +37,7 @@ const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 
 const fetchBookings = async () => {
   try {
-    const response = await api.get(`/bookings`);
+    const response = await api.get(`/bookings`, { params: { per_page: -1 } });
     rawBookings.value = response.data?.data || [];
     processBookings(rawBookings.value);
   } catch (error) {
@@ -376,7 +376,7 @@ const cancelBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="confirmBooking(booking.id)">Confirm</button>

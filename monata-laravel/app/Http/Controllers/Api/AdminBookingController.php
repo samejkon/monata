@@ -116,6 +116,16 @@ class AdminBookingController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Mark the specified booking as no-show.
+     *
+     * This method sets the booking status to NO_SHOW for the given booking ID
+     * if the booking status is CONFIRMED. It updates the booking record
+     * accordingly.
+     *
+     * @param  int  $id  The ID of the booking to be marked as no-show.
+     * @return \Illuminate\Http\Response
+     */
     public function noShow($id): \Illuminate\Http\Response
     {
         $this->service->noShow($id);

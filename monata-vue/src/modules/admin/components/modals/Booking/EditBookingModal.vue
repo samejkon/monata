@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed, nextTick } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
@@ -152,7 +152,7 @@ const checkAvailability = async () => {
     }
   } catch (error) {
     console.error('Error checking room availability:', error);
-    toast.error('Error checking room availability: ' + (error.response.data.message || 'Unknown error.'));
+    toast.error('Error checking room availability: ' + (error.response?.data?.message || 'Unknown error.'));
     availableRooms.value = [];
   }
 };

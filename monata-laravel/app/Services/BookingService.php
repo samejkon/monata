@@ -25,11 +25,12 @@ class BookingService
     ) {}
 
     /**
-     * Get all bookings.
+     * Get a list of bookings filtered by the given payload.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param array $payload
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function get($payload)
+    public function get($payload): \Illuminate\Contracts\Pagination\LengthAwarePaginator
     {
         $per_page = Arr::get($payload, 'per_page', 15);
 
@@ -40,6 +41,13 @@ class BookingService
         return $bookings;
     }
 
+    /**
+     * Filter bookings based on specified criteria.
+     *
+     * @param array $filter An associative array containing filter criteria such as
+     *                      'guest_name', 'guest_email', 'guest_phone', and 'status'.
+     * @return \Illuminate\Database\Eloquent\Builder The query builder with applied filters.
+     */
     public function filter($filter)
     {
         return $this->model
@@ -435,6 +443,17 @@ class BookingService
         return $booking->save();
     }
 
+    /**
+     * Set a booking as NO_SHOW by its ID.
+     *
+     * This method updates a booking status from CONFIRMED to NO_SHOW.
+     * It retrieves the booking by its ID, ensuring that it is currently
+     * in the CONFIRMED status. If the booking is found, its status is updated
+     * to NO_SHOW and saved.
+     *
+     * @param int $id The ID of the booking to set as no show.
+     * @return bool True if the booking status was successfully updated, false otherwise.
+     */
     public function noShow($id): bool
     {
         $booking = $this->model->where('id', $id)
