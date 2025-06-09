@@ -164,7 +164,9 @@ onMounted(() => {
 });
 
 const handleCheckout = async () => {
+  
   if (!props.booking || !props.booking.id) {
+    console.log(props.booking.id)
     toast.error('No booking found.');
     return;
   }

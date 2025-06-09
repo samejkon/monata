@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed, nextTick } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';
@@ -67,7 +67,7 @@ const populateForm = (bookingData) => {
   guestName.value = bookingData.guest_name || '';
   guestEmail.value = bookingData.guest_email || '';
   guestPhone.value = bookingData.guest_phone || '';
-  deposit.value = bookingData.deposit_amount || 0;
+  deposit.value = bookingData.deposit || 0;
   bookingNote.value = bookingData.note || '';
   bookingStatus.value = mapStatusNumberToString(bookingData.status) || 'PENDING';
 

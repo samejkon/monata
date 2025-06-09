@@ -25,15 +25,24 @@ class BookingService
     ) {}
 
     /**
-     * Get all bookings.
+     * Get a list of bookings filtered by the given payload.
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param array $payload
      */
-    public function get(): Collection
+    public function get($payload)
     {
-        $query  = $this->model->query();
+        $per_page = Arr::get($payload, 'per_page', 15);
 
-        return $query->orderBy('created_at', 'desc')->get();
+        $query = $this->filter($payload)
+            ->orderBy('created_at', 'desc');
+
+        if ($per_page == -1) {
+            $bookings = $query->get();
+        } else {
+            $bookings = $query->paginate($per_page);
+        }
+
+        return $bookings;
     }
 
     /**
@@ -45,11 +54,34 @@ class BookingService
     {
         $user = Auth::user();
 
-        $query  = $this->model->where('user_id', $user->id); 
+        $query  = $this->model->where('user_id', $user->id);
 
-        return $query->orderBy('created_at','desc')->get();
+        return $query->orderBy('created_at', 'desc')->get();
     }
 
+    /**
+     * Filter bookings based on specified criteria.
+     *
+     * @param array $filter An associative array containing filter criteria such as
+     *                      'guest_name', 'guest_email', 'guest_phone', and 'status'.
+     * @return \Illuminate\Database\Eloquent\Builder The query builder with applied filters.
+     */
+    public function filter($filter)
+    {
+        return $this->model
+            ->when(Arr::get($filter, 'guest_name'), function ($query, $guest_name) {
+                $query->where('guest_name', 'like', '%' . $guest_name . '%');
+            })
+            ->when(Arr::get($filter, 'guest_email'), function ($query, $guest_email) {
+                $query->where('guest_email', 'like', '%' . $guest_email . '%');
+            })
+            ->when(Arr::get($filter, 'guest_phone'), function ($query, $guest_phone) {
+                $query->where('guest_phone', 'like', '%' . $guest_phone . '%');
+            })
+            ->when(Arr::get($filter, 'status'), function ($query, $status) {
+                $query->where('status', $status);
+            });
+    }
     /**
      * Create a booking.
      *
@@ -147,10 +179,7 @@ class BookingService
                 'guest_name'     => Arr::get($data, 'guest_name'),
                 'guest_email'    => Arr::get($data, 'guest_email'),
                 'guest_phone'    => Arr::get($data, 'guest_phone'),
-                'check_in'       => Arr::get($data, 'check_in'),
-                'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status'         => Arr::get($data, 'status', BookingStatus::CONFIRMED),
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -406,6 +435,54 @@ class BookingService
     }
 
     /**
+     * Cancel a booking by its ID.
+     *
+     * This method changes the status of a booking from PENDING to CANCELLED.
+     * It retrieves the booking by its ID, ensuring that it is currently
+     * in the PENDING status. If the booking is found, its status is updated
+     * to CANCELLED and saved.
+     *
+     * @param int $id The ID of the booking to cancel.
+     * @return bool True if the booking status was successfully updated, false otherwise.
+     */
+    public function cancelled($id): bool
+    {
+        $booking = $this->model->where('id', $id)
+            ->whereIn('status', [
+                BookingStatus::PENDING
+            ])
+            ->first();
+
+        $booking->status = BookingStatus::CANCELLED;
+
+        return $booking->save();
+    }
+
+    /**
+     * Set a booking as NO_SHOW by its ID.
+     *
+     * This method updates a booking status from CONFIRMED to NO_SHOW.
+     * It retrieves the booking by its ID, ensuring that it is currently
+     * in the CONFIRMED status. If the booking is found, its status is updated
+     * to NO_SHOW and saved.
+     *
+     * @param int $id The ID of the booking to set as no show.
+     * @return bool True if the booking status was successfully updated, false otherwise.
+     */
+    public function noShow($id): bool
+    {
+        $booking = $this->model->where('id', $id)
+            ->whereIn('status', [
+                BookingStatus::CONFIRMED
+            ])
+            ->first();
+
+        $booking->status = BookingStatus::NO_SHOW;
+
+        return $booking->save();
+    }
+
+    /**
      * Confirm a booking by its ID.
      *
      * This method changes the status of a booking from PENDING to CONFIRMED.
@@ -496,7 +573,7 @@ class BookingService
                 ->select(DB::raw('SUM(price * quantity) as total'))
                 ->value('total');
 
-            $totalPayment = $priceRoom + $priceService;
+            $totalPayment = $priceRoom + $priceService - $booking->deposit;
 
             $booking->update([
                 'total_payment' => $totalPayment,

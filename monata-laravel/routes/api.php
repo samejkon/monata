@@ -29,6 +29,8 @@ Route::prefix('admin')->group(function () {
         Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
         Route::post('/bookings/{booking}/confirm', [AdminBookingController::class, 'confirm']);
         Route::post('/bookings/{booking}/check-in', [AdminBookingController::class, 'checkInGuest']);
+        Route::post('/bookings/{booking}/cancelled', [AdminBookingController::class, 'cancelled']);
+        Route::post('/bookings/{booking}/no-show', [AdminBookingController::class, 'noShow']);
         Route::post('/bookings/{booking}/check-out', [AdminBookingController::class, 'checkOutGuest']);
 
         Route::get('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'index']);
@@ -59,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
     Route::apiResource('bookings', AdminBookingController::class);
-    Route::get('/bookings-user', [AdminBookingController::class,'indexCustomer']);
+    Route::get('/bookings-user', [AdminBookingController::class, 'indexCustomer']);
 });
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);
