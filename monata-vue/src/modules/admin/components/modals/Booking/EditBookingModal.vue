@@ -67,7 +67,7 @@ const populateForm = (bookingData) => {
   guestName.value = bookingData.guest_name || '';
   guestEmail.value = bookingData.guest_email || '';
   guestPhone.value = bookingData.guest_phone || '';
-  deposit.value = bookingData.deposit_amount || 0;
+  deposit.value = bookingData.deposit || 0;
   bookingNote.value = bookingData.note || '';
   bookingStatus.value = mapStatusNumberToString(bookingData.status) || 'PENDING';
 
