@@ -28,15 +28,20 @@ class BookingService
      * Get a list of bookings filtered by the given payload.
      *
      * @param array $payload
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get($payload): \Illuminate\Contracts\Pagination\LengthAwarePaginator
+    public function get($payload): \Illuminate\Database\Eloquent\Collection
     {
         $per_page = Arr::get($payload, 'per_page', 15);
 
-        $bookings = $this->filter($payload)
-            ->orderBy('created_at', 'desc')
-            ->paginate($per_page);
+        $query = $this->filter($payload)
+            ->orderBy('created_at', 'desc');
+
+        if ($per_page == -1) {
+            $bookings = $query->get();
+        } else {
+            $bookings = $query->paginate($per_page);
+        }
 
         return $bookings;
     }
