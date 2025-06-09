@@ -61,9 +61,12 @@
                                 <th>Phone</th>
                                 <th>Status</th>
                                 <th class="text-center">
-                                    <router-link to="/admin/users/create" class="btn btn-primary btn-sm">
+                                    <button 
+                                        @click="showCreateModal = true" 
+                                        class="btn btn-primary btn-sm"
+                                    >
                                         <Plus />
-                                    </router-link>
+                                    </button>
                                 </th>
                             </tr>
                         </thead>
@@ -166,6 +169,10 @@
             v-model:currentPage="currentPage" 
             :meta="meta"
         />
+        <UserCreate
+            v-model="showCreateModal"
+            @created="fetchUsers"
+        />
     </div>
 </template>
 
@@ -175,6 +182,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useUser } from '../../composables/user/User.service';
 import { UserStatus } from '../../stores/enum/User';
 import Pagination from '../../components/layouts/Pagination.vue';
+import UserCreate from './UserCreate.vue';
 import { SquarePen, Trash2, Plus, Check, X} from 'lucide-vue-next';
 
 const route = useRoute();
@@ -196,6 +204,8 @@ const {
         cancelEdit,
         handleUpdateUser
         } = useUser();
+
+const showCreateModal = ref(false)
 
 watch(() => route.query, (newQuery) => {
     fetchUsers();

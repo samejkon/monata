@@ -24,6 +24,7 @@ export const useUser = () => {
     });
 
     const editingUser = ref<any>(null);
+    const isLoading = ref(false)
 
     const fetchUsers = async () => {
         try {
@@ -105,10 +106,19 @@ export const useUser = () => {
 
     const handleCreate = async () => {
         Object.keys(errors).forEach(key => delete errors[key]);
+        isLoading.value = true
         try {
             await createUser(formCreate.value);
             await fetchUsers();
-            router.push('/admin/users');
+            formCreate.value = {
+                name: '',
+                email: '',
+                phone: '',
+                status: UserStatus.Active,
+                password: '',
+                password_confirmation: '',
+            };
+            return true;
         } catch (error: any) {
             if (error.response?.status === 422) {
                 Object.assign(errors, error.response.data.errors);
@@ -116,6 +126,9 @@ export const useUser = () => {
                 console.error(error);
                 alert('An error occurred while creating the user.');
             }
+            return false;
+        } finally {
+            isLoading.value = false
         }
     };
 
@@ -175,6 +188,7 @@ export const useUser = () => {
         cancelEdit,
         handleUpdateUser,
         handleCreate,
-        changePassword
+        changePassword,
+        isLoading
     };
 };

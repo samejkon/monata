@@ -128,7 +128,16 @@ const resetForm = () => {
 const formatDateTime = (dateTimeStr: string): string => {
   if (!dateTimeStr) return ''
   const date = new Date(dateTimeStr)
-  return date.toISOString().slice(0, 16).replace('T', ' ')
+  
+  // Format theo múi giờ địa phương (Việt Nam) với định dạng Y-m-d H:i
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  
+  // Trả về đúng định dạng Y-m-d H:i
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 const formatPrice = (price: string) => {
@@ -142,6 +151,9 @@ const checkAvailability = async (e: Event) => {
   e.preventDefault()
   errors.value = {}
   isChecking.value = true
+  
+  // Lưu lại danh sách phòng đã chọn trước đó
+  const previousSelectedRooms = [...selectedRooms.value]
   availableRooms.value = []
 
   try {
@@ -153,10 +165,18 @@ const checkAvailability = async (e: Event) => {
 
     if (response.data.data.length > 0) {
       availableRooms.value = response.data.data
+      
+      // Lọc lại danh sách phòng đã chọn, chỉ giữ lại những phòng còn khả dụng
+      const availableRoomIds = response.data.data.map(room => room.id)
+      selectedRooms.value = previousSelectedRooms.filter(roomId => 
+        availableRoomIds.includes(roomId)
+      )
     } else {
       errors.value = {
         availability: ['No rooms available for the selected time']
       }
+      // Nếu không có phòng nào khả dụng, reset danh sách đã chọn
+      selectedRooms.value = []
     }
   } catch (error: any) {
     if (error.response?.data?.errors) {
@@ -166,6 +186,7 @@ const checkAvailability = async (e: Event) => {
         general: ['An error occurred, please try again later']
       }
     }
+    // Nếu có lỗi, giữ nguyên danh sách đã chọn
   } finally {
     isChecking.value = false
   }
