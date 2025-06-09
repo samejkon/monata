@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, reactive, nextTick, computed, watch } from 'vue'
 import { Modal } from 'bootstrap'
 import { api } from '@/modules/admin/lib/axios'
+import { useToast } from 'vue-toastification'
 import CreateRoomModal from '@/modules/admin/components/modals/room/CreateForm.vue'
 import EditRoomModal from '@/modules/admin/components/modals/room/EditForm.vue'
 import Pagination from '@/modules/admin/components/layouts/Pagination.vue'
@@ -18,6 +19,8 @@ const roomToEdit = ref<any | null>(null)
 const rooms = ref([])
 const roomTypes = ref<any[]>([])
 let intervalId: NodeJS.Timeout | null = null
+
+const toast = useToast();
 
 const currentPage = ref(1)
 const meta = ref<any | null>(null)
@@ -252,11 +255,27 @@ const openCreateRoomModal = () => {
   createRoomModal.value.show()
 }
 
-const handleRoomCreated = (newRoomData) => {
+const handleRoomCreated = (newRoomData: any) => {
   console.log('Phòng mới đã được tạo ở component cha:', newRoomData)
   rooms.value.push(newRoomData)
   fetchRooms()
 }
+
+const deleteRoom = async (roomId: number) => {
+  if (!confirm('Are you sure you want to delete this room?')) {
+    return; // User cancelled
+  }
+
+  try {
+    await api.delete(`/rooms/${roomId}`);
+    toast.success('Room deleted successfully!');
+    fetchRooms(); // Reload room list after deletion
+    closeRoomDetailsModal(); // Close the details modal if open
+  } catch (error) {
+    console.error(`Error deleting room ${roomId}:`, error);
+    toast.error('Failed to delete room!');
+  }
+};
 
 const displayedRoomTypeName = computed(() => {
   if (roomDetails.value && roomDetails.value.room_type_id && roomTypes.value.length > 0) {
@@ -375,18 +394,9 @@ onUnmounted(() => {
                       <p class="card-text">
                         <span :class="{
                           'status-label badge bg-success text-white': room.status === 1,
-                          'badge bg-primary text-white': room.status === 2,
-                          'badge bg-warning text-dark': room.status === 3,
-                          'badge bg-info text-white': room.status === 4,
-                          'badge bg-secondary text-white': room.status === 5
+                          'badge bg-secondary text-white': room.status === 2
                         }">
-                          {{
-                            room.status === 1 ? 'Active' :
-                              room.status === 2 ? 'Booked' :
-                                room.status === 3 ? 'Occupied' :
-                                  room.status === 4 ? 'Cleaning' :
-                                    'Inactive'
-                          }}
+                          {{room.status === 1 ? 'Active' : 'Inactive'}}
                         </span>
                       </p>
                     </div>
@@ -400,14 +410,14 @@ onUnmounted(() => {
 
           <div class="modal fade " id="roomDetailsModal" tabindex="-1" aria-labelledby="roomDetailsModalLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-xl-custom">
+            <div class="modal-dialog modal-dialog-centered modal-xl-custom modal-dialog-scrollable">
               <div class="modal-content shadow">
                 <div class="modal-header justify-content-center">
                   <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">
                     Room {{ roomDetails.name }} - {{ displayedRoomTypeName }}
                   </h5>
                 </div>
-                <div class="modal-body" v-if="roomDetails">
+                <div class="modal-body modal-body-scrollable" v-if="roomDetails">
                   <div v-if="roomDetails.images && roomDetails.images.length > 0" class="room-images-container">
                     <img :src="currentLargeImage" :alt="roomDetails.name"
                       class="room-large-image img-fluid rounded-2 shadow-sm mb-2">
@@ -430,10 +440,15 @@ onUnmounted(() => {
                   <h3>Description</h3>
                   <div v-html="roomDetails.description" class="room-description"></div>
                 </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-warning" @click="openEditRoomModal(roomDetails)">Edit</button>
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                <div class="modal-footer justify-content-between">
+                  <div>
+                    <button type="button" class="btn btn-danger" @click="deleteRoom(roomDetails.id)">Delete</button>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-warning me-" @click="openEditRoomModal(roomDetails)">Edit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                     @click="closeRoomDetailsModal">Close</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -565,5 +580,10 @@ a .active-thumbnail {
   max-height: 500px;
   width: 100%;
   object-fit: cover;
+}
+
+.modal-body-scrollable {
+  max-height: calc(100vh - 200px); /* Adjust based on your modal header/footer height */
+  overflow-y: auto;
 }
 </style>

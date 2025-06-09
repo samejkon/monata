@@ -3,9 +3,26 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Modal } from 'bootstrap'
 import { api, csrf } from '@/modules/admin/lib/axios'
 import { useToast } from 'vue-toastification'
+import Editor from '@tinymce/tinymce-vue'
 
 const toast = useToast();
 const emit = defineEmits(['room-updated'])
+
+const tinyMceConfig = {
+  height: 300,
+  menubar: false,
+  plugins: [
+    'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+  ],
+  toolbar:
+    'undo redo | formatselect | ' +
+    'bold italic backcolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | link code fullscreen help',
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+};
 
 const props = defineProps({
   modalId: {
@@ -255,8 +272,8 @@ const submitForm = async () => {
           <h5 class="modal-title" id="roomFormModalLabel">{{ modalTitle }}</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form @submit.prevent="submitForm">
+        <form @submit.prevent="submitForm">
+          <div class="modal-body modal-body-scrollable">
             <div class="mb-3">
               <label for="name" class="form-label">Name:</label>
               <input type="text" class="form-control" id="name" v-model="room.name">
@@ -272,7 +289,7 @@ const submitForm = async () => {
                   </option>
                 </select>
                 <div v-if="validationErrors.room_type_id" class="text-danger mt-1">{{ validationErrors.room_type_id[0]
-                }}</div>
+                  }}</div>
                 <div v-if="loadingRoomTypes">Loading room types...</div>
                 <div v-if="errorRoomTypes" class="text-danger">{{ errorRoomTypes }}</div>
               </div>
@@ -280,10 +297,7 @@ const submitForm = async () => {
                 <label for="edit_status" class="form-label">Status:</label>
                 <select class="form-select" id="edit_status" v-model="room.status">
                   <option value="1">Active</option>
-                  <option value="2">Booked</option>
-                  <option value="3">Occupied</option>
-                  <option value="4">Cleaning</option>
-                  <option value="5">Inactive</option>
+                  <option value="2">Inactive</option>
                 </select>
                 <div v-if="validationErrors.status" class="text-danger mt-1">{{ validationErrors.status[0] }}</div>
               </div>
@@ -291,7 +305,8 @@ const submitForm = async () => {
 
             <div class="mb-3">
               <label for="description" class="form-label">Description:</label>
-              <textarea class="form-control" id="description" v-model="room.description" rows="3"></textarea>
+              <editor api-key="mw4qmrce6512eg9eejrdl3izr2a7k6j1doyvp0f6btppb20q" :init="tinyMceConfig"
+                v-model="room.description" />
               <div v-if="validationErrors.description" class="text-danger mt-1">{{ validationErrors.description[0] }}
               </div>
             </div>
@@ -339,15 +354,14 @@ const submitForm = async () => {
                     aria-label="Remove New Image" @click="removeNewImage(index)">&times;</button>
                 </div>
               </div>
-            </div>
-
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">{{ props.initialRoomData.id ? 'Save Changes' :
-                'Create Room' }}</button>
-            </div>
-          </form>
-        </div>
+          </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">{{ props.initialRoomData.id ? 'Save Changes' :
+              'Create Room' }}</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -378,5 +392,15 @@ const submitForm = async () => {
 
 .to-remove-badge {
   font-size: 0.6rem;
+}
+
+.tox .tox-tinymce {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+}
+
+.modal-body-scrollable {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 </style>
