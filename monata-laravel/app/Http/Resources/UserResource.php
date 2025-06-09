@@ -23,6 +23,7 @@ class UserResource extends JsonResource
             'status' => $this->status,
             'created_at' => Carbon::parse($this->created_at)->format('Y-m-d'),
             'updated_at' => Carbon::parse($this->updated_at)->format('Y-m-d'),
+            'role' => $this->when(isset($this->role), $this->role),
         ];
     }
 }

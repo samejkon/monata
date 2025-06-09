@@ -14,11 +14,14 @@ class CheckRoleAdmin
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if(Auth::guard('admin')->user()->role !== 'manager') {
+        $user = auth()->guard('admin')->user();
+
+        if(!$user || !in_array($user->role, $roles)) {
             return response()->json(['message' => 'Unauthorized Admin'], 403);
         }
+        
         return $next($request);
     }
 }
