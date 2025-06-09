@@ -152,7 +152,7 @@ const checkAvailability = async () => {
     }
   } catch (error) {
     console.error('Error checking room availability:', error);
-    toast.error('Error checking room availability: ' + (error.response?.data?.message || 'Unknown error.'));
+    toast.error('Error checking room availability: ' + (error.response.data.message || 'Unknown error.'));
     availableRooms.value = [];
   }
 };

@@ -133,7 +133,7 @@ const printInvoice = () => {
 };
 
 watch(() => props.bookingData, (newVal, oldVal) => {
-  console.log("Initial/Prop bookingData for ViewInvoiceModal changed from:", oldVal, "to:", newVal);
+  // console.log("Initial/Prop bookingData for ViewInvoiceModal changed from:", oldVal, "to:", newVal);
 }, { deep: true, immediate: true });
 
 </script>

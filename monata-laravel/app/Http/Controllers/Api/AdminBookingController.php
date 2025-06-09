@@ -11,6 +11,7 @@ use App\Http\Resources\BookingResource;
 use App\Http\Resources\RoomResource;
 use App\Services\BookingService;
 use App\Http\Requests\Booking\CheckRoomUserAvaiableRequest;
+use App\Http\Requests\Booking\SearchBookingRequest;
 
 class AdminBookingController extends Controller
 {
@@ -23,9 +24,9 @@ class AdminBookingController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection | Null
      */
-    public function index(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection | Null
+    public function index(SearchBookingRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection | Null
     {
-        $data = $this->service->get();
+        $data = $this->service->get($request->validated());
 
         return BookingResource::collection($data);
     }
@@ -69,7 +70,7 @@ class AdminBookingController extends Controller
     public function checkRoomAvailability(CheckRoomAvaiableRequest $request): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         $data = $this->service->checkRoom($request->validated());
-        
+
         return RoomResource::collection($data);
     }
 
@@ -96,6 +97,28 @@ class AdminBookingController extends Controller
     public function destroy($id): \Illuminate\Http\Response
     {
         $this->service->delete($id);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Cancel the specified booking.
+     *
+     * This method sets the booking status to CANCELED and saves the booking.
+     *
+     * @param  int  $id  The ID of the booking to be canceled.
+     * @return \Illuminate\Http\Response
+     */
+    public function cancelled($id): \Illuminate\Http\Response
+    {
+        $this->service->cancelled($id);
+
+        return response()->noContent();
+    }
+
+    public function noShow($id): \Illuminate\Http\Response
+    {
+        $this->service->noShow($id);
 
         return response()->noContent();
     }
@@ -152,5 +175,4 @@ class AdminBookingController extends Controller
 
         return response()->noContent();
     }
-
 }

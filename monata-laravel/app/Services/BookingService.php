@@ -29,18 +29,33 @@ class BookingService
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get(): Collection
+    public function get($payload)
     {
-        $user = Auth::user();
+        $per_page = Arr::get($payload, 'per_page', 15);
 
-        if($user)
-            $query  = $this->model->where('user_id', $user->id)->orderBy('id', 'desc'); 
-        else
-            $query  = $this->model->query();
+        $bookings = $this->filter($payload)
+            ->orderBy('created_at', 'desc')
+            ->paginate($per_page);
 
-        return $query->orderBy('created_at', 'desc')->get();
+        return $bookings;
     }
 
+    public function filter($filter)
+    {
+        return $this->model
+            ->when(Arr::get($filter, 'guest_name'), function ($query, $guest_name) {
+                $query->where('guest_name', 'like', '%' . $guest_name . '%');
+            })
+            ->when(Arr::get($filter, 'guest_email'), function ($query, $guest_email) {
+                $query->where('guest_email', 'like', '%' . $guest_email . '%');
+            })
+            ->when(Arr::get($filter, 'guest_phone'), function ($query, $guest_phone) {
+                $query->where('guest_phone', 'like', '%' . $guest_phone . '%');
+            })
+            ->when(Arr::get($filter, 'status'), function ($query, $status) {
+                $query->where('status', $status);
+            });
+    }
     /**
      * Create a booking.
      *
@@ -394,6 +409,43 @@ class BookingService
         }
 
         return $booking->delete();
+    }
+
+    /**
+     * Cancel a booking by its ID.
+     *
+     * This method changes the status of a booking from PENDING to CANCELLED.
+     * It retrieves the booking by its ID, ensuring that it is currently
+     * in the PENDING status. If the booking is found, its status is updated
+     * to CANCELLED and saved.
+     *
+     * @param int $id The ID of the booking to cancel.
+     * @return bool True if the booking status was successfully updated, false otherwise.
+     */
+    public function cancelled($id): bool
+    {
+        $booking = $this->model->where('id', $id)
+            ->whereIn('status', [
+                BookingStatus::PENDING
+            ])
+            ->first();
+
+        $booking->status = BookingStatus::CANCELLED;
+
+        return $booking->save();
+    }
+
+    public function noShow($id): bool
+    {
+        $booking = $this->model->where('id', $id)
+            ->whereIn('status', [
+                BookingStatus::CONFIRMED
+            ])
+            ->first();
+
+        $booking->status = BookingStatus::NO_SHOW;
+
+        return $booking->save();
     }
 
     /**

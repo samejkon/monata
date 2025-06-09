@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/modules/admin/lib/axios';
 import { useToast } from 'vue-toastification'
@@ -12,6 +12,7 @@ const isSidebarToggled = ref(false);
 const isCollapseTwoOpen = ref(false);
 const isUserDropdownOpen = ref(false);
 const isRoomsDropdownOpen = ref(false);
+const isBookingsDropdownOpen = ref(false);
 
 const logout = async () => {
   try {
@@ -36,18 +37,28 @@ const toggleCollapseTwo = () => {
   isCollapseTwoOpen.value = !isCollapseTwoOpen.value;
   isUserDropdownOpen.value = false;
   isRoomsDropdownOpen.value = false;
+  isBookingsDropdownOpen.value = false;
 };
 
 const toggleUserDropdown = () => {
   isUserDropdownOpen.value = !isUserDropdownOpen.value;
   isCollapseTwoOpen.value = false;
   isRoomsDropdownOpen.value = false;
+  isBookingsDropdownOpen.value = false;
 };
 
 const toggleRoomsDropdown = () => {
   isRoomsDropdownOpen.value = !isRoomsDropdownOpen.value;
   isCollapseTwoOpen.value = false;
   isUserDropdownOpen.value = false;
+  isBookingsDropdownOpen.value = false;
+};
+
+const toggleBookingsDropdown = () => {
+  isBookingsDropdownOpen.value = !isBookingsDropdownOpen.value;
+  isCollapseTwoOpen.value = false;
+  isUserDropdownOpen.value = false;
+  isRoomsDropdownOpen.value = false;
 };
 
 const isActiveRoute = (path: string): boolean => {
@@ -55,7 +66,6 @@ const isActiveRoute = (path: string): boolean => {
 };
 
 const isComponentsDropdownActive = computed(() => {
-
   return false;
 });
 
@@ -63,6 +73,10 @@ const isRoomsDropdownActive = computed(() => {
   return route.path.startsWith('/admin/rooms') ||
     route.path.startsWith('/admin/properties') ||
     route.path.startsWith('/admin/room-types');
+});
+
+const isBookingsDropdownActive = computed(() => {
+  return route.path.startsWith('/admin/bookings');
 });
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -94,6 +108,15 @@ const handleClickOutside = (event: MouseEvent) => {
       isRoomsDropdownOpen.value = false;
     }
   }
+
+  const bookingsDropdownElement = document.getElementById('collapseBookings');
+  const bookingsDropdownToggler = document.querySelector('.nav-item a[data-target="#collapseBookings"], .nav-item a[href="#"][aria-expanded][aria-controls="collapseBookings"]');
+
+  if (bookingsDropdownElement && bookingsDropdownToggler) {
+    if (!bookingsDropdownElement.contains(target) && !bookingsDropdownToggler.contains(target)) {
+      isBookingsDropdownOpen.value = false;
+    }
+  }
 };
 
 onMounted(() => {
@@ -104,18 +127,10 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-import { watch } from 'vue';
-watch(() => route.path, (newPath, oldPath) => {
-  if (isRoomsDropdownActive.value) {
-    isRoomsDropdownOpen.value = true;
-  } else {
-    isRoomsDropdownOpen.value = false;
-  }
-  if (isComponentsDropdownActive.value) {
-    isCollapseTwoOpen.value = true;
-  } else {
-    isCollapseTwoOpen.value = false;
-  }
+watch(() => route.path, () => {
+  isRoomsDropdownOpen.value = isRoomsDropdownActive.value;
+  isCollapseTwoOpen.value = isComponentsDropdownActive.value;
+  isBookingsDropdownOpen.value = isBookingsDropdownActive.value;
 });
 </script>
 
@@ -157,10 +172,23 @@ watch(() => route.path, (newPath, oldPath) => {
             </div>
           </div>
         </li>
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/bookings') }">
-          <router-link class="nav-link" to="/admin/bookings">
-            <span>Booking</span>
-          </router-link>
+
+        <li class="nav-item" :class="{ 'active': isBookingsDropdownActive || isBookingsDropdownOpen }">
+          <a class="nav-link collapsed" href="#" @click.prevent="toggleBookingsDropdown"
+            :aria-expanded="isBookingsDropdownOpen">
+            <span>Bookings</span>
+            <i class="fas fa-angle-down dropdown-arrow" :class="{ 'rotate-180': isBookingsDropdownOpen }"></i>
+          </a>
+          <div id="collapseBookings" :class="{ 'collapse': true, 'show': isBookingsDropdownOpen }"
+            aria-labelledby="headingBookings" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Booking Management:</h6>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/bookings') }"
+                to="/admin/bookings">Booking Calendar</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/bookings-list') }"
+                to="/admin/bookings-list">Booking List</router-link>
+            </div>
+          </div>
         </li>
 
         <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/services') }">
@@ -174,12 +202,14 @@ watch(() => route.path, (newPath, oldPath) => {
             <span>Contact</span>
           </router-link>
         </li>
+
         <li class="nav-item">
           <router-link class="nav-link" to="/admin/users">
             <span>Users</span>
           </router-link>
         </li>
       </ul>
+
       <div id="content-wrapper" class="d-flex flex-column">
         <div id="content">
           <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -219,16 +249,17 @@ watch(() => route.path, (newPath, oldPath) => {
               </li>
             </ul>
           </nav>
+
           <div class="container-fluid">
             <router-view></router-view>
           </div>
         </div>
       </div>
     </div>
+
     <a class="scroll-to-top rounded" href="#page-top">
       <i class="fas fa-angle-up"></i>
     </a>
-
   </div>
 </template>
 
