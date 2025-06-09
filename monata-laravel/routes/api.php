@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
     Route::apiResource('bookings', AdminBookingController::class);
+    Route::get('/bookings-user', [AdminBookingController::class,'indexCustomer']);
 });
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);

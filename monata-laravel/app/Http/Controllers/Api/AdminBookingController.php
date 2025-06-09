@@ -31,6 +31,18 @@ class AdminBookingController extends Controller
     }
 
     /**
+     * Get all bookings.
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     */
+    public function indexCustomer(): \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    {
+        $data = $this->service->getCusomer();
+
+        return BookingResource::collection($data);
+    }
+
+    /**
      * Create a new booking.
      *
      * @param  \App\Http\Requests\Booking\CreateBookingRequest  $request

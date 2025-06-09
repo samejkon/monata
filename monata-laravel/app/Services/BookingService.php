@@ -31,14 +31,23 @@ class BookingService
      */
     public function get(): Collection
     {
-        $user = Auth::user();
-
-        if($user)
-            $query  = $this->model->where('user_id', $user->id)->orderBy('id', 'desc'); 
-        else
-            $query  = $this->model->query();
+        $query  = $this->model->query();
 
         return $query->orderBy('created_at', 'desc')->get();
+    }
+
+    /**
+     * Get all bookings.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getCusomer(): Collection
+    {
+        $user = Auth::user();
+
+        $query  = $this->model->where('user_id', $user->id); 
+
+        return $query->orderBy('created_at','desc')->get();
     }
 
     /**
