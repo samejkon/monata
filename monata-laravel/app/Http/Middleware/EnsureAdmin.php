@@ -21,6 +21,8 @@ class EnsureAdmin
             return response()->json(['message' => 'Unauthorized Admin'], 403);
         }
 
+        Auth::setUser(Auth::guard('admin')->user());
+
         return $next($request);
     }
-} 
+}

@@ -239,7 +239,7 @@ const bookSelectedRooms = async () => {
 
 const checkPendingBooking = () => {
   const pendingBooking = localStorage.getItem('pendingBooking')
-  if (pendingBooking && authStore.user) {
+  if (pendingBooking && authStore.type === "user") {
     const bookingData = JSON.parse(pendingBooking)
     formData.value = {
       checkin_at: bookingData.checkin_at,
@@ -259,7 +259,7 @@ const handleBookRooms = () => {
     return
   }
 
-  if (!authStore.user) {
+  if (!(authStore.type === "user")) {
     showLoginPopup.value = true
     showRegisterPopup.value = false
     return
@@ -300,7 +300,7 @@ const restoreBookingState = () => {
 }
 
 watch(
-  () => authStore.user,
+  () => authStore.type === "user",
   (isAuthenticated) => {
     if (isAuthenticated) {
       fetchUserData()
@@ -324,10 +324,10 @@ watch(
 
 onMounted(() => {
   fetchRoomTypes()
-  if (authStore.user) {
+  if (authStore.type === "user") {
     fetchUserData()
   }
-  if (authStore.user && localStorage.getItem('pendingBooking')) {
+  if (authStore.type === "user" && localStorage.getItem('pendingBooking')) {
     restoreBookingState()
   }
 })

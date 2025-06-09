@@ -47,6 +47,20 @@ class BookingService
     }
 
     /**
+     * Get all bookings.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getCustomer(): Collection
+    {
+        $user = Auth::user();
+
+        $query  = $this->model->where('user_id', $user->id); 
+
+        return $query->orderBy('created_at','desc')->get();
+    }
+
+    /**
      * Filter bookings based on specified criteria.
      *
      * @param array $filter An associative array containing filter criteria such as

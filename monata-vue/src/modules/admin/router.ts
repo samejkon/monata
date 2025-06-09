@@ -34,7 +34,7 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'properties',
         name: 'AdminProperties',
         component: Properties,
-        meta: { requiresAdmin: true },
+        meta: { requiresAdmin: true, requiresSuperAdmin: true },
       },
       {
         path: 'bookings',
@@ -51,7 +51,7 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'room-types',
         name: 'AdminRoomTypes',
         component: RoomType,
-        meta: { requiresAdmin: true },
+        meta: { requiresAdmin: true, requiresSuperAdmin: true },
       },
       {
         path: '', // Default child route for /admin
@@ -61,7 +61,7 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'services',
         name: 'AdminServiceList',
         component: ServiceList,
-        meta: { requiresAuth: true, requiresAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
       },
       {
         path: 'contacts',
@@ -73,19 +73,19 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'rooms',
         name: 'Rooms',
         component: Rooms,
-        meta: { requiresAuth: true, requiresAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
       },
       {
         path: 'users',
         name: 'AdminUserList',
         component: UserList,
-        meta: { requiresAuth: true, requiresAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
       },
       {
         path: 'users/create',
         name: 'AdminUserCreate',
         component: UserCreate,
-        meta: { requiresAuth: true, requiresAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
       },
     ],
   },

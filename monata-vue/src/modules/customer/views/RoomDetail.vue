@@ -1,15 +1,18 @@
-<script setup>
+<script setup lang="ts">
 import Footer from '@/modules/customer/components/layouts/Footer.vue'
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/modules/customer/lib/axios'
+import CheckAvailable from '../components/forms/CheckAvailable.vue'
 
 const route = useRoute()
 const roomDetails = ref(null)
 const currentLargeImage = ref(null)
 const currentImageIndex = ref(0)
 const isTransitioning = ref(false)
+const showCheckAvailable = ref(false)
+const selectedRoomType = ref<number | null>(null)
 let intervalId = null
 
 const bookingCardRef = ref(null)
@@ -137,6 +140,11 @@ const scrollToBookingCard = () => {
   }
 }
 
+const handleBookNow = (roomTypeId: number) => {
+  selectedRoomType.value = roomTypeId
+  showCheckAvailable.value = true
+}
+
 onMounted(async () => {
   const roomId = route.params.id
   if (roomId) {
@@ -198,7 +206,7 @@ onUnmounted(() => {
               </li>
             </ul>
             <div class="d-grid gap-2">
-              <button class="btn btn-primary btn-lg rounded-pill">Book Now</button>
+              <button class="btn btn-primary btn-lg rounded-pill" @click.prevent="handleBookNow(roomDetails.room_type_id)">Book Now</button>
             </div>
           </div>
         </div>
@@ -215,6 +223,11 @@ onUnmounted(() => {
       Book Now
     </button>
   </transition>
+
+  <CheckAvailable 
+    v-model="showCheckAvailable"
+    :initial-room-type="selectedRoomType"
+  />
 
   <Footer />
 </template>

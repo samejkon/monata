@@ -185,7 +185,7 @@ const fetchBookings = async (): Promise<void> => {
   bookingError.value = null;
 
   try {
-    const response = await api.get('/bookings');
+    const response = await api.get('/bookings-user');
     bookings.value = response.data.data;
   } catch (err) {
     console.error('Error fetching bookings:', err);

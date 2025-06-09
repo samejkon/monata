@@ -18,6 +18,7 @@ class RoomDetailClientResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'room_type' => $this->roomType->name,
+            'room_type_id' => $this->room_type_id,
             'price' => $this->roomType->price,
             'thumbnail_path' => asset('storage/' . $this->thumbnail_path),
             'images' => ImageResource::collection($this->images),
