@@ -22,7 +22,6 @@ class StoreRoomRequest extends FormRequest
             'images' => ['nullable', 'array', 'max:10'],
             'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
             'description' => ['nullable', 'string'],
-            'status' => ['nullable', 'integer', Rule::enum(RoomStatus::class)],
         ];
     }
 }
