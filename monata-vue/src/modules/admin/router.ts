@@ -8,10 +8,10 @@ import RoomType from './views/RoomType.vue'
 import Rooms from './views/Room.vue'
 
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
-import ServiceCreate from '@/modules/admin/views/service/ServiceCreate.vue'
 import ContactList from '@/modules/admin/views/contact/ContactList.vue'
 import UserList from '@/modules/admin/views/user/UserList.vue'
 import UserCreate from '@/modules/admin/views/user/UserCreate.vue'
+import BookingList from './views/BookingList.vue'
 
 const adminRoutes: Array<RouteRecordRaw> = [
   {
@@ -40,6 +40,11 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'bookings',
         name: 'AdminBookings',
         component: Bookings,
+        meta: { requiresAdmin: true },
+      }, {
+        path: 'bookings-list',
+        name: 'BookingList',
+        component: BookingList,
         meta: { requiresAdmin: true },
       },
       {

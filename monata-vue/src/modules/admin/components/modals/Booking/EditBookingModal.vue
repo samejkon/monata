@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed, nextTick } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { api } from '@/modules/admin/lib/axios';
 import moment from 'moment';
 import { useToast } from 'vue-toastification';

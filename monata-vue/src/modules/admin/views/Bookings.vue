@@ -37,7 +37,7 @@ const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 
 const fetchBookings = async () => {
   try {
-    const response = await api.get(`/bookings`);
+    const response = await api.get(`/bookings`, { params: { per_page: -1 } });
     rawBookings.value = response.data?.data || [];
     processBookings(rawBookings.value);
   } catch (error) {
@@ -221,7 +221,6 @@ const handleBookingConfirmed = async () => {
     if (updatedBooking) {
       selectedBookingDetail.value = updatedBooking;
     } else {
-      // If booking not found (e.g. deleted or status changed drastically), close modal
       closeBookingDetailModal();
     }
   }
@@ -282,14 +281,42 @@ const closeViewInvoiceModal = () => {
   bookingDataForInvoiceView.value = null;
 };
 
-const checkInBooking = async (bookingId) => {
-  try {
-    const response = await api.post(`/bookings/${bookingId}/check-in`);
-    toast.success('Check-in successful!');
-    await fetchBookings();
-  } catch (error) {
-    console.error('Error during check-in:', error);
-    toast.error('Failed to check-in booking. Please try again.');
+const confirmBooking = async (bookingId) => {
+  if (confirm('Are you sure you want to confirm this booking?')) {
+    try {
+      await api.post(`/bookings/${bookingId}/confirm`);
+      toast.success('Booking confirmed successfully!');
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error confirming booking:', error.response?.data || error.message);
+      toast.error('Failed to confirm booking: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
+  }
+};
+
+const guestNoShow = async (bookingId) => {
+  if (confirm('Are you sure want to mark this booking as no show?')) {
+    try {
+      await api.post(`/bookings/${bookingId}/no-show`);
+      toast.success('Booking confirmed successfully!');
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error confirming booking:', error.response?.data || error.message);
+      toast.error('Failed to confirm booking: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
+  }
+};
+
+const cancelBooking = async (bookingId) => {
+  if (confirm('Are you sure want to cancel this booking?')) {
+    try {
+      await api.post(`/bookings/${bookingId}/cancelled`);
+      toast.success('Booking cancelled successfully!');
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error confirming booking:', error.response?.data || error.message);
+      toast.error('Failed to confirm booking: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
   }
 };
 </script>
@@ -349,16 +376,19 @@ const checkInBooking = async (bookingId) => {
                   </p>
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
-
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
-                    @click="openBookingDetailModal(booking)">Confirm</button>
+                    @click="confirmBooking(booking.id)">Confirm</button>
                   <button v-if="booking.status === 2 || booking.status === 3" class="btn btn-warning btn-sm mr-2"
                     @click="openInvoiceServiceModal(booking)">Services</button>
-                  <button class="btn btn-info btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
-                  <button v-if="booking.status === 4" type=" button" class="btn btn-info btn-sm ms-2"
+                  <button class="btn btn-primary btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
+                  <button v-if="booking.status === 4" type=" button" class="btn btn-success btn-sm ms-2"
                     @click="openViewInvoiceModal(booking)">Invoice</button>
+                  <button v-if="booking.status === 2" type=" button" class="btn btn-info btn-sm ms-2"
+                    @click="guestNoShow(booking.id)">No Show</button>
+                  <button v-if="booking.status === 1" type=" button" class="btn btn-danger btn-sm ms-2"
+                    @click="cancelBooking(booking.id)">Cancel</button>
                 </div>
               </div>
             </div>
