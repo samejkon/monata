@@ -121,7 +121,7 @@ const checkInRoom = async (bookingId, detailId) => {
                     <p><strong>Email:</strong> {{ selectedBookingDetail.guest_email }}</p>
                     <p><strong>Phone:</strong> {{ selectedBookingDetail.guest_phone }}</p>
                     <p><strong>Total price:</strong> {{ formatCurrency(selectedBookingDetail.total_payment) }}</p>
-                    <p><strong>Deposit:</strong>{{ formatCurrency(selectedBookingDetail.deposit_amount) || ' 0 VNĐ' }}
+                    <p><strong>Deposit:</strong> {{ formatCurrency(selectedBookingDetail.deposit) || ' 0 VNĐ' }}
                     </p>
                     <p><strong>Status:</strong> {{ getStatusText(selectedBookingDetail.status) }}</p>
                     <p><strong>Note:</strong> {{ selectedBookingDetail.notes || '' }}</p>

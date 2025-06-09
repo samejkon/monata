@@ -28,9 +28,8 @@ class BookingService
      * Get a list of bookings filtered by the given payload.
      *
      * @param array $payload
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function get($payload): \Illuminate\Database\Eloquent\Collection
+    public function get($payload)
     {
         $per_page = Arr::get($payload, 'per_page', 15);
 
@@ -55,9 +54,9 @@ class BookingService
     {
         $user = Auth::user();
 
-        $query  = $this->model->where('user_id', $user->id); 
+        $query  = $this->model->where('user_id', $user->id);
 
-        return $query->orderBy('created_at','desc')->get();
+        return $query->orderBy('created_at', 'desc')->get();
     }
 
     /**
@@ -180,10 +179,7 @@ class BookingService
                 'guest_name'     => Arr::get($data, 'guest_name'),
                 'guest_email'    => Arr::get($data, 'guest_email'),
                 'guest_phone'    => Arr::get($data, 'guest_phone'),
-                'check_in'       => Arr::get($data, 'check_in'),
-                'check_out'      => Arr::get($data, 'check_out'),
                 'deposit'        => Arr::get($data, 'deposit'),
-                'status'         => Arr::get($data, 'status', BookingStatus::CONFIRMED),
                 'note'           => Arr::get($data, 'note'),
             ];
 
@@ -577,7 +573,7 @@ class BookingService
                 ->select(DB::raw('SUM(price * quantity) as total'))
                 ->value('total');
 
-            $totalPayment = $priceRoom + $priceService;
+            $totalPayment = $priceRoom + $priceService - $booking->deposit;
 
             $booking->update([
                 'total_payment' => $totalPayment,
