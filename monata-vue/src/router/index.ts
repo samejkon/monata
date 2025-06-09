@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import customerRouter from '../modules/customer/router'
-import adminRoutes from '@/modules/admin/router';
-import { useAuthStore } from '@/stores/auth';
+import adminRoutes from '@/modules/admin/router'
+import { useAuthStore } from '@/stores/auth'
 import Errors from '@/views/Errors.vue'
-import NotFound from '@/views/NotFound.vue';
+import NotFound from '@/views/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,6 +36,10 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.meta.requiresAdmin && auth.type !== 'admin') {
     return next({ name: 'AdminLogin' })
+  }
+
+  if (to.meta.requiresSuperAdmin && auth.user.role !== 'superadmin') {
+    return next({ name: 'Error403' })
   }
 
   if (to.meta.requiresUser && auth.type !== 'user') {
