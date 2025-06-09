@@ -355,6 +355,7 @@ onMounted(() => {
               :class="{ 'is-invalid': errors.checkin_at }"
               required
               step="3600"
+              data-date-format="24h"
             />
             <div v-if="errors.checkin_at" class="invalid-feedback">
               {{ errors.checkin_at[0] }}
@@ -370,6 +371,7 @@ onMounted(() => {
               :class="{ 'is-invalid': errors.checkout_at }"
               required
               step="3600"
+              data-date-format="24h"
             />
             <div v-if="errors.checkout_at" class="invalid-feedback">
               {{ errors.checkout_at[0] }}
@@ -501,6 +503,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.modal-content{
+  height: 1000px;
+}
 .booking-modal-display {
   position: fixed;
   top: 0;
@@ -528,7 +533,6 @@ onMounted(() => {
 }
 
 .modal-body {
-  padding: 2.5rem;
   width: 100%;
   max-width: 1000px;
   margin: 0 auto;
