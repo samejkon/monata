@@ -14,10 +14,15 @@ interface FormData {
   checkout_at: string
 }
 
-const formatDateTime = (dateTimeStr: string): string => {
+const formatDisplayDateTime = (dateTimeStr: string): string => {
   if (!dateTimeStr) return ''
   const date = new Date(dateTimeStr)
-  return date.toISOString().slice(0, 16).replace('T', ' ')
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 const formatPrice = (price: string) => {
@@ -83,8 +88,8 @@ const closeModal = () => {
           </div>
           <div class="card-body">
             <h5>Booking information</h5>
-            <p><strong>Check-in:</strong> {{ formatDateTime(formData.checkin_at) }}</p>
-            <p><strong>Check-out:</strong> {{ formatDateTime(formData.checkout_at) }}</p>
+            <p><strong>Check-in:</strong> {{ formatDisplayDateTime(formData.checkin_at) }}</p>
+            <p><strong>Check-out:</strong> {{ formatDisplayDateTime(formData.checkout_at) }}</p>
             
             <h6 class="mt-4 mb-3">You have selected {{selectedRooms.length}} rooms:</h6>
             <ul class="list-group mb-4">

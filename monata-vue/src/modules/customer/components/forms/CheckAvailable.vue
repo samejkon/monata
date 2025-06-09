@@ -7,6 +7,8 @@ import { useAuthStore } from '@/stores/auth'
 import LoginPopup from '../auth/LoginModal.vue'
 import RegisterModal from '../auth/RegisterModal.vue'
 import BookingConfirmationModal from './BookingConfirmationModal.vue'
+import FlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 
 const toast = useToast()
 const router = useRouter()
@@ -75,6 +77,14 @@ const formData = ref<FormData>({
   roomType: null
 })
 
+const flatpickrConfigGlobal = {
+  enableTime: true,
+  dateFormat: "Y-m-d H:i",
+  time_24hr: true,
+  minuteIncrement: 30,
+  allowInput: true,
+};
+
 const errors = ref<Record<string, string[]>>({})
 const isLoading = ref(false)
 const isChecking = ref(false)
@@ -128,7 +138,16 @@ const resetForm = () => {
 const formatDateTime = (dateTimeStr: string): string => {
   if (!dateTimeStr) return ''
   const date = new Date(dateTimeStr)
-  return date.toISOString().slice(0, 16).replace('T', ' ')
+  
+  // Format theo múi giờ địa phương (Việt Nam) với định dạng Y-m-d H:i
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  
+  // Trả về đúng định dạng Y-m-d H:i
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 const formatPrice = (price: string) => {
@@ -142,6 +161,9 @@ const checkAvailability = async (e: Event) => {
   e.preventDefault()
   errors.value = {}
   isChecking.value = true
+  
+  // Lưu lại danh sách phòng đã chọn trước đó
+  const previousSelectedRooms = [...selectedRooms.value]
   availableRooms.value = []
 
   try {
@@ -153,10 +175,18 @@ const checkAvailability = async (e: Event) => {
 
     if (response.data.data.length > 0) {
       availableRooms.value = response.data.data
+      
+      // Lọc lại danh sách phòng đã chọn, chỉ giữ lại những phòng còn khả dụng
+      const availableRoomIds = response.data.data.map(room => room.id)
+      selectedRooms.value = previousSelectedRooms.filter(roomId => 
+        availableRoomIds.includes(roomId)
+      )
     } else {
       errors.value = {
         availability: ['No rooms available for the selected time']
       }
+      // Nếu không có phòng nào khả dụng, reset danh sách đã chọn
+      selectedRooms.value = []
     }
   } catch (error: any) {
     if (error.response?.data?.errors) {
@@ -166,6 +196,7 @@ const checkAvailability = async (e: Event) => {
         general: ['An error occurred, please try again later']
       }
     }
+    // Nếu có lỗi, giữ nguyên danh sách đã chọn
   } finally {
     isChecking.value = false
   }
@@ -347,32 +378,18 @@ onMounted(() => {
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Check-in date</label>
-            <input 
-              class="form-control" 
-              type="datetime-local" 
-              v-model="formData.checkin_at"
-              :class="{ 'is-invalid': errors.checkin_at }"
-              required
-              step="3600"
-              data-date-format="24h"
-            />
+            <label for="checkinDateInput" class="form-label">Check-in date:</label>
+            <FlatPickr v-model="formData.checkin_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkin_at }"
+                    placeholder="Select check-in date and time" id="checkinDateInput" />
             <div v-if="errors.checkin_at" class="invalid-feedback">
               {{ errors.checkin_at[0] }}
             </div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Check-out date</label>
-            <input 
-              class="form-control" 
-              type="datetime-local" 
-              v-model="formData.checkout_at"
-              :class="{ 'is-invalid': errors.checkout_at }"
-              required
-              step="3600"
-              data-date-format="24h"
-            />
+            <label for="checkoutDateInput" class="form-label">Check-in date:</label>
+            <FlatPickr v-model="formData.checkout_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkout_at }"
+                    placeholder="Select check-out date and time" id="checkoutDateInput" />
             <div v-if="errors.checkout_at" class="invalid-feedback">
               {{ errors.checkout_at[0] }}
             </div>
