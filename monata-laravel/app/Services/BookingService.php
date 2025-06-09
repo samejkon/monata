@@ -44,7 +44,7 @@ class BookingService
 
         return $bookings;
     }
-
+    
     /**
      * Get all bookings.
      *
