@@ -7,6 +7,8 @@ import { useAuthStore } from '@/stores/auth'
 import LoginPopup from '../auth/LoginModal.vue'
 import RegisterModal from '../auth/RegisterModal.vue'
 import BookingConfirmationModal from './BookingConfirmationModal.vue'
+import FlatPickr from 'vue-flatpickr-component';
+import 'flatpickr/dist/flatpickr.css';
 
 const toast = useToast()
 const router = useRouter()
@@ -74,6 +76,14 @@ const formData = ref<FormData>({
   checkout_at: '',
   roomType: null
 })
+
+const flatpickrConfigGlobal = {
+  enableTime: true,
+  dateFormat: "Y-m-d H:i",
+  time_24hr: true,
+  minuteIncrement: 30,
+  allowInput: true,
+};
 
 const errors = ref<Record<string, string[]>>({})
 const isLoading = ref(false)
@@ -368,32 +378,18 @@ onMounted(() => {
       <div class="modal-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Check-in date</label>
-            <input 
-              class="form-control" 
-              type="datetime-local" 
-              v-model="formData.checkin_at"
-              :class="{ 'is-invalid': errors.checkin_at }"
-              required
-              step="3600"
-              data-date-format="24h"
-            />
+            <label for="checkinDateInput" class="form-label">Check-in date:</label>
+            <FlatPickr v-model="formData.checkin_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkin_at }"
+                    placeholder="Select check-in date and time" id="checkinDateInput" />
             <div v-if="errors.checkin_at" class="invalid-feedback">
               {{ errors.checkin_at[0] }}
             </div>
           </div>
 
           <div class="col-md-6">
-            <label class="form-label">Check-out date</label>
-            <input 
-              class="form-control" 
-              type="datetime-local" 
-              v-model="formData.checkout_at"
-              :class="{ 'is-invalid': errors.checkout_at }"
-              required
-              step="3600"
-              data-date-format="24h"
-            />
+            <label for="checkoutDateInput" class="form-label">Check-in date:</label>
+            <FlatPickr v-model="formData.checkout_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkout_at }"
+                    placeholder="Select check-out date and time" id="checkoutDateInput" />
             <div v-if="errors.checkout_at" class="invalid-feedback">
               {{ errors.checkout_at[0] }}
             </div>
