@@ -615,40 +615,61 @@ class BookingService
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      * @throws \Exception
      */
-    public function checkout(int $bookingId, array $detailIds): Booking
+    public function checkout(int $bookingId): Booking
     {
-        return DB::transaction(function () use ($bookingId, $detailIds) {
-            $booking = $this->model->findOrFail($bookingId);
+        return DB::transaction(function () use ($bookingId) {
+            $booking = Booking::findOrFail($bookingId);
 
-            $this->bookingDetail
+            if ($booking->status !== BookingStatus::CHECK_OUT) {
+                throw new \Exception('Booking is not in CHECK_OUT status.');
+            }
+
+            $priceRoom = $booking->total_payment;
+
+            $priceService = InvoiceDetail::where('booking_id', $bookingId)
+                ->select(DB::raw('SUM(price * quantity) as total'))
+                ->value('total');
+
+            $totalPayment = $priceRoom + $priceService - $booking->deposit;
+
+            $booking->update([
+                'total_payment' => $totalPayment,
+                'status' => BookingStatus::CHECK_OUT,
+                'check_out' => Carbon::now(),
+            ]);
+
+            return $booking;
+        });
+    }
+
+    public function checkOutRoom(int $bookingId, int $roomId): bool
+    {
+        return DB::transaction(function () use ($bookingId, $roomId) {
+            $updatedRows = $this->bookingDetail
                 ->where('booking_id', $bookingId)
-                ->whereIn('id', $detailIds)
                 ->where('status', BookingDetailStatus::CHECK_IN)
+                ->where('room_id', $roomId)
                 ->update([
                     'status' => BookingDetailStatus::CHECK_OUT,
                     'checkout' => Carbon::now(),
                 ]);
 
-            $notCheckedOutExists = $this->bookingDetail
-                ->where('booking_id', $bookingId)
-                ->where('status', '!=', BookingDetailStatus::CHECK_OUT)
-                ->exists();
+            if ($updatedRows > 0) {
+                $remainingRooms = $this->bookingDetail
+                    ->where('booking_id', $bookingId)
+                    ->where('status', '!=', BookingDetailStatus::CHECK_OUT)
+                    ->exists();
 
-            if (!$notCheckedOutExists) {
-                $priceRoom = $booking->total_payment;
-
-                $priceService = InvoiceDetail::where('booking_id', $bookingId)
-                    ->select(DB::raw('SUM(price * quantity) as total'))
-                    ->value('total');
-
-                $totalPayment = $priceRoom + ($priceService ?? 0) - $booking->deposit;
-
-                $booking->update([
-                    'total_payment' => $totalPayment,
-                    'status' => BookingStatus::CHECK_OUT,
-                    'check_out' => Carbon::now(),
-                ]);
+                if (!$remainingRooms) {
+                    $booking = $this->model->find($bookingId);
+                    if ($booking) {
+                        $booking->status = BookingStatus::CHECK_OUT;
+                        $booking->save();
+                    }
+                }
             }
+
+            return $updatedRows > 0;
         });
     }
 }

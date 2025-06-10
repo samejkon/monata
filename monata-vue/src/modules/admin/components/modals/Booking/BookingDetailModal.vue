@@ -117,10 +117,10 @@ const checkInRoom = async (bookingId, detailId) => {
   }
 };
 
-const checkOutRoom = async (bookingId, detailId) => {
+const checkOutRoom = async (bookingId, detail) => {
   if (confirm('Are you sure you want to check out this room?')) {
     try {
-      await api.post(`/bookings/${bookingId}/check-out`, { ids: [detailId] });
+      await api.post(`/bookings/${bookingId}/check-out-room`, { room_id: detail.room_id });
       toast.success('Room checked out successfully!');
       emit('bookingConfirmed'); // To trigger data refresh in parent
     } catch (error) {
@@ -191,7 +191,7 @@ const cancelBooking = async (bookingId) => {
                       Check In Room
                     </button>
                     <button v-if="detail.status === 2" class="btn btn-sm btn-warning"
-                      @click="checkOutRoom(selectedBookingDetail.id, detail.id)">
+                      @click="checkOutRoom(selectedBookingDetail.id, detail)">
                       Check Out Room
                     </button>
                   </td>
