@@ -169,45 +169,75 @@ const handleApiErrors = (error: any) => {
 
         if (apiError.errors) {
             Object.entries(apiError.errors).forEach(([field, messages]) => {
-                const fieldName = field.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+                const fieldName = field.split('_').map((word, index) => {
+                    if (index === 0) return word;
+                    return word.charAt(0).toUpperCase() + word.slice(1);
+                }).join('');
+                
                 if (fieldName in errors) {
-                    errors[fieldName as keyof FormErrors] = messages[0]
+                    errors[fieldName as keyof FormErrors] = messages[0];
                 }
-            })
+            });
         } else if (apiError.message) {
-            alert(apiError.message)
+            errors.title = apiError.message;
         }
     } else {
-        // Lỗi không xác định
-        alert('Có lỗi xảy ra khi gửi tin nhắn. Vui lòng thử lại sau!')
+        errors.title = 'An error occurred while sending the message. Please try again later!';
     }
 }
 
 const submitForm = async () => {
-    try {
-        isSubmitting.value = true
+    Object.keys(errors).forEach(key => {
+        errors[key as keyof FormErrors] = ''
+    });
 
-        const dataToSend: ContactForm = {
-            title: formData.title,
-            content: formData.content
+    try {
+        isSubmitting.value = true;
+
+        if (!formData.title.trim()) {
+            errors.title = 'Title is required';
+            return;
+        }
+        if (!formData.content.trim()) {
+            errors.content = 'Content is required';
+            return;
+        }
+        if (authStore.type !== "user") {
+            if (!formData.guest_name?.trim()) {
+                errors.guest_name = 'Name is required';
+                return;
+            }
+            if (!formData.guest_email?.trim()) {
+                errors.guest_email = 'Email is required';
+                return;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.guest_email)) {
+                errors.guest_email = 'Please enter a valid email address';
+                return;
+            }
         }
 
-        if (authStore.user) {
+        const dataToSend: ContactForm = {
+            title: formData.title.trim(),
+            content: formData.content.trim()
+        }
+
+        if (authStore.type === "user") {
             try {
                 const response = await api.get('/profile')
                 dataToSend.user_id = response.data.data.id
             } catch (error: any) {
-                console.error('Lỗi khi lấy thông tin user:', error.response?.data)
-                throw new Error('Không thể lấy thông tin người dùng')
+                console.error('Failed to fetch user information:', error.response?.data)
+                errors.title = 'Unable to retrieve user information';
+                return;
             }
         } else {
-            dataToSend.guest_name = formData.guest_name
-            dataToSend.guest_email = formData.guest_email
+            dataToSend.guest_name = formData.guest_name?.trim()
+            dataToSend.guest_email = formData.guest_email?.trim()
         }
 
         const response = await sendContact(dataToSend)
-
-        alert('Gửi tin nhắn thành công!')
 
         formData.guest_name = ''
         formData.guest_email = ''
@@ -217,8 +247,10 @@ const submitForm = async () => {
             errors[key as keyof FormErrors] = ''
         })
 
+        alert('Message sent successfully!')
+
     } catch (error: any) {
-        console.error('Chi tiết lỗi:', error.response?.data) // Debug log
+        console.error('Error detail:', error.response?.data)
         handleApiErrors(error)
     } finally {
         isSubmitting.value = false
