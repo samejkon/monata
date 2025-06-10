@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoomType\CreateRoomTypeRequest;
 use App\Http\Requests\RoomType\SearchRoomTypeRequest;
@@ -13,7 +14,9 @@ class RoomTypeController extends Controller
 {
     public function __construct(
         protected RoomTypeService $service
-    ) {}
+    ) {
+        $this->middleware('role:' . RoleAdmin::SUPERADMIN->value);
+    }
 
     /**
      * Display a listing of the resource.

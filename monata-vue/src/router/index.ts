@@ -27,7 +27,11 @@ router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
 
   if (!auth.userLoaded) {
-    await auth.fetchUser()
+    if (to.path.startsWith('/admin')) {
+      await auth.fetchAdmin()
+    } else {
+      await auth.fetchUser()
+    }
   }
 
   if (to.meta.requiresAuth && !auth.user) {

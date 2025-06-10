@@ -41,7 +41,8 @@ const adminRoutes: Array<RouteRecordRaw> = [
         name: 'AdminBookings',
         component: Bookings,
         meta: { requiresAdmin: true },
-      }, {
+      },
+      {
         path: 'bookings-list',
         name: 'BookingList',
         component: BookingList,
@@ -79,13 +80,13 @@ const adminRoutes: Array<RouteRecordRaw> = [
         path: 'users',
         name: 'AdminUserList',
         component: UserList,
-        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true },
       },
       {
         path: 'users/create',
         name: 'AdminUserCreate',
         component: UserCreate,
-        meta: { requiresAuth: true, requiresAdmin: true, requiresSuperAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true },
       },
     ],
   },

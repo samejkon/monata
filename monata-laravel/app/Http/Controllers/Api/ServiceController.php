@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Service\SearchServiceRequest;
 use App\Http\Requests\Service\CreateServiceRequest;
@@ -18,6 +19,7 @@ class ServiceController extends Controller
         protected ServiceService $service,
     ) {
         $this->service = $service;
+        $this->middleware('role:' . RoleAdmin::SUPERADMIN->value)->except('index', 'show');
     }
 
     /**

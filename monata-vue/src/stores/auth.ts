@@ -11,25 +11,27 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async fetchUser() {
-      this.userLoaded = false
-
       try {
         const res = await apiUser.get('/profile', { withCredentials: true })
         this.type = 'user'
         this.user = res.data.data
         this.userLoaded = true
-        return
-      } catch {}
+      } catch {
+        this.clearUser()
+      }
+    },
 
+    async fetchAdmin() {
       try {
         const res = await apiAdmin.get('/profile', { withCredentials: true })
         this.type = 'admin'
         this.user = res.data.data
-        this.userLoaded = true
-        return
-      } catch {}
+        console.log(this.user.role)
 
-      this.clearUser()
+        this.userLoaded = true
+      } catch {
+        this.clearUser()
+      }
     },
 
     clearUser() {

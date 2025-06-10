@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/modules/admin/lib/axios';
 import { useToast } from 'vue-toastification';
 import { useAuthStore } from '@/stores/auth';
+import { USER_ROLES } from '@/modules/admin/constants';
 
 const authStore = useAuthStore();
 
@@ -150,13 +151,15 @@ watch(() => route.path, () => {
 
         <hr class="sidebar-divider">
 
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/dashboard') }">
+        <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
+          :class="{ 'active': isActiveRoute('/admin/dashboard') }">
           <router-link class="nav-link" to="/admin/dashboard">
             <span>Dashboard</span>
           </router-link>
         </li>
 
-        <li class="nav-item" :class="{ 'active': isRoomsDropdownActive || isRoomsDropdownOpen }">
+        <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
+          :class="{ 'active': isRoomsDropdownActive || isRoomsDropdownOpen }">
           <a class="nav-link collapsed" href="#" @click.prevent="toggleRoomsDropdown"
             :aria-expanded="isRoomsDropdownOpen">
             <span>Rooms & Properties</span>
@@ -194,7 +197,8 @@ watch(() => route.path, () => {
           </div>
         </li>
 
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/services') }">
+        <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
+          :class="{ 'active': isActiveRoute('/admin/services') }">
           <router-link class="nav-link" to="/admin/services">
             <span>Service</span>
           </router-link>
