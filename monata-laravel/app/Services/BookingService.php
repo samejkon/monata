@@ -33,10 +33,42 @@ class BookingService
     {
         $per_page = Arr::get($payload, 'per_page', 15);
 
-        $query = $this->filter($payload)
-            ->orderBy('created_at', 'desc');
+        $query = $this->model->newQuery();
 
-        if ($per_page == -1) {
+        $query = $this->filter($query, $payload);
+
+        $month = Arr::get($payload, 'month');
+        $year = Arr::get($payload, 'year');
+
+        if ($month && $year) {
+            $startDateOfMonth = Carbon::createFromDate($year, $month, 1)->startOfDay();
+            $endDateOfMonth = Carbon::createFromDate($year, $month, 1)->endOfMonth()->endOfDay();
+
+            $query->whereHas('bookingDetails', function ($q) use ($startDateOfMonth, $endDateOfMonth) {
+                $q->where(function ($innerQ) use ($startDateOfMonth, $endDateOfMonth) {
+                    $innerQ->whereBetween('checkin_at', [$startDateOfMonth, $endDateOfMonth])
+                        ->whereBetween('checkout_at', [$startDateOfMonth, $endDateOfMonth])
+                        ->orWhere(function ($q2) use ($startDateOfMonth, $endDateOfMonth) {
+                            $q2->where('checkin_at', '<', $startDateOfMonth)
+                                ->whereBetween('checkout_at', [$startDateOfMonth, $endDateOfMonth->copy()->addDay()]);
+                        })
+                        ->orWhere(function ($q3) use ($startDateOfMonth, $endDateOfMonth) {
+                            $q3->whereBetween('checkin_at', [$startDateOfMonth, $endDateOfMonth])
+                                ->where('checkout_at', '>', $endDateOfMonth);
+                        })
+                        ->orWhere(function ($q4) use ($startDateOfMonth, $endDateOfMonth) {
+                            $q4->where('checkin_at', '<', $startDateOfMonth)
+                                ->where('checkout_at', '>', $endDateOfMonth);
+                        });
+                });
+            });
+        }
+
+        $query->orderBy('created_at', 'desc');
+
+        $query->with('bookingDetails');
+
+        if ($per_page === null || $per_page == 0) {
             $bookings = $query->get();
         } else {
             $bookings = $query->paginate($per_page);
@@ -44,7 +76,7 @@ class BookingService
 
         return $bookings;
     }
-    
+
     /**
      * Get all bookings.
      *
@@ -577,34 +609,46 @@ class BookingService
      * is set to the calculated total service cost.
      *
      * @param  int  $bookingId  The ID of the booking to be checked out.
+     * @param  array  $detailIds  The IDs of the booking details to be checked out.
      * @return \App\Models\Booking  The updated booking instance.
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
+     * @throws \Exception
      */
-    public function checkout(int $bookingId): Booking
+    public function checkout(int $bookingId, array $detailIds): Booking
     {
-        return DB::transaction(function () use ($bookingId) {
-            $booking = Booking::findOrFail($bookingId);
+        return DB::transaction(function () use ($bookingId, $detailIds) {
+            $booking = $this->model->findOrFail($bookingId);
 
-            if ($booking->status !== BookingStatus::CHECK_IN) {
-                throw new \Exception('Booking is not in CHECK_IN status.');
+            $this->bookingDetail
+                ->where('booking_id', $bookingId)
+                ->whereIn('id', $detailIds)
+                ->where('status', BookingDetailStatus::CHECK_IN)
+                ->update([
+                    'status' => BookingDetailStatus::CHECK_OUT,
+                    'checkout' => Carbon::now(),
+                ]);
+
+            $notCheckedOutExists = $this->bookingDetail
+                ->where('booking_id', $bookingId)
+                ->where('status', '!=', BookingDetailStatus::CHECK_OUT)
+                ->exists();
+
+            if (!$notCheckedOutExists) {
+                $priceRoom = $booking->total_payment;
+
+                $priceService = InvoiceDetail::where('booking_id', $bookingId)
+                    ->select(DB::raw('SUM(price * quantity) as total'))
+                    ->value('total');
+
+                $totalPayment = $priceRoom + ($priceService ?? 0) - $booking->deposit;
+
+                $booking->update([
+                    'total_payment' => $totalPayment,
+                    'status' => BookingStatus::CHECK_OUT,
+                    'check_out' => Carbon::now(),
+                ]);
             }
-
-            $priceRoom = $booking->total_payment;
-
-            $priceService = InvoiceDetail::where('booking_id', $bookingId)
-                ->select(DB::raw('SUM(price * quantity) as total'))
-                ->value('total');
-
-            $totalPayment = $priceRoom + $priceService - $booking->deposit;
-
-            $booking->update([
-                'total_payment' => $totalPayment,
-                'status' => BookingStatus::CHECK_OUT,
-                'check_out' => Carbon::now(),
-            ]);
-
-            return $booking;
         });
     }
 }

@@ -191,9 +191,9 @@ class AdminBookingController extends Controller
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
-    public function checkOutGuest(int $id): \Illuminate\Http\Response
+    public function checkOutGuest(int $idBooking, IdsRequest $ids): \Illuminate\Http\Response
     {
-        $this->service->checkout($id);
+        $this->service->checkout($idBooking, $ids->validated()['ids']);
 
         return response()->noContent();
     }

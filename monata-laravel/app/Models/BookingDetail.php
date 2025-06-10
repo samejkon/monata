@@ -18,6 +18,8 @@ class BookingDetail extends Model
         'checkin_at',
         'checkout_at',
         'price_per_day',
+        'checkin',
+        'checkout',
     ];
 
     protected $casts = [

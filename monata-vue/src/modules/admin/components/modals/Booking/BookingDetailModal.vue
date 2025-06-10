@@ -58,6 +58,15 @@ const getStatusText = (status) => {
   }
 };
 
+const getDetailStatusText = (status) => {
+  switch (status) {
+    case 1: return 'NOT CHECKED IN';
+    case 2: return 'CHECKED IN';
+    case 3: return 'CHECKED OUT';
+    default: return 'UNDEFINED';
+  }
+};
+
 const close = () => {
   emit('close');
 };
@@ -104,6 +113,19 @@ const checkInRoom = async (bookingId, detailId) => {
     } catch (error) {
       console.error('Error checking in room:', error.response?.data || error.message);
       toast.error('Failed to check in room: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
+  }
+};
+
+const checkOutRoom = async (bookingId, detailId) => {
+  if (confirm('Are you sure you want to check out this room?')) {
+    try {
+      await api.post(`/bookings/${bookingId}/check-out`, { ids: [detailId] });
+      toast.success('Room checked out successfully!');
+      emit('bookingConfirmed'); // To trigger data refresh in parent
+    } catch (error) {
+      console.error('Error checking out room:', error.response?.data || error.message);
+      toast.error('Failed to check out room: ' + (error.response?.data?.message || 'Unknown error.'));
     }
   }
 };
@@ -161,11 +183,16 @@ const cancelBooking = async (bookingId) => {
                   <td>{{ formatCurrency(detail.price_per_day) }}</td>
                   <td>{{ formatDate(detail.checkin_at, 'HH:mm DD-MM-YYYY') }}</td>
                   <td>{{ formatDate(detail.checkout_at, 'HH:mm DD-MM-YYYY') }}</td>
-                  <td>{{ getStatusText(detail.status) === "PENDING" ? 'NOT CHECKED IN' : 'CHECKED IN' }}</td>
+                  <td>{{ getDetailStatusText(detail.status) }}</td>
                   <td>
-                    <button v-if="selectedBookingDetail.status === 2 && detail.status === 1"
+                    <button
+                      v-if="(selectedBookingDetail.status === 2 || selectedBookingDetail.status === 3) && detail.status === 1"
                       class="btn btn-sm btn-success" @click="checkInRoom(selectedBookingDetail.id, detail.id)">
                       Check In Room
+                    </button>
+                    <button v-if="detail.status === 2" class="btn btn-sm btn-warning"
+                      @click="checkOutRoom(selectedBookingDetail.id, detail.id)">
+                      Check Out Room
                     </button>
                   </td>
                 </tr>

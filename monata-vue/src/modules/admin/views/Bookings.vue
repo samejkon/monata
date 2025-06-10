@@ -37,7 +37,7 @@ const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 
 const fetchBookings = async () => {
   try {
-    const response = await api.get(`/bookings`, { params: { per_page: -1 } });
+    const response = await api.get(`/bookings`, { params: { month: currentMonth.value + 1, year: currentYear.value } });
     rawBookings.value = response.data?.data || [];
     processBookings(rawBookings.value);
   } catch (error) {
@@ -68,9 +68,6 @@ const processBookings = (bookingsData) => {
         const startDate = checkinMoment.clone().startOf('day');
         const endDate = checkoutMoment.clone().startOf('day');
 
-        // A booking is considered to run up to the day before checkout,
-        // unless the checkout time is not midnight. In that case, the
-        // checkout day itself is included.
         const isCheckoutAtMidnight = checkoutMoment.hour() === 0 && checkoutMoment.minute() === 0 && checkoutMoment.second() === 0;
         const lastDayOfBooking = isCheckoutAtMidnight ? endDate.clone().subtract(1, 'day') : endDate;
 
@@ -375,7 +372,8 @@ const cancelBooking = async (bookingId) => {
                     Phone: <strong>{{ booking.guest_phone }}</strong>
                   </p>
                   <p class="card-text">
-                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
+                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{
+                      getStatusText(booking.status)
                       }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"

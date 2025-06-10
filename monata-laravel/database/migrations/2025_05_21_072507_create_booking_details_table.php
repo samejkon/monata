@@ -20,6 +20,7 @@ return new class extends Migration
             $table->datetime('checkout_at')->nullable();
             $table->integer('status')->default(1);
             $table->datetime('checkin')->nullable();
+            $table->datetime('checkout')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

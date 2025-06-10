@@ -22,6 +22,8 @@ class SearchBookingRequest extends FormRequest
             'created_to' => ['nullable', 'date_format:Y-m-d H:i', 'after_or_equal:created_from'],
             'page' => ['nullable', 'integer', 'min:1'],
             'per_page' => ['nullable', 'integer', 'max:100'],
+            'month' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'year' => ['nullable', 'integer', 'min:1'],
         ];
     }
 }
