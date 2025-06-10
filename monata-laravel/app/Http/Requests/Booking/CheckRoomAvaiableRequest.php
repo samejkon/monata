@@ -16,7 +16,7 @@ class CheckRoomAvaiableRequest extends FormRequest
         return [
             'roomType' => ['nullable', 'integer'],
             'roomId' => ['nullable', 'integer'],
-            'checkin_at' => ['required', 'date_format:Y-m-d H:i', 'after_or_equal:today', 'before:checkout_at'],
+            'checkin_at' => ['required', 'date_format:Y-m-d H:i', 'after_or_equal:now'],
             'checkout_at' => ['required', 'date_format:Y-m-d H:i', 'after:checkin_at'],
         ];
     }
@@ -29,9 +29,17 @@ class CheckRoomAvaiableRequest extends FormRequest
     public function messages()
     {
         return [
-            'checkin_at.required' => 'Check-in date is required.',
-            'checkout_at.required' => 'Check-out date is required.',
-            'checkout_at.after' => 'Check-out date must be after check-in date.',
+            'roomType.integer' => 'Room type must be a valid number.',
+
+            'roomId.integer' => 'Room must be a valid number.',
+
+            'checkin_at.required' => 'Please select a check-in date and time.',
+            'checkin_at.date_format' => 'Check-in date format is invalid. Please use YYYY-MM-DD HH:mm.',
+            'checkin_at.after_or_equal' => 'Check-in date and time must be today or later. Past times are not allowed.',
+
+            'checkout_at.required' => 'Please select a check-out date and time.',
+            'checkout_at.date_format' => 'Check-out date format is invalid. Please use YYYY-MM-DD HH:mm.',
+            'checkout_at.after' => 'Check-out date and time must be after the check-in date and time.',
         ];
     }
 }

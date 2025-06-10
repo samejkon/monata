@@ -183,6 +183,12 @@ class BookingService
                 'note'           => Arr::get($data, 'note'),
             ];
 
+            $hasNewDetails = collect($data['booking_details'])->contains(fn($value) => empty($value['id']));
+
+            if ($hasNewDetails) {
+                $bookingUpdate['status'] = BookingStatus::CONFIRMED;
+            }
+
             $idBookingDetails = collect($data['booking_details'])->pluck('id')->filter()->toArray();
 
             // Check if any booking detail to be removed is already checked in
@@ -203,14 +209,17 @@ class BookingService
             $detailsToRemoveQuery->delete();
 
             $rooms = $this->getRoomsByBookingDetails($data['booking_details']);
+            $booking->load('bookingDetails');
+            $existingDetails = $booking->bookingDetails->keyBy('id');
 
             $total = 0;
 
-            $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total, $rooms) {
+            $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total, $rooms, $existingDetails) {
                 $price = $this->getPriceRoomType($rooms, $item['room_id']);
 
                 $duration = config('room.duration');
                 $unitHours = config('room.unit_hours');
+                $cleanRoom = config('room.clean_room');
 
                 $duration = $this->calculateDuration($item['checkin_at'], $item['checkout_at'], $unitHours);
 
@@ -219,9 +228,19 @@ class BookingService
 
                 $item['price_per_day'] = $price;
 
-                // Ensure all required fields are present
+                $item['checkout_at'] = Carbon::parse($item['checkout_at'])->addMinutes($cleanRoom);
+
                 $item['id'] = $item['id'] ?? null;
-                $item['created_at'] = now();
+
+                if (!$item['id']) {
+                    $item['status'] = BookingDetailStatus::PENDING;
+                    $item['created_at'] = now();
+                } else {
+                    $existingDetail = $existingDetails->get($item['id']);
+                    $item['status'] = $existingDetail->status;
+                    $item['created_at'] = $existingDetail->created_at;
+                }
+
                 $item['updated_at'] = now();
 
                 return $item;
@@ -335,6 +354,10 @@ class BookingService
             $roomId = $detail['room_id'];
             $newCheckIn = $detail['checkin_at'];
             $newCheckOut = $detail['checkout_at'];
+            $room = $this->room::find($roomId);
+            if (!$room) {
+                throw new \Exception("Room with ID {$roomId} not found.");
+            }
 
             $query = $this->bookingDetail->where('room_id', $roomId)
                 ->whereHas('booking', function ($query) {
@@ -355,7 +378,7 @@ class BookingService
             $isAvailable = !$query->exists();
 
             if (!$isAvailable) {
-                throw new \Exception("Room ID {$roomId} is not available for the selected dates.");
+                throw new \Exception("Room {$room->name} is not available for the selected dates.");
             }
         }
     }
