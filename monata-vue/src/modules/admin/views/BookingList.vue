@@ -50,9 +50,9 @@
             <thead>
               <tr>
                 <th width="5px">#</th>
-                <th>guest_name</th>
-                <th>Guest Email</th>
-                <th>Guest Phone</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
                 <th>Total Payment</th>
                 <th>Status</th>
                 <th>Created At</th>

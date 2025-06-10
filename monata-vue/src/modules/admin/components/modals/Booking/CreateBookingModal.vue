@@ -42,13 +42,16 @@ const selectedAvailableRoomIds = ref([]);
 const validationErrors = ref({});
 
 const flatpickrConfig = {
+  minDate: "today",
   enableTime: true,
   noCalendar: false,
   dateFormat: "Y-m-d H:i",
   time_24hr: true,
+  defaultHour: 12,
+  defaultMinute: 0,
   allowInput: true,
-
 };
+
 
 const formatCurrency = (value) => {
   if (value === null || value === undefined) return '';
@@ -358,7 +361,7 @@ const createBooking = async () => {
               <p class="text-muted">You have selected <b>{{ selectedAvailableRoomIds.length }}</b> rooms.</p>
             </div>
             <div v-else class="alert alert-warning mt-2">
-              No rooms are available for the selected period. Please adjust the times and check again.
+              Please check room availability before create booking.
             </div>
           </form>
         </div>
