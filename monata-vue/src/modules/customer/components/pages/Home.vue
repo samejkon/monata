@@ -1,8 +1,8 @@
 <template>
   <header class="hero" :style="{ backgroundImage: `url(${heroImage})` }">
     <div class="hero-content">
-      <h1>{{ title }}</h1>
-      <p>{{ description }}</p>
+      <h1 class = "animate__animated animate__fadeInLeft">{{ title }}</h1>
+      <p class = "animate__animated animate__fadeInRight">{{ description }}</p>
     </div>
   </header>
   <section class="section-about container mt-5">
@@ -37,19 +37,21 @@
       <h3 class="section-ouroffer-heading">Ongoing Offers</h3>
     </div>
     <div class="section-ouroffer-offers container">
-      <div v-for="offer in roomTypeOffers" :key="offer.id" class="offer">
-        <img class="offer-img" :src="offer.image" alt="our offer" />
-        <div class="offer-info">
-          <h3 class="offer-heading">
-            {{ offer.name }}
-          </h3>
-          <ul class="offer-descriptions gray">
-            <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">{{
-              property.name }}: {{ property.value }}</li>
-          </ul>
-          <a class="section-ouroffer-booking text-decor-none" href="#" @click.prevent="handleBookNow(offer.id)">
-            Book Now
-          </a>
+      <div class="row">
+        <div v-for="offer in roomTypeOffers" :key="offer.id" class="col-12 col-xl-4 col-md-4 offer">
+          <img class="offer-img" :src="offer.image" alt="our offer" />
+          <div class="offer-info">
+            <h3 class="offer-heading">
+              {{ offer.name }}
+            </h3>
+            <ul class="offer-descriptions gray">
+              <li class="offer-description" v-for="property in offer.properties" :key="property.property_id">{{
+                property.name }}: {{ property.value }}</li>
+            </ul>
+            <a class="section-ouroffer-booking text-decor-none" href="#" @click.prevent="handleBookNow(offer.id)">
+              Book Now
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -98,7 +100,7 @@
       </div>
       <template v-else>
         <div class="row">
-          <div v-for="roomType in roomTypeBetters" :key="roomType.id" class="col-md-6 single_rooms">
+          <div v-for="roomType in roomTypeBetters" :key="roomType.id" class="col-12 col-md-6 single_rooms">
             <div class="room_thumb">
               <img :src="roomType.image" :alt="roomType.name">
               <div class="room_heading d-flex justify-content-between align-items-center">

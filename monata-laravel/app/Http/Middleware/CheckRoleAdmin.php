@@ -18,10 +18,10 @@ class CheckRoleAdmin
     {
         $user = auth()->guard('admin')->user();
 
-        if(!$user || !in_array($user->role, $roles)) {
+        if (!$user || !in_array($user->role->value, $roles)) {
             return response()->json(['message' => 'Unauthorized Admin'], 403);
         }
-        
+
         return $next($request);
     }
 }

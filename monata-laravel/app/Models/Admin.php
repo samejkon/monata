@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RoleAdmin;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -22,6 +23,15 @@ class Admin extends Authenticatable
         'phone',
         'status',
         'role',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'role' => RoleAdmin::class,
     ];
 
     /**
