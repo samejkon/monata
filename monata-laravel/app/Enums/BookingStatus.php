@@ -11,4 +11,5 @@ enum BookingStatus
     const CANCELLED = 5;
     const NO_SHOW = 6;
     const EXPIRED = 7;
+    const COMPLETED = 8;
 }

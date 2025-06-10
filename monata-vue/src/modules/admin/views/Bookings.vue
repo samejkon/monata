@@ -185,7 +185,8 @@ const getStatusText = (status) => {
     case 4: return 'CHECKED OUT';
     case 5: return 'CANCELLED';
     case 6: return 'NO SHOW';
-    default: return 'UNDEFINED';
+    case 7: return 'EXPIRED';
+    case 8: return 'COMPLETED';
   }
 };
 const getBadgeClass = (status) => {
@@ -193,10 +194,11 @@ const getBadgeClass = (status) => {
     case 1: return 'bg-secondary'; // PENDING
     case 2: return 'bg-primary';   // CONFIRMED
     case 3: return 'bg-success';   // CHECKED IN
-    case 4: return 'bg-warning';   // CANCELLED
+    case 4: return 'bg-info';   // CANCELLED
     case 5: return 'bg-danger';    // NO SHOW
-    case 6: return 'bg-info';      // CHECKED OUT
-    default: return 'bg-dark';     // Others
+    case 6: return 'bg-warning';      // CHECKED OUT
+    case 7: return 'bg-light';
+    case 8: return 'bg-dark'   // Others
   }
 };
 
@@ -265,7 +267,7 @@ const handleInvoiceUpdated = () => {
 };
 
 const openViewInvoiceModal = (booking) => {
-  if (booking && (booking.status === 3 || booking.status === 4)) {
+  if (booking && (booking.status === 3 || booking.status === 4 || booking.status === 8)) {
     bookingDataForInvoiceView.value = booking;
     isViewInvoiceModalVisible.value = true;
   } else {
@@ -374,7 +376,7 @@ const cancelBooking = async (bookingId) => {
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status)]">{{
                       getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="confirmBooking(booking.id)">Confirm</button>

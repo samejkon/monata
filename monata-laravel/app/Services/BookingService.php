@@ -634,7 +634,7 @@ class BookingService
 
             $booking->update([
                 'total_payment' => $totalPayment,
-                'status' => BookingStatus::CHECK_OUT,
+                'status' => BookingStatus::COMPLETED,
                 'check_out' => Carbon::now(),
             ]);
 
