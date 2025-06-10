@@ -115,6 +115,7 @@ class InvoiceDetailService
             BookingStatus::CONFIRMED,
             BookingStatus::CHECK_IN,
             BookingStatus::CHECK_OUT,
+            BookingStatus::COMPLETED,
         ])->where('id', $id)->firstOrFail();
     }
 }

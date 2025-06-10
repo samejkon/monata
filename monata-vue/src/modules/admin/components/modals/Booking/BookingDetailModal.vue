@@ -204,8 +204,9 @@ const cancelBooking = async (bookingId) => {
           <button type="button" class="btn btn-secondary" @click="close">Close</button>
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-success"
             @click="confirmBooking(selectedBookingDetail.id)">Confirm Booking</button>
-          <button v-if="selectedBookingDetail?.status !== 4 && selectedBookingDetail?.status !== 5" type="button"
-            class="btn btn-primary" @click="editBooking">Edit</button>
+          <button
+            v-if="selectedBookingDetail?.status !== 4 && selectedBookingDetail?.status !== 5 && selectedBookingDetail?.status !== 6 && selectedBookingDetail?.status !== 8"
+            type="button" class="btn btn-primary" @click="editBooking">Edit</button>
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-danger"
             @click="cancelBooking(selectedBookingDetail.id)">Cancel</button>
           <button v-if="selectedBookingDetail?.status === 4" type="button" class="btn btn-info"

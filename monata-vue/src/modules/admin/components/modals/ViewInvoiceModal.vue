@@ -78,7 +78,8 @@ const fetchFullInvoiceDetails = async (bookingId) => {
 
   } catch (error) {
     console.error('Error fetching full invoice details:', error);
-    toast.error('Error.');
+    const errorMessage = error.response?.data?.message || 'Failed to fetch invoice details.';
+    toast.error(errorMessage);
 
     detailedBookingInfo.value = null;
     fetchedInvoiceServices.value = [];
