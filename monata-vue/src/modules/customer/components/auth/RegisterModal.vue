@@ -3,6 +3,7 @@ import { reactive, ref } from 'vue'
 import { api, csrf } from '@/modules/customer/lib/axios'
 import type { RegisterForm, ValidationErrors } from '@/modules/customer/types/auth'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 
 defineProps({
   modelValue: {
@@ -13,11 +14,13 @@ defineProps({
 
 const emit = defineEmits(['update:modelValue', 'switchToLogin'])
 
+const authStore = useAuthStore()
 const toast = useToast()
 const errors = ref<ValidationErrors>({})
 const registerForm = reactive<RegisterForm>({
   name: '',
   email: '',
+  phone: '',
   password: '',
   password_confirmation: '',
 })
@@ -32,6 +35,7 @@ async function register() {
   try {
     await csrf.get('/sanctum/csrf-cookie')
     await api.post(`/register`, registerForm)
+    await authStore.fetchUser()
 
     toast.success('Register succsessfully!')
     closeModal()
@@ -71,6 +75,14 @@ async function register() {
                   v-model="registerForm.email" />
                 <div v-if="errors.email" class="text-danger small mt-1">
                   {{ errors.email[0] }}
+                </div>
+              </div>
+              <div class="mb-3">
+                <label for="phone-register" class="form-label">Phone</label>
+                <input type="text" class="form-control" id="phone-register" placeholder="Enter your phone number"
+                  v-model="registerForm.phone" />
+                <div v-if="errors.phone" class="text-danger small mt-1">
+                  {{ errors.phone[0] }}
                 </div>
               </div>
               <div class="mb-3">
