@@ -21,12 +21,19 @@
   }
 
   .section-ouroffer-offers {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
     column-gap: 10px;
   }
 
   .offer {
+    
+    @include responsive(table) {
+      margin-bottom: 30px;
+    }
+
+    @include responsive(sp) {
+      margin-bottom: 30px;
+    }
+  
     .offer-heading {
       font-size: $fs-22;
       line-height: $lh-26;

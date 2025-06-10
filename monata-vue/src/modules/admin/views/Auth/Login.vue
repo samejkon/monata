@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { api, csrf } from '@/modules/admin/lib/axios'
 import { ValidationErrors } from '@/modules/customer/types/auth'
-import { useAuthStore } from '@/stores/auth';
+import { useAuthStore } from '@/stores/auth'
 
-const email = ref('');
-const password = ref('');
-const router = useRouter();
+const email = ref('')
+const password = ref('')
+const router = useRouter()
 const errors = ref<ValidationErrors>({})
 const authStore = useAuthStore()
 
 const handleLogin = async () => {
   try {
-    await csrf.get('/sanctum/csrf-cookie');
+    await csrf.get('/sanctum/csrf-cookie')
     await api.post('/login', {
       email: email.value,
       password: password.value
     })
 
-    await authStore.fetchUser()
-    router.push({ name: 'AdminDashboard' });
+    await authStore.fetchAdmin()
+    router.push({ name: 'AdminDashboard' })
   } catch (error: any) {
     if (error.response && error.status === 422) {
       errors.value = error.response.data.errors
     }
     else if (error.response && error.response.status === 401) {
-      alert('Invalid credentials');
+      alert('Invalid credentials')
     } else {
-      alert('An error occurred during login. Please try again.');
+      alert('An error occurred during login. Please try again.')
     }
   }
-};
+}
 </script>
 
 <template>
