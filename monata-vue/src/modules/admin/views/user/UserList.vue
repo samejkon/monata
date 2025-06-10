@@ -28,25 +28,25 @@
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 mt-3 mb-1">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
-                            <div class="col-md-3 mt-1 mb-1">
+                            <div class="col-12 col-md-6 col-lg-3 mt-1 mb-1">
                                 <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="User name ..." />
                             </div>
-                            <div class="col-md-3 mt-1 mb-1">
+                            <div class="col-12 col-md-6 col-lg-3 mt-1 mb-1">
                                 <input v-model="searchForm.email" type="text" class="form-control form-control-sm" placeholder="User email ..." />
                             </div>
-                            <div class="col-md-3 mt-1 mb-1">
+                            <div class="col-12 col-md-6 col-lg-3 mt-1 mb-1">
                                 <input v-model="searchForm.phone" type="text" inputmode="numeric" class="form-control form-control-sm" placeholder="User phone ..." />
                             </div>
-                            <div class="col-md-2 mt-1 mb-1">
+                            <div class="col-12 col-md-6 col-lg-2 mt-1 mb-1">
                                 <select v-model="searchForm.status" class="custom-select custom-select-sm form-control form-control-sm">
                                     <option value="">-- Select status --</option>
                                     <option :value="UserStatus.Active">Active</option>
                                     <option :value="UserStatus.Blocked">Blocked</option>
                                 </select>
                             </div>
-                            <div class="col-md-1 mt-1 mb-1">
+                            <div class="col-12 col-lg-1 mt-1 mb-1">
                                 <button type="submit" class="btn btn-primary btn-sm">
-                                    <i class="fa-solid fa-magnifying-glass me-1"></i> Search
+                                    <i class="fa-solid fa-magnifying-glass me-1"></i>
                                 </button>
                             </div>
                         </form>

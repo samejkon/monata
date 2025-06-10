@@ -10,6 +10,7 @@ import RegisterModal from '@/modules/customer/components/auth/RegisterModal.vue'
 import { useToast } from 'vue-toastification'
 import { useRoute, useRouter } from 'vue-router'
 import { ShoppingBasket } from 'lucide-vue-next'
+import 'animate.css';
 
 const route = useRoute()
 const router = useRouter()
@@ -99,7 +100,8 @@ onUnmounted(() => {
     <div class="container-fluid">
       
       <div class="row align-items-center">
-        <div class="col-lg-5 d-none d-lg-flex justify-content-center">
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center"
+        :class="route.name === 'home' ? 'animate__animated animate__fadeInLeft' : ''">
           <ul class="navbar-nav d-flex flex-row">
             <li class="nav-item mx-2">
               <a class="nav-link" :class="{ 'active': route.name === 'home' }">
@@ -124,10 +126,12 @@ onUnmounted(() => {
           </ul>
         </div>
 
-        <div class="col-2  text-center">
+        <div class="col-2 col-lg-2  text-center"
+        :class="route.name === 'home' ? 'animate__animated animate__fadeInDown' : ''">
           <img src="@/modules/customer/assets/img/logo.png" alt="motana logo" class="img-fluid" />
         </div>
-        <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center">
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center "
+        :class="route.name === 'home' ? 'animate__animated animate__fadeInRight' : ''">
           <div>
             <span v-if="authStore.type === 'user'">
               <router-link to="/profile" class="text-light">{{ authStore.user.name }}</router-link>
@@ -172,12 +176,14 @@ onUnmounted(() => {
             </li>
           </ul>
         </div>
-        <div class="col-8 d-flex d-lg-none justify-content-end">
+        <div class="col-8 d-flex d-lg-none justify-content-end" 
+        :class="route.name === 'home' ? 'animate__animated animate__fadeInRight' : ''">
           <button class="nav-booking btn btn-primary ms-3" @click="openModal">
               Book A Room
             </button>
         </div>
-        <div class="col-2 d-flex d-lg-none justify-content-end  menu-toggle" @click="toggleMenu"><i class="fa-solid fa-bars"></i></div>
+        <div class="col-2 d-flex d-lg-none justify-content-end  menu-toggle"
+        :class="route.name === 'home' ? 'animate__animated animate__fadeInRight' : ''" @click="toggleMenu"><i class="fa-solid fa-bars"></i></div>
       </div>
     </div>
   </nav>
@@ -208,6 +214,11 @@ onUnmounted(() => {
   left: 0;
   background-color: transparent;
   /* Nền trong suốt khi ở trang chủ */
+}
+
+.container-fluid {
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 /* Kiểu dáng cho active-under */

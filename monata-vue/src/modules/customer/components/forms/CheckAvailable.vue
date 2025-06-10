@@ -555,6 +555,8 @@ onMounted(() => {
   margin: 0 auto;
   max-height: 85vh;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .form-label {
