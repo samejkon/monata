@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Enums\BookingStatus;
+use App\Enums\ContactEnum;
 use App\Models\Booking;
+use App\Models\Contact;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -44,5 +46,21 @@ class DashboardService
             default:
                 throw new \InvalidArgumentException('Invalid revenue type');
         }
+    }
+
+    function getTotalBooking()
+    {
+        return Booking::count();
+    }
+
+
+    function getTotalBookingPending()
+    {
+        return Booking::Where('status', '=', ContactEnum::Unresponse->value)->count();
+    }
+
+    function getTotalContactUnresponse()
+    {
+        return Contact::Where('status', '=', ContactEnum::Unresponse->value)->count();
     }
 }

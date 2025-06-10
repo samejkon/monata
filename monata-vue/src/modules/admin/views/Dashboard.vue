@@ -56,7 +56,7 @@
                   <div class="col mr-2">
                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                       Pending Requests</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ totalBookingPending }}</div>
                   </div>
                   <div class="col-auto">
                     <i class="fas fa-comments fa-2x text-gray-300"></i>
@@ -87,6 +87,7 @@ export default defineComponent({
   setup() {
     const revenueType = ref('day');
     const rawData = ref<any[]>([]);
+    const totalBookingPending = ref(0);
 
     const getRevenue = async (type: string) => {
       try {
@@ -98,6 +99,16 @@ export default defineComponent({
       }
     };
 
+    const getTotalBookingPending = async () => {
+      try {
+        const response = await api.get('/booking/pending/count');
+        totalBookingPending.value = response.data.count;
+      } catch (error) {
+        console.error('Error fetching pending bookings count:', error);
+        totalBookingPending.value = 0;
+      }
+    };
+
     const setRevenueType = (type: string) => {
       revenueType.value = type;
       getRevenue(type);
@@ -105,6 +116,7 @@ export default defineComponent({
 
     onMounted(() => {
       getRevenue(revenueType.value);
+      getTotalBookingPending();
     });
 
     const chartData = computed<ChartData<'line'>>(() => {
@@ -140,6 +152,7 @@ export default defineComponent({
       revenueType,
       setRevenueType,
       chartData,
+      totalBookingPending,
     };
   }
 });
