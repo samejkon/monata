@@ -37,7 +37,7 @@ const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Satur
 
 const fetchBookings = async () => {
   try {
-    const response = await api.get(`/bookings`, { params: { per_page: -1 } });
+    const response = await api.get(`/bookings`, { params: { month: currentMonth.value + 1, year: currentYear.value } });
     rawBookings.value = response.data?.data || [];
     processBookings(rawBookings.value);
   } catch (error) {
@@ -68,9 +68,6 @@ const processBookings = (bookingsData) => {
         const startDate = checkinMoment.clone().startOf('day');
         const endDate = checkoutMoment.clone().startOf('day');
 
-        // A booking is considered to run up to the day before checkout,
-        // unless the checkout time is not midnight. In that case, the
-        // checkout day itself is included.
         const isCheckoutAtMidnight = checkoutMoment.hour() === 0 && checkoutMoment.minute() === 0 && checkoutMoment.second() === 0;
         const lastDayOfBooking = isCheckoutAtMidnight ? endDate.clone().subtract(1, 'day') : endDate;
 
@@ -188,7 +185,8 @@ const getStatusText = (status) => {
     case 4: return 'CHECKED OUT';
     case 5: return 'CANCELLED';
     case 6: return 'NO SHOW';
-    default: return 'UNDEFINED';
+    case 7: return 'EXPIRED';
+    case 8: return 'COMPLETED';
   }
 };
 const getBadgeClass = (status) => {
@@ -196,10 +194,11 @@ const getBadgeClass = (status) => {
     case 1: return 'bg-secondary'; // PENDING
     case 2: return 'bg-primary';   // CONFIRMED
     case 3: return 'bg-success';   // CHECKED IN
-    case 4: return 'bg-warning';   // CANCELLED
+    case 4: return 'bg-info';   // CANCELLED
     case 5: return 'bg-danger';    // NO SHOW
-    case 6: return 'bg-info';      // CHECKED OUT
-    default: return 'bg-dark';     // Others
+    case 6: return 'bg-warning';      // CHECKED OUT
+    case 7: return 'bg-light';
+    case 8: return 'bg-dark'   // Others
   }
 };
 
@@ -268,7 +267,7 @@ const handleInvoiceUpdated = () => {
 };
 
 const openViewInvoiceModal = (booking) => {
-  if (booking && (booking.status === 3 || booking.status === 4)) {
+  if (booking && (booking.status === 3 || booking.status === 4 || booking.status === 8)) {
     bookingDataForInvoiceView.value = booking;
     isViewInvoiceModalVisible.value = true;
   } else {
@@ -375,16 +374,17 @@ const cancelBooking = async (bookingId) => {
                     Phone: <strong>{{ booking.guest_phone }}</strong>
                   </p>
                   <p class="card-text">
-                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{ getStatusText(booking.status)
+                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{
+                      getStatusText(booking.status)
                       }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="confirmBooking(booking.id)">Confirm</button>
-                  <button v-if="booking.status === 2 || booking.status === 3" class="btn btn-warning btn-sm mr-2"
-                    @click="openInvoiceServiceModal(booking)">Services</button>
+                  <button v-if="booking.status === 2 || booking.status === 3 || booking.status === 4"
+                    class="btn btn-warning btn-sm mr-2" @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-primary btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
-                  <button v-if="booking.status === 4" type=" button" class="btn btn-success btn-sm ms-2"
-                    @click="openViewInvoiceModal(booking)">Invoice</button>
+                  <button v-if="booking.status === 4 || booking.status === 8" type=" button"
+                    class="btn btn-success btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
                   <button v-if="booking.status === 2" type=" button" class="btn btn-info btn-sm ms-2"
                     @click="guestNoShow(booking.id)">No Show</button>
                   <button v-if="booking.status === 1" type=" button" class="btn btn-danger btn-sm ms-2"

@@ -164,15 +164,13 @@ onMounted(() => {
 });
 
 const handleCheckout = async () => {
-  
   if (!props.booking || !props.booking.id) {
-    console.log(props.booking.id)
     toast.error('No booking found.');
     return;
   }
 
-  if (props.booking.status !== 3) {
-    toast.error('Booking is not checked out.');
+  if (![4, 8].includes(props.booking.status)) {
+    toast.error('Booking is not ready for final checkout. Please ensure all rooms are checked out first.');
     return;
   }
 
@@ -309,7 +307,7 @@ const handleCheckout = async () => {
             Save
           </button>
           <button type="button" class="btn btn-success" @click="handleCheckout"
-            :disabled="isLoading || !props.booking || props.booking.status !== 3">
+            :disabled="isLoading || !props.booking || ![4, 8].includes(props.booking.status)">
             <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
             Check out
           </button>

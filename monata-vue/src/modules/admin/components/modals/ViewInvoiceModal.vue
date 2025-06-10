@@ -78,7 +78,8 @@ const fetchFullInvoiceDetails = async (bookingId) => {
 
   } catch (error) {
     console.error('Error fetching full invoice details:', error);
-    toast.error('Error.');
+    const errorMessage = error.response?.data?.message || 'Failed to fetch invoice details.';
+    toast.error(errorMessage);
 
     detailedBookingInfo.value = null;
     fetchedInvoiceServices.value = [];
@@ -144,7 +145,7 @@ watch(() => props.bookingData, (newVal, oldVal) => {
 <template>
   <div v-if="show" class="modal fade show d-block" tabindex="-1" aria-labelledby="viewInvoiceModalLabel"
     aria-hidden="true" style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="viewInvoiceModalLabel">Booking Invoice</h5>

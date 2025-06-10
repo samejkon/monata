@@ -32,6 +32,7 @@ Route::prefix('admin')->group(function () {
         Route::post('/bookings/{booking}/cancelled', [AdminBookingController::class, 'cancelled']);
         Route::post('/bookings/{booking}/no-show', [AdminBookingController::class, 'noShow']);
         Route::post('/bookings/{booking}/check-out', [AdminBookingController::class, 'checkOutGuest']);
+        Route::post('/bookings/{booking}/check-out-room', [AdminBookingController::class, 'checkOutRoom']);
 
         Route::get('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'index']);
         Route::post('bookings/{booking}/invoice-details', [InvoiceDetailController::class, 'editSave']);

@@ -12,6 +12,7 @@ use App\Http\Resources\RoomResource;
 use App\Services\BookingService;
 use App\Http\Requests\Booking\CheckRoomUserAvaiableRequest;
 use App\Http\Requests\Booking\SearchBookingRequest;
+use App\Http\Requests\Booking\CheckOutRoomRequest;
 
 class AdminBookingController extends Controller
 {
@@ -191,9 +192,16 @@ class AdminBookingController extends Controller
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException  If the booking is not found.
      */
-    public function checkOutGuest(int $id): \Illuminate\Http\Response
+    public function checkOutGuest(int $idBooking): \Illuminate\Http\Response
     {
-        $this->service->checkout($id);
+        $this->service->checkout($idBooking);
+
+        return response()->noContent();
+    }
+
+    public function checkOutRoom(int $idBooking, CheckOutRoomRequest $request): \Illuminate\Http\Response
+    {
+        $this->service->checkOutRoom($idBooking, $request->validated()['room_id']);
 
         return response()->noContent();
     }

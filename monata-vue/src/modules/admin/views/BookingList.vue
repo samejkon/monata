@@ -175,6 +175,8 @@ const getStatusText = (status) => {
       return 'CANCELLED';
     case 6:
       return 'NO SHOW';
+    case 8:
+      return 'COMPLETED';
 
     default:
       return 'Unknown';
@@ -183,13 +185,14 @@ const getStatusText = (status) => {
 
 const getButtonClass = (status) => {
   switch (status) {
-    case 1: return 'btn-outline-secondary'; // PENDING
-    case 2: return 'btn-outline-primary';   // CONFIRMED
-    case 3: return 'btn-outline-success';   // CHECKED IN
-    case 4: return 'btn-outline-warning';   // CHECKED OUT
-    case 5: return 'btn-outline-danger';    // CANCELLED
-    case 6: return 'btn-outline-info';      // NO SHOW
-    default: return 'btn-outline-dark';     // Others
+    case 1: return 'btn-outline-secondary';
+    case 2: return 'btn-outline-primary';
+    case 3: return 'btn-outline-success';
+    case 4: return 'btn-outline-warning';
+    case 5: return 'btn-outline-danger';
+    case 6: return 'btn-outline-info';
+    case 7: return 'btn-outline-ligh';
+    case 8: return 'btn-outline-dark';
   }
 };
 
