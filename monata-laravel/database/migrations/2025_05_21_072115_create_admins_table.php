@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        DB::table('admins')->insert(
+        DB::table('admins')->insert([
             [
                 'name' => 'Admin',
                 'email' => 'admin@tomosia.com',
@@ -37,7 +37,7 @@ return new class extends Migration
                 'password' => Hash::make('123456'),
                 'role' => 'staff'
             ],
-        );
+        ]);
     }
 
     public function down(): void
