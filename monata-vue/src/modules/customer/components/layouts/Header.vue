@@ -3,7 +3,7 @@
 import { computed } from 'vue'; // Import computed
 import { useAuthStore } from '@/stores/auth';
 import { api } from '@/modules/customer/lib/axios'
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import CheckAvailable from '../forms/CheckAvailable.vue'
 import LoginModal from '@/modules/customer/components/auth/LoginModal.vue'
 import RegisterModal from '@/modules/customer/components/auth/RegisterModal.vue'
@@ -61,6 +61,37 @@ async function logout() {
 }
 const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', import.meta.url).href
 
+const isMenuActive = ref(false)
+
+const toggleMenu = () => {
+  isMenuActive.value = !isMenuActive.value
+}
+
+const closeMenu = (event: MouseEvent) => {
+  const menuToggle = document.querySelector('.menu-toggle')
+  const menuMobile = document.querySelector('.menu-mobile')
+  
+  if (menuToggle && menuMobile) {
+    // Kiểm tra xem click có phải từ menu-toggle hoặc menu-mobile không
+    const isClickInside = menuToggle.contains(event.target as Node) || 
+                         menuMobile.contains(event.target as Node)
+    
+    if (!isClickInside && isMenuActive.value) {
+      isMenuActive.value = false
+    }
+  }
+}
+
+// Thêm event listener khi component được mount
+onMounted(() => {
+  document.addEventListener('click', closeMenu)
+})
+
+// Cleanup event listener khi component unmount
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenu)
+})
+
 </script>
 
 <template>
@@ -68,7 +99,7 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
     <div class="container-fluid">
       
       <div class="row align-items-center">
-        <div class="col-5 d-flex justify-content-center">
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center">
           <ul class="navbar-nav d-flex flex-row">
             <li class="nav-item mx-2">
               <a class="nav-link" :class="{ 'active': route.name === 'home' }">
@@ -93,11 +124,10 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
           </ul>
         </div>
 
-        <div class="col-2 text-center">
+        <div class="col-2  text-center">
           <img src="@/modules/customer/assets/img/logo.png" alt="motana logo" class="img-fluid" />
         </div>
-
-        <div class="col-5 d-flex justify-content-center align-items-center">
+        <div class="col-lg-5 d-none d-lg-flex justify-content-center align-items-center">
           <div>
             <span v-if="authStore.type === 'user'">
               <router-link to="/profile" class="text-light">{{ authStore.user.name }}</router-link>
@@ -112,6 +142,42 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
             </button>
           </div>
         </div>
+        <div class="menu-mobile" :class="{ 'active': isMenuActive }">
+          <ul id="nav-mobile-menu">
+            <li class="nav-mobile-home">
+              <div class="menu-close" @click="toggleMenu"><i class="fa-solid fa-xmark"></i></div>
+              <router-link to="/" @click="toggleMenu">Home</router-link>
+            </li>
+            <li class="nav-mobile">
+              <router-link to="/rooms" @click="toggleMenu">Rooms</router-link>
+            </li>
+            <li class="nav-mobile">
+              <router-link to="/about" @click="toggleMenu">About</router-link>
+            </li>
+            <li class="nav-mobile">
+              <router-link to="/contact" @click="toggleMenu">Contact</router-link>
+            </li>
+            <span v-if="authStore.type === 'user'">
+              <li class="nav-mobile">
+                <router-link to="/profile" class="text-light">{{ authStore.user.name }} </router-link>
+              </li>
+              <li class="nav-mobile">
+                <a href="#" @click.prevent="logout()" class="text-light">Logout</a>
+              </li>
+            </span>
+            <li class="nav-mobile" v-else>
+              <a href="#" @click.prevent="openLoginModal" class="nav-item text-decoration-none text-light">
+                Login to your account
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-8 d-flex d-lg-none justify-content-end">
+          <button class="nav-booking btn btn-primary ms-3" @click="openModal">
+              Book A Room
+            </button>
+        </div>
+        <div class="col-2 d-flex d-lg-none justify-content-end  menu-toggle" @click="toggleMenu"><i class="fa-solid fa-bars"></i></div>
       </div>
     </div>
   </nav>
