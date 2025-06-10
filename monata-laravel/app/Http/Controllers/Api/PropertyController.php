@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleAdmin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Property\CreatePropertyRequest;
 use App\Http\Requests\Property\SearchPropertyRequest;
@@ -15,7 +16,9 @@ class PropertyController extends Controller
 {
     public function __construct(
         protected PropertyService $service
-    ) {}
+    ) {
+        $this->middleware('role:' . RoleAdmin::SUPERADMIN->value);
+    }
 
     /**
      * Search properties.

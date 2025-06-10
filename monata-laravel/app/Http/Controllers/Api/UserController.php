@@ -91,7 +91,7 @@ class UserController extends Controller
      * @param int $id
      * @return UserResource
      */
-    public function restore(int $id): UserResource  
+    public function restore(int $id): UserResource
     {
         $user = $this->userService->restore($id);
 

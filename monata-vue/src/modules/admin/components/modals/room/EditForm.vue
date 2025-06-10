@@ -268,11 +268,10 @@ const submitForm = async () => {
     data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="roomFormModalLabel">{{ modalTitle }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
         <form @submit.prevent="submitForm">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="roomFormModalLabel">{{ modalTitle }}</h5>
+          </div>
           <div class="modal-body modal-body-scrollable">
             <div class="mb-3">
               <label for="name" class="form-label">Name:</label>
@@ -354,7 +353,7 @@ const submitForm = async () => {
                     aria-label="Remove New Image" @click="removeNewImage(index)">&times;</button>
                 </div>
               </div>
-          </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
@@ -401,6 +400,12 @@ const submitForm = async () => {
 
 .modal-body-scrollable {
   max-height: calc(100vh - 200px);
-  overflow-y: auto;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-body-scrollable::-webkit-scrollbar {
+  display: none;
 }
 </style>

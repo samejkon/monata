@@ -1,14 +1,13 @@
 <template>
   <div class="modal fade" :id="modalId" tabindex="-1" aria-labelledby="roomFormModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="roomFormModalLabel">{{ modalTitle }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
+        <form @submit.prevent="submitForm">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="roomFormModalLabel">{{ modalTitle }}</h5>
+          </div>
 
-        <div class="modal-body modal-body-scrollable">
-          <form @submit.prevent="submitForm">
+          <div class="modal-body modal-body-scrollable">
             <div class="mb-3 row">
               <div class="col-md-6">
                 <label for="name" class="form-label">Name:</label>
@@ -68,12 +67,12 @@
               </div>
             </div>
 
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetForm">Close</button>
-              <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-          </form>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="resetForm">Close</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -197,6 +196,7 @@ const resetForm = () => {
   if (thumbnailInput) thumbnailInput.value = '';
   const imagesInput = document.getElementById('images');
   if (imagesInput) imagesInput.value = '';
+  room.value.images = [];
 }
 
 const submitForm = async () => {
@@ -306,7 +306,13 @@ const submitForm = async () => {
 }
 
 .modal-body-scrollable {
-  max-height: calc(100vh - 200px); /* Adjust based on your modal header/footer height */
-  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-body-scrollable::-webkit-scrollbar {
+  display: none;
 }
 </style>

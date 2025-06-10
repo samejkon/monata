@@ -396,7 +396,7 @@ onUnmounted(() => {
                           'status-label badge bg-success text-white': room.status === 1,
                           'badge bg-secondary text-white': room.status === 2
                         }">
-                          {{room.status === 1 ? 'Active' : 'Inactive'}}
+                          {{ room.status === 1 ? 'Active' : 'Inactive' }}
                         </span>
                       </p>
                     </div>
@@ -412,9 +412,13 @@ onUnmounted(() => {
             aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-xl-custom modal-dialog-scrollable">
               <div class="modal-content shadow">
-                <div class="modal-header justify-content-center">
+                <div class="modal-header justify-content-center align-items-center">
                   <h5 class="modal-title" id="roomDetailsModalLabel" v-if="roomDetails">
                     Room {{ roomDetails.name }} - {{ displayedRoomTypeName }}
+                    <span
+                      :class="{ 'badge bg-success text-white': roomDetails.status === 1, 'badge bg-secondary text-white': roomDetails.status !== 1 }">
+                      {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
+                    </span>
                   </h5>
                 </div>
                 <div class="modal-body modal-body-scrollable" v-if="roomDetails">
@@ -430,14 +434,7 @@ onUnmounted(() => {
                   </div>
                   <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
                     class="img-fluid mb-3 rounded-2 shadow-sm room-single-thumbnail">
-                  <p v-if="roomDetails.price"><strong>Price:</strong> {{ roomDetails.price }}</p>
-                  <p><strong>Status:</strong>
-                    <span
-                      :class="{ 'badge bg-success text-white': roomDetails.status === 1, 'badge bg-secondary text-white': roomDetails.status !== 1 }">
-                      {{ roomDetails.status === 1 ? 'Active' : 'Inactive' }}
-                    </span>
-                  </p>
-                  <h3>Description</h3>
+                  <h4>Description</h4>
                   <div v-html="roomDetails.description" class="room-description"></div>
                 </div>
                 <div class="modal-footer justify-content-between">
@@ -445,9 +442,10 @@ onUnmounted(() => {
                     <button type="button" class="btn btn-danger" @click="deleteRoom(roomDetails.id)">Delete</button>
                   </div>
                   <div>
-                    <button type="button" class="btn btn-warning me-" @click="openEditRoomModal(roomDetails)">Edit</button>
+                    <button type="button" class="btn btn-primary me-3"
+                      @click="openEditRoomModal(roomDetails)">Edit</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                    @click="closeRoomDetailsModal">Close</button>
+                      @click="closeRoomDetailsModal">Close</button>
                   </div>
                 </div>
               </div>
@@ -468,16 +466,13 @@ onUnmounted(() => {
   margin-top: 2rem;
 }
 
-/* Fix for images inside v-html content */
 .room-description :deep(img) {
   max-width: 100%;
   height: auto;
   display: block;
   margin: 1rem auto;
   border-radius: 0.375rem;
-  /* Bootstrap's .rounded */
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  /* Subtle shadow */
 }
 
 .room-thumbnail {
@@ -488,7 +483,6 @@ onUnmounted(() => {
 
 .modal-xl-custom {
   max-width: 1200px;
-  /* hoặc bao nhiêu bạn muốn */
   width: 100%;
 }
 
@@ -507,39 +501,31 @@ onUnmounted(() => {
 
 .badge {
   padding: 0.5em 0.75em;
-  /* Adjust these values as needed */
-  /* You can also add other styling like border-radius if you want rounded corners */
   border-radius: 0.25rem;
 }
 
-/* Your existing status-specific styles */
 .status-label.bg-success {
   background-color: #198754 !important;
-  /* Example color for success */
   color: white;
 }
 
 .badge.bg-primary {
   background-color: #0d6efd !important;
-  /* Example color for primary */
   color: white;
 }
 
 .badge.bg-warning {
   background-color: #ffc107 !important;
-  /* Example color for warning */
   color: black;
 }
 
 .badge.bg-info {
   background-color: #0dcaf0 !important;
-  /* Example color for info */
   color: white;
 }
 
 .badge.bg-secondary {
   background-color: #6c757d !important;
-  /* Example color for secondary */
   color: white;
 }
 
@@ -583,7 +569,13 @@ a .active-thumbnail {
 }
 
 .modal-body-scrollable {
-  max-height: calc(100vh - 200px); /* Adjust based on your modal header/footer height */
-  overflow-y: auto;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.modal-body-scrollable::-webkit-scrollbar {
+  display: none;
 }
 </style>
