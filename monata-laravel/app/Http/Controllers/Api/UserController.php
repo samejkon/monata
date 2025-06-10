@@ -54,7 +54,7 @@ class UserController extends Controller
      */
     public function store(CreateUserRequest $request): UserResource
     {
-        $data = $request->all();
+        $data = $request->validated();
         $user = $this->userService->store($data);
 
         return new UserResource($user);
@@ -68,7 +68,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, int $id): UserResource
     {
-        $data = $request->all();
+        $data = $request->validated();
         $user = $this->userService->update($id, $data);
 
         return new UserResource($user);

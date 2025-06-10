@@ -48,7 +48,7 @@ class ContactController extends Controller
      */
     public function sendMail(SendMailRequest $request,int $id): ContactResources
     {
-        $data = $request->all();
+        $data = $request->validated();
 
         $sendMail = $this->contactService->sendMail($data,$id);
 

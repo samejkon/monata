@@ -41,14 +41,11 @@
                     </div>
                     <div class="col-lg-10 col-md-10 col-sm-10 mt-3 mb-1">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
-                            <div class="col-md-2 mt-1 mb-1">
-                                <input v-model="searchForm.user_id" type="number" class="form-control form-control-sm" placeholder="Service userID ..." />
+                            <div class="col-md-3 mt-1 mb-1">
+                                <input v-model="searchForm.guest_name" type="text" class="form-control form-control-sm" placeholder="Guest_name ..." />
                             </div>
                             <div class="col-md-3 mt-1 mb-1">
-                                <input v-model="searchForm.guest_name" type="text" class="form-control form-control-sm" placeholder="Service name ..." />
-                            </div>
-                            <div class="col-md-3 mt-1 mb-1">
-                                <input v-model="searchForm.guest_email" type="text" class="form-control form-control-sm" placeholder="Service email ..." />
+                                <input v-model="searchForm.guest_email" type="text" class="form-control form-control-sm" placeholder="Guest_email ..." />
                             </div>
                             <div class="col-md-2 mt-1 mb-1">
                                 <select v-model="searchForm.status" class="custom-select custom-select-sm form-control form-control-sm">
@@ -69,7 +66,6 @@
                     <table class="table table-bordered row-5" id="dataTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th>User ID</th>
                                 <th>Guest Name</th>
                                 <th>Guest Email</th>
                                 <th>Status</th>
@@ -78,7 +74,6 @@
                         </thead>
                         <tbody>
                             <tr v-for="contact of contacts" :key="contact.id">
-                                <td class="col-lg-1 col-md-1 col-sm-1">{{ contact.user_id }}</td>
                                 <td class="col-lg-2 col-md-2 col-sm-2">{{ contact.guest_name }}</td>
                                 <td class="col-lg-2 col-md-2 col-sm-2">{{ contact.guest_email }}</td>
                                 <td class="col-lg-1 col-md-1 col-sm-1">
