@@ -29,13 +29,13 @@
                     <div class="col-lg-10 col-md-10 col-sm-10 mt-3 mb-1">
                         <form @submit.prevent="onSearch" class="row g-3 align-items-center">
                             <div class="col-md-3 mt-1 mb-1">
-                                <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="Service name ..." />
+                                <input v-model="searchForm.name" type="text" class="form-control form-control-sm" placeholder="User name ..." />
                             </div>
                             <div class="col-md-3 mt-1 mb-1">
-                                <input v-model="searchForm.email" type="text" class="form-control form-control-sm" placeholder="Service email ..." />
+                                <input v-model="searchForm.email" type="text" class="form-control form-control-sm" placeholder="User email ..." />
                             </div>
                             <div class="col-md-3 mt-1 mb-1">
-                                <input v-model="searchForm.phone" type="text" inputmode="numeric" class="form-control form-control-sm" placeholder="Service phone ..." />
+                                <input v-model="searchForm.phone" type="text" inputmode="numeric" class="form-control form-control-sm" placeholder="User phone ..." />
                             </div>
                             <div class="col-md-2 mt-1 mb-1">
                                 <select v-model="searchForm.status" class="custom-select custom-select-sm form-control form-control-sm">
@@ -96,8 +96,8 @@
                                             class="form-control"
                                             :class="{ 'is-invalid': errors.email }"
                                         />
-                                        <div v-if="errors.price" class="invalid-feedback">
-                                            {{ errors.price[0] }}
+                                        <div v-if="errors.email" class="invalid-feedback">
+                                            {{ errors.email[0] }}
                                         </div>
                                     </template>
                                     <template v-else>
