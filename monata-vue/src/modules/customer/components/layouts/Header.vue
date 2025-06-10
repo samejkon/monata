@@ -61,7 +61,6 @@ async function logout() {
 }
 const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', import.meta.url).href
 
-
 </script>
 
 <template>
@@ -101,12 +100,12 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
         <div class="col-5 d-flex justify-content-center align-items-center">
           <div>
             <span v-if="authStore.type === 'user'">
-              <router-link to="/profile" class="text-light">Profile /</router-link>
-              <a href="#" @click.prevent="logout()" class="text-light">Logout</a>
+              <router-link to="/profile" class="text-light">{{ authStore.user.name }}</router-link>
+              <span> | </span>
+              <a href="#" @click.prevent="logout()" class="text-light">logout</a>
             </span>
-            <a href="#" @click.prevent="openLoginModal" class="nav-item text-decoration-none text-light"
-              v-else>
-              Sign in to your account
+            <a v-else href="#" @click.prevent="openLoginModal" class="nav-item text-decoration-none text-light">
+              Login to your account
             </a>
             <button class="nav-booking btn btn-primary ms-3" @click="openModal">
               Book A Room

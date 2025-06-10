@@ -40,8 +40,10 @@ async function login() {
   try {
     await csrf.get('/sanctum/csrf-cookie')
     await api.post(`/login`, loginForm)
-
     await authStore.fetchUser()
+
+    loginForm.email = ''
+    loginForm.password = ''
     toast.success('Login successfully!')
     closeModal()
   } catch (error: any) {

@@ -2,7 +2,10 @@
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from '@/modules/admin/lib/axios';
-import { useToast } from 'vue-toastification'
+import { useToast } from 'vue-toastification';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -221,7 +224,7 @@ watch(() => route.path, () => {
               <li class="nav-item dropdown no-arrow">
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                   @click.prevent="toggleUserDropdown" :aria-expanded="isUserDropdownOpen">
-                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ authStore.user.name }}</span>
                   <img class="img-profile rounded-circle" src="@/modules/admin/assets/img/undraw_profile.svg">
                   <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>
                 </a>
