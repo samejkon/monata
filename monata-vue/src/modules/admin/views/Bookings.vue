@@ -376,15 +376,15 @@ const cancelBooking = async (bookingId) => {
                   <p class="card-text">
                     Status: <span :class="['badge', getBadgeClass(booking.status), 'badge-custom-size']">{{
                       getStatusText(booking.status)
-                    }}</span>
+                      }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="confirmBooking(booking.id)">Confirm</button>
                   <button v-if="booking.status === 2 || booking.status === 3 || booking.status === 4"
                     class="btn btn-warning btn-sm mr-2" @click="openInvoiceServiceModal(booking)">Services</button>
                   <button class="btn btn-primary btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
-                  <button v-if="booking.status === 4 || booking.status === 8" type=" button"
-                    class="btn btn-success btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
+                  <button v-if="booking.status === 8" type=" button" class="btn btn-success btn-sm ms-2"
+                    @click="openViewInvoiceModal(booking)">Invoice</button>
                   <!-- <button v-if="booking.status === 2" type=" button" class="btn btn-info btn-sm ms-2"
                     @click="guestNoShow(booking.id)">No Show</button> -->
                   <button v-if="booking.status === 1" type=" button" class="btn btn-danger btn-sm ms-2"

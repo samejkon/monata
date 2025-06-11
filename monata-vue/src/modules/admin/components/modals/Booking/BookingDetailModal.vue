@@ -209,8 +209,8 @@ const cancelBooking = async (bookingId) => {
             type="button" class="btn btn-primary" @click="editBooking">Edit</button>
           <button v-if="selectedBookingDetail?.status === 1" type="button" class="btn btn-danger"
             @click="cancelBooking(selectedBookingDetail.id)">Cancel</button>
-          <button v-if="selectedBookingDetail?.status === 4" type="button" class="btn btn-info"
-            @click="openViewInvoice">Invoice</button>
+          <!-- <button v-if="selectedBookingDetail?.status === 8" type="button" class="btn btn-info"
+            @click="openViewInvoice">Invoice</button> -->
         </div>
       </div>
     </div>
