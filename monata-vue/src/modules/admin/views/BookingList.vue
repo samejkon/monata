@@ -27,12 +27,13 @@
                 <label for="filterStatus" class="form-label">Status:</label>
                 <select class="form-select" id="filterStatus" v-model="filters.status">
                   <option value="">--All status--</option>
-                  <option :value="1">PENDING</option>
-                  <option :value="2">CONFIRMED</option>
-                  <option :value="3">CHECKED IN</option>
-                  <option :value="4">CHECKED OUT</option>
-                  <option :value="5">CANCELLED</option>
-                  <option :value="6">NO SHOW</option>
+                  <option :value="1">Pending</option>
+                  <option :value="2">Confirmed</option>
+                  <option :value="3">Checked In</option>
+                  <option :value="4">Checked Out</option>
+                  <option :value="5">Cancelled</option>
+                  <option :value="6">No Show</option>
+                  <option :value="8">Completed</option>
                 </select>
               </div>
             </div>
@@ -61,14 +62,14 @@
             </thead>
             <tbody>
               <tr v-if="bookings.length === 0">
-                <td colspan="7" class="text-center">No bookings found.</td>
+                <td colspan="8" class="text-center">No bookings found.</td>
               </tr>
               <tr v-for="(booking, index) in bookings" :key="booking.id">
                 <td>{{ index + 1 }}</td>
                 <td>{{ booking.guest_name }}</td>
                 <td>{{ booking.guest_email }}</td>
                 <td>{{ booking.guest_phone }}</td>
-                <td>${{ parseFloat(booking.total_payment).toLocaleString() }}</td>
+                <td>{{ formatCurrency(booking.total_payment) }}</td>
                 <td>
                   <button class="btn btn-sm" :class="getButtonClass(booking.status)"
                     @click="booking.status === 1 && confirmBooking(booking.id)" :disabled="booking.status !== 1">
@@ -272,6 +273,10 @@ const resetFilters = () => {
   filters.status = '';
   fetchBookings(1);
   toast.info('Clear filters.');
+};
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) return '';
+  return new Intl.NumberFormat('en-GB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' VNĐ';
 };
 
 onMounted(() => {

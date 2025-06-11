@@ -48,21 +48,21 @@ const formatDate = (dateString, format = 'DD-MM-YYYY') => {
 
 const getStatusText = (status) => {
   switch (status) {
-    case 1: return 'PENDING';
-    case 2: return 'CONFIRMED';
-    case 3: return 'CHECKED IN';
-    case 4: return 'CHECKED OUT';
-    case 5: return 'CANCELLED';
-    case 6: return 'NO SHOW';
+    case 1: return 'Pending';
+    case 2: return 'Confirmed';
+    case 3: return 'Checked In';
+    case 4: return 'Checked Out';
+    case 5: return 'Cancelled';
+    case 6: return 'No Show';
     default: return 'UNDEFINED';
   }
 };
 
 const getDetailStatusText = (status) => {
   switch (status) {
-    case 1: return 'NOT CHECKED IN';
-    case 2: return 'CHECKED IN';
-    case 3: return 'CHECKED OUT';
+    case 1: return 'Pending';
+    case 2: return 'Checked In';
+    case 3: return 'Checked Out';
     default: return 'UNDEFINED';
   }
 };

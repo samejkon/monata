@@ -288,7 +288,7 @@ const submitForm = async () => {
                   </option>
                 </select>
                 <div v-if="validationErrors.room_type_id" class="text-danger mt-1">{{ validationErrors.room_type_id[0]
-                  }}</div>
+                }}</div>
                 <div v-if="loadingRoomTypes">Loading room types...</div>
                 <div v-if="errorRoomTypes" class="text-danger">{{ errorRoomTypes }}</div>
               </div>
@@ -322,7 +322,7 @@ const submitForm = async () => {
             <div v-if="room.existing_images && room.existing_images.length > 0" class="mb-3">
               <label class="form-label">Current Images:</label>
               <div class="d-flex flex-wrap">
-                <div v-for="image in room.existing_images" :key="image.id"
+                <div v-for="image in room.existing_images.slice(1)" :key="image.id"
                   class="position-relative m-1 p-1 border rounded image-container"
                   :class="{ 'image-to-remove opacity-50 border-danger border-2': imagesToRemove.includes(image.id) }">
                   <img :src="image.image_path" :alt="'Existing Image ' + image.id" class="img-fluid image-display">

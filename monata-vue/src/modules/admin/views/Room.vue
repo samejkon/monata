@@ -272,8 +272,8 @@ const deleteRoom = async (roomId: number) => {
     fetchRooms(); // Reload room list after deletion
     closeRoomDetailsModal(); // Close the details modal if open
   } catch (error) {
-    console.error(`Error deleting room ${roomId}:`, error);
-    toast.error('Failed to delete room!');
+    const message = error?.response?.data?.message || 'Something went wrong.';
+    toast.error(message);
   }
 };
 
