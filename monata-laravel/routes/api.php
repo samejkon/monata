@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ServiceController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoomClientController;
 use App\Http\Controllers\Api\UserHomeController;
+use App\Http\Controllers\Api\UserBookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -61,8 +62,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthUserController::class, 'getProfile']);
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
-    Route::apiResource('bookings', AdminBookingController::class);
-    Route::get('/bookings-user', [AdminBookingController::class, 'indexCustomer']);
+    Route::apiResource('bookings', UserBookingController::class);
+    Route::get('/bookings-user', [UserBookingController::class, 'indexCustomer']);
 });
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);
