@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\RoleAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\UserService;
@@ -20,6 +21,7 @@ class UserController extends Controller
     public function __construct(UserService $userService)
     {
         $this->userService = $userService;
+        $this->middleware('role:' . RoleAdmin::SUPERADMIN->value)->except('index', 'show', 'store', 'update');
     }
 
     /**

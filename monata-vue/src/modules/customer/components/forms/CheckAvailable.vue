@@ -41,23 +41,23 @@ const closeModal = () => {
 }
 
 interface RoomType {
-    id: number
-    name: string
-    price: string
-    image: string
+  id: number
+  name: string
+  price: string
+  image: string
 }
 
 interface Room {
-    id: number
+  id: number
+  name: string
+  room_type: string
+  price: string
+  thumbnail_path: string
+  properties: Array<{
+    property_id: number
     name: string
-    room_type: string
-    price: string
-    thumbnail_path: string
-    properties: Array<{
-        property_id: number
-        name: string
-        value: string
-    }>
+    value: string
+  }>
 }
 
 interface ApiResponse {
@@ -138,14 +138,14 @@ const resetForm = () => {
 const formatDateTime = (dateTimeStr: string): string => {
   if (!dateTimeStr) return ''
   const date = new Date(dateTimeStr)
-  
+
   // Format theo múi giờ địa phương (Việt Nam) với định dạng Y-m-d H:i
   const year = date.getFullYear()
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const day = String(date.getDate()).padStart(2, '0')
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
-  
+
   // Trả về đúng định dạng Y-m-d H:i
   return `${year}-${month}-${day} ${hours}:${minutes}`
 }
@@ -161,7 +161,7 @@ const checkAvailability = async (e: Event) => {
   e.preventDefault()
   errors.value = {}
   isChecking.value = true
-  
+
   // Lưu lại danh sách phòng đã chọn trước đó
   const previousSelectedRooms = [...selectedRooms.value]
   availableRooms.value = []
@@ -175,10 +175,10 @@ const checkAvailability = async (e: Event) => {
 
     if (response.data.data.length > 0) {
       availableRooms.value = response.data.data
-      
+
       // Lọc lại danh sách phòng đã chọn, chỉ giữ lại những phòng còn khả dụng
       const availableRoomIds = response.data.data.map(room => room.id)
-      selectedRooms.value = previousSelectedRooms.filter(roomId => 
+      selectedRooms.value = previousSelectedRooms.filter(roomId =>
         availableRoomIds.includes(roomId)
       )
     } else {
@@ -240,15 +240,18 @@ const bookSelectedRooms = async () => {
 
     toast.success('Booking successful!')
     closeModal()
-    
+
     localStorage.setItem('newBooking', JSON.stringify({
       timestamp: new Date().getTime(),
       bookingId: response.data.data.id
     }))
-    
+
     router.push('/profile')
   } catch (error: any) {
     console.error('Booking error:', error.response?.data)
+    if (error.response?.status === 429) {
+      toast.error('Too many requests. Please try again later.')
+    }
     if (error.response?.status === 422) {
       const errors = error.response.data.errors
       if (errors) {
@@ -264,12 +267,11 @@ const bookSelectedRooms = async () => {
       } else {
         toast.error(error.response.data.message || 'The data provided is invalid')
       }
-    } else if (error.response?.data?.message) {
-      toast.error(error.response.data.message)
     } else {
-      toast.error('Booking failed. Please try again later!')
+      toast.error(error.response.data.message)
     }
   } finally {
+    console.log('search completed')
     isLoading.value = false
   }
 }
@@ -371,11 +373,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div 
-    v-if="isModalOpen" 
-    class="booking-modal-display" 
-    @click="closeModal"
-  >
+  <div v-if="isModalOpen" class="booking-modal-display" @click="closeModal">
     <form class="modal-content" @click.stop>
       <button type="button" class="btn-close-modal" @click="closeModal">
         <i class="fas fa-times"></i>
@@ -385,8 +383,9 @@ onMounted(() => {
         <div class="row g-3">
           <div class="col-md-6">
             <label for="checkinDateInput" class="form-label">Check-in date:</label>
-            <FlatPickr v-model="formData.checkin_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkin_at }"
-                    placeholder="Select check-in date and time" id="checkinDateInput" />
+            <FlatPickr v-model="formData.checkin_at" :config="flatpickrConfigGlobal" class="form-control"
+              :class="{ 'is-invalid': errors.checkin_at }" placeholder="Select check-in date and time"
+              id="checkinDateInput" />
             <div v-if="errors.checkin_at" class="invalid-feedback">
               {{ errors.checkin_at[0] }}
             </div>
@@ -394,8 +393,9 @@ onMounted(() => {
 
           <div class="col-md-6">
             <label for="checkoutDateInput" class="form-label">Check-in date:</label>
-            <FlatPickr v-model="formData.checkout_at" :config="flatpickrConfigGlobal" class="form-control" :class="{ 'is-invalid': errors.checkout_at }"
-                    placeholder="Select check-out date and time" id="checkoutDateInput" />
+            <FlatPickr v-model="formData.checkout_at" :config="flatpickrConfigGlobal" class="form-control"
+              :class="{ 'is-invalid': errors.checkout_at }" placeholder="Select check-out date and time"
+              id="checkoutDateInput" />
             <div v-if="errors.checkout_at" class="invalid-feedback">
               {{ errors.checkout_at[0] }}
             </div>
@@ -403,11 +403,7 @@ onMounted(() => {
 
           <div class="col-12">
             <label class="form-label">Room Type</label>
-            <select 
-              class="form-select" 
-              v-model="formData.roomType"
-              :class="{ 'is-invalid': errors.roomType }"
-            >
+            <select class="form-select" v-model="formData.roomType" :class="{ 'is-invalid': errors.roomType }">
               <option :value="null">Room Type</option>
               <option v-for="roomType in roomTypes" :key="roomType.id" :value="roomType.id">
                 {{ roomType.name }}
@@ -426,12 +422,7 @@ onMounted(() => {
           </div>
 
           <div class="col-12">
-            <button 
-              type="submit" 
-              class="btn btn-primary w-100" 
-              @click="checkAvailability"
-              :disabled="isChecking"
-            >
+            <button type="submit" class="btn btn-primary w-100" @click="checkAvailability" :disabled="isChecking">
               {{ isChecking ? 'Checking...' : 'Check Availability' }}
             </button>
           </div>
@@ -443,18 +434,10 @@ onMounted(() => {
               </div>
 
               <div class="row g-3">
-                <div v-for="room in availableRooms" 
-                  :key="room.id" 
-                  class="col-md-4"
-                >
-                  <div class="card h-100 room-card" 
-                    :class="{ 'border-primary': selectedRooms.includes(room.id) }"
-                    @click="toggleRoomSelection(room.id)"
-                  >
-                    <img :src="room.thumbnail_path" 
-                      :alt="room.name" 
-                      class="card-img-top room-thumbnail"
-                    >
+                <div v-for="room in availableRooms" :key="room.id" class="col-md-4">
+                  <div class="card h-100 room-card" :class="{ 'border-primary': selectedRooms.includes(room.id) }"
+                    @click="toggleRoomSelection(room.id)">
+                    <img :src="room.thumbnail_path" :alt="room.name" class="card-img-top room-thumbnail">
                     <div class="card-body">
                       <h5 class="card-title">Room {{ room.name }}</h5>
                       <p class="card-text text-muted small">{{ room.room_type }}</p>
@@ -462,10 +445,7 @@ onMounted(() => {
                         <strong>{{ formatPrice(room.price) }}</strong> / night
                       </p>
                       <ul class="list-unstyled small">
-                        <li v-for="property in room.properties" 
-                          :key="property.property_id"
-                          class="mb-1"
-                        >
+                        <li v-for="property in room.properties" :key="property.property_id" class="mb-1">
                           <i class="fas fa-check text-success me-2"></i>
                           {{ property.name }}: {{ property.value }}
                         </li>
@@ -473,13 +453,8 @@ onMounted(() => {
                     </div>
                     <div class="card-footer bg-transparent py-2">
                       <div class="form-check">
-                        <input 
-                          class="form-check-input" 
-                          type="checkbox" 
-                          :checked="selectedRooms.includes(room.id)"
-                          @click.stop
-                          @change="toggleRoomSelection(room.id)"
-                        >
+                        <input class="form-check-input" type="checkbox" :checked="selectedRooms.includes(room.id)"
+                          @click.stop @change="toggleRoomSelection(room.id)">
                         <label class="form-check-label small">
                           Choose this room
                         </label>
@@ -490,13 +465,9 @@ onMounted(() => {
               </div>
 
               <div class="mt-4">
-                <button 
-                  type="button" 
-                  class="btn btn-primary w-100" 
-                  @click="handleBookRooms"
-                  :disabled="isLoading || selectedRooms.length === 0"
-                >
-                {{ isLoading ? 'Please wait...' : `Proceed to book ${selectedRooms.length} selected rooms` }}
+                <button type="button" class="btn btn-primary w-100" @click="handleBookRooms"
+                  :disabled="isLoading || selectedRooms.length === 0">
+                  {{ isLoading ? 'Please wait...' : `Proceed to book ${selectedRooms.length} selected rooms` }}
                 </button>
               </div>
             </div>
@@ -506,29 +477,20 @@ onMounted(() => {
     </form>
   </div>
 
-  <LoginPopup
-    v-model="showLoginPopup"
-    @login-success="handleLoginSuccess"
-    @switchToRegister="handleSwitchToRegister"
-  />
+  <LoginPopup v-model="showLoginPopup" @login-success="handleLoginSuccess" @switchToRegister="handleSwitchToRegister" />
 
-  <RegisterModal
-    v-model="showRegisterPopup"
-    @switchToLogin="handleSwitchToLogin"
-  />
+  <RegisterModal v-model="showRegisterPopup" @switchToLogin="handleSwitchToLogin" />
 
-  <BookingConfirmationModal
-    v-model="showBookingConfirmation"
-    :selected-rooms="availableRooms.filter(room => selectedRooms.includes(room.id))"
-    :form-data="formData"
-    @confirm-booking="bookSelectedRooms"
-  />
+  <BookingConfirmationModal v-model="showBookingConfirmation"
+    :selected-rooms="availableRooms.filter(room => selectedRooms.includes(room.id))" :form-data="formData"
+    @confirm-booking="bookSelectedRooms" />
 </template>
 
 <style scoped>
-.modal-content{
+.modal-content {
   height: 1000px;
 }
+
 .booking-modal-display {
   position: fixed;
   top: 0;
@@ -571,7 +533,8 @@ onMounted(() => {
   margin-bottom: 0.5rem;
 }
 
-.form-control, .form-select {
+.form-control,
+.form-select {
   height: 45px;
   font-size: 1rem;
 }
@@ -715,7 +678,7 @@ onMounted(() => {
 }
 
 .card-footer {
-  border-top: 1px solid rgba(0,0,0,0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   padding: 0.5rem 1rem;
 }
 

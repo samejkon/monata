@@ -22,9 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        RateLimiter::for('client', function (Request $request) {
-            return Limit::perHour(1)->response(function (Request $request, array $headers) {
-                return response('Custom response...', 429, $headers);
+        RateLimiter::for('limitBooking', function (Request $request) {
+            return Limit::perHour(3)->response(function (Request $request, array $headers) {
+                return response('Too many requests', 429, $headers);
             });
         });
     }

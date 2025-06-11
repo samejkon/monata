@@ -16,7 +16,7 @@ import BookingList from './views/BookingList.vue'
 
 const adminRoutes: Array<RouteRecordRaw> = [
   {
-    path: '/admin',
+    path: '/admins',
     component: AdminLayout,
     children: [
       {
@@ -98,7 +98,7 @@ const adminRoutes: Array<RouteRecordRaw> = [
     ],
   },
   {
-    path: '/admin/login',
+    path: '/admins/login',
     name: 'AdminLogin',
     component: () => import('@/modules/admin/views/Auth/Login.vue'),
   },
