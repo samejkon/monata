@@ -74,11 +74,15 @@ class DashboardService
     {
         $today = Carbon::today()->toDateString();
 
-        $todayCheckouts = BookingDetail::whereRaw('CAST(checkout_at AS DATE) = ?', [$today])
+        $todayBookings = BookingDetail::with(['room', 'booking'])
+            ->where(function ($query) use ($today) {
+                $query->whereDate('checkin_at', $today)
+                    ->orWhereDate('checkout_at', $today);
+            })
             ->orderBy('checkin_at', 'ASC')
             ->get();
 
-        $results = $todayCheckouts->map(function ($bookingDetail) {
+        $results = $todayBookings->map(function ($bookingDetail) {
             return [
                 'booking_id' => $bookingDetail->id,
                 'room_id' => $bookingDetail->room_id,
