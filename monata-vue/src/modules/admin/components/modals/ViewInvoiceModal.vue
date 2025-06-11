@@ -60,7 +60,7 @@ const finalTotalAmount = computed(() => {
 });
 
 const roomPrice = computed(() => {
-  return (finalTotalAmount.value || 0) - (totalServiceCost.value || 0);
+  return Number(finalTotalAmount.value || 0) - Number(totalServiceCost.value || 0) + Number(deposit.value || 0);
 });
 
 const deposit = computed(() => {
@@ -137,7 +137,6 @@ const printInvoice = () => {
 };
 
 watch(() => props.bookingData, (newVal, oldVal) => {
-  // console.log("Initial/Prop bookingData for ViewInvoiceModal changed from:", oldVal, "to:", newVal);
 }, { deep: true, immediate: true });
 
 </script>
@@ -216,7 +215,11 @@ watch(() => props.bookingData, (newVal, oldVal) => {
                 <div class="col-8"><strong>Deposit:</strong></div>
                 <div class="col-4 text-end">- {{ formatCurrency(deposit) }}</div>
               </div>
-              <hr>
+              <div class="row mb-2">
+                <div class="col-8"><strong>Service:</strong></div>
+                <div class="col-4 text-end">+ {{ formatCurrency(totalServiceCost) }}</div>
+              </div>
+              <hr class="my-2">
               <div class="row mt-3">
                 <div class="col-8 h5"><strong>Total payment:</strong></div>
                 <div class="col-4 text-end h5">{{ formatCurrency(finalTotalAmount) }}</div>
