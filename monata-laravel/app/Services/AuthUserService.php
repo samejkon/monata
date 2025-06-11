@@ -111,10 +111,7 @@ class AuthUserService
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        $user->name = $data['name'];
-        $user->email = $data['email'];
-        $user->phone = $data['phone'];
-        $user->save();
+        $user->update($data);
 
         return $user;
     }

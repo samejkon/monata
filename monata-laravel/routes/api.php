@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\AuthAdminController;
 use App\Http\Controllers\Api\AdminBookingController;
 use App\Http\Controllers\Api\InvoiceDetailController;
 use App\Http\Controllers\Api\PropertyController;
@@ -17,11 +17,13 @@ use App\Http\Controllers\Api\UserBookingController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthAdminController::class, 'login']);
 
     Route::middleware('admin')->group(function () {
-        Route::get('/profile', [AuthController::class, 'getProfile']);
-        Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/profile', [AuthAdminController::class, 'getProfile']);
+        Route::post('/logout', [AuthAdminController::class, 'logout']);
+        Route::put('/profile', [AuthAdminController::class, 'updateProfile']);
+        Route::post('/change-password', [AuthAdminController::class, 'changePassword']);
 
         Route::apiResource('properties', PropertyController::class);
         Route::apiResource('room-types', RoomTypeController::class);

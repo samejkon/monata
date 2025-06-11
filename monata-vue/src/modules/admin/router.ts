@@ -6,6 +6,7 @@ import AdminLayout from './components/layouts/AdminLayout.vue'
 import Bookings from './views/Bookings.vue'
 import RoomType from './views/RoomType.vue'
 import Rooms from './views/Room.vue'
+import Profile from './views/Profile.vue'
 
 import ServiceList from '@/modules/admin/views/service/ServiceList.vue'
 import ContactList from '@/modules/admin/views/contact/ContactList.vue'
@@ -87,6 +88,12 @@ const adminRoutes: Array<RouteRecordRaw> = [
         name: 'AdminUserCreate',
         component: UserCreate,
         meta: { requiresAuth: true, requiresAdmin: true },
+      },
+      {
+        path: 'profile',
+        name: 'AdminProfile',
+        component: Profile,
+        meta: { requiresAuth: true },
       },
     ],
   },

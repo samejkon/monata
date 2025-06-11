@@ -5,7 +5,9 @@ import { api } from '../lib/axios';
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import Footer from '@/modules/customer/components/layouts/Footer.vue'
 import { useToast } from 'vue-toastification'
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const toast = useToast()
 
 // Interfaces
@@ -253,6 +255,8 @@ const handleUpdateProfile = async (): Promise<void> => {
       email: editUser.value.email,
       phone: editUser.value.phone
     });
+
+    authStore.fetchUser();
 
     toast.success('Profile updated successfully!');
 
@@ -570,7 +574,8 @@ onMounted(() => {
                       <div class="flex-grow-1">
                         <p class="mb-1"><strong>Booking code:</strong> #{{ booking.id }}</p>
                         <p class="mb-0"><strong>Rooms booked:</strong> {{ booking.booking_details.length }}</p>
-                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{ formatCurrency(booking.deposit) }}</p>
+                        <p class="mb-0" v-if="booking.deposit"><strong>Deposit:</strong> {{
+                          formatCurrency(booking.deposit) }}</p>
                         <p class="mb-0"><strong>Total payment:</strong> {{ formatCurrency(booking.total_payment) }}</p>
                       </div>
                       <div class="mt-2 text-muted small">
