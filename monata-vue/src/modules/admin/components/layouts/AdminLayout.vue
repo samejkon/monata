@@ -21,7 +21,7 @@ const isBookingsDropdownOpen = ref(false);
 const logout = async () => {
   try {
     await api.post('/logout');
-    router.push('/admin/login');
+    router.push('/admins/login');
     toast.success('You have been logged out');
   } catch (error) {
     console.error(error);
@@ -74,13 +74,13 @@ const isComponentsDropdownActive = computed(() => {
 });
 
 const isRoomsDropdownActive = computed(() => {
-  return route.path.startsWith('/admin/rooms') ||
-    route.path.startsWith('/admin/properties') ||
-    route.path.startsWith('/admin/room-types');
+  return route.path.startsWith('/admins/rooms') ||
+    route.path.startsWith('/admins/properties') ||
+    route.path.startsWith('/admins/room-types');
 });
 
 const isBookingsDropdownActive = computed(() => {
-  return route.path.startsWith('/admin/bookings');
+  return route.path.startsWith('/admins/bookings');
 });
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -152,8 +152,8 @@ watch(() => route.path, () => {
         <hr class="sidebar-divider">
 
         <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
-          :class="{ 'active': isActiveRoute('/admin/dashboard') }">
-          <router-link class="nav-link" to="/admin/dashboard">
+          :class="{ 'active': isActiveRoute('/admins/dashboard') }">
+          <router-link class="nav-link" to="/admins/dashboard">
             <span>Dashboard</span>
           </router-link>
         </li>
@@ -169,12 +169,12 @@ watch(() => route.path, () => {
             aria-labelledby="headingRooms" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
               <h6 class="collapse-header">Room Management:</h6>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/rooms') }"
-                to="/admin/rooms">Rooms</router-link>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/properties') }"
-                to="/admin/properties">Properties</router-link>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/room-types') }"
-                to="/admin/room-types">Room Types</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admins/rooms') }"
+                to="/admins/rooms">Rooms</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admins/properties') }"
+                to="/admins/properties">Properties</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admins/room-types') }"
+                to="/admins/room-types">Room Types</router-link>
             </div>
           </div>
         </li>
@@ -189,29 +189,29 @@ watch(() => route.path, () => {
             aria-labelledby="headingBookings" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
               <h6 class="collapse-header">Booking Management:</h6>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/bookings') }"
-                to="/admin/bookings">Booking Calendar</router-link>
-              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admin/bookings-list') }"
-                to="/admin/bookings-list">Booking List</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admins/bookings') }"
+                to="/admins/bookings">Booking Calendar</router-link>
+              <router-link class="collapse-item" :class="{ 'active': isActiveRoute('/admins/bookings-list') }"
+                to="/admins/bookings-list">Booking List</router-link>
             </div>
           </div>
         </li>
 
         <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
-          :class="{ 'active': isActiveRoute('/admin/services') }">
-          <router-link class="nav-link" to="/admin/services">
+          :class="{ 'active': isActiveRoute('/admins/services') }">
+          <router-link class="nav-link" to="/admins/services">
             <span>Service</span>
           </router-link>
         </li>
 
-        <li class="nav-item" :class="{ 'active': isActiveRoute('/admin/contacts') }">
-          <router-link class="nav-link" to="/admin/contacts">
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admins/contacts') }">
+          <router-link class="nav-link" to="/admins/contacts">
             <span>Contact</span>
           </router-link>
         </li>
 
         <li class="nav-item">
-          <router-link class="nav-link" to="/admin/users">
+          <router-link class="nav-link" to="/admins/users">
             <span>Users</span>
           </router-link>
         </li>
@@ -229,13 +229,13 @@ watch(() => route.path, () => {
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                   @click.prevent="toggleUserDropdown" :aria-expanded="isUserDropdownOpen">
                   <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ authStore.user.name }}</span>
-                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>  
+                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow"
                   :class="{ 'animated--grow-in': isUserDropdownOpen, 'show': isUserDropdownOpen }"
                   aria-labelledby="userDropdown">
 
-                  <router-link to="/admin/login" class="dropdown-item" @click="logout">
+                  <router-link to="/admins/login" class="dropdown-item" @click="logout">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Logout
                   </router-link>

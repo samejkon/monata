@@ -154,7 +154,7 @@
                                         <button class="btn btn-warning btn-sm me-1" @click="startEdit(user)">
                                             <SquarePen />
                                         </button>
-                                        <button class="btn btn-danger btn-sm" @click="actionDeleteUser(user.id)">
+                                        <button v-if="authStore.user.role === 'superadmin'" class="btn btn-danger btn-sm" @click="actionDeleteUser(user.id)">
                                             <Trash2 />
                                         </button>
                                     </template>
@@ -184,7 +184,9 @@ import { UserStatus } from '../../stores/enum/User';
 import Pagination from '../../components/layouts/Pagination.vue';
 import UserCreate from './UserCreate.vue';
 import { SquarePen, Trash2, Plus, Check, X} from 'lucide-vue-next';
+import { useAuthStore } from '@/stores/auth';
 
+const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 

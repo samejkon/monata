@@ -249,6 +249,10 @@ const updateBooking = async () => {
     emit('bookingUpdated');
     closeModal();
   } catch (error) {
+    if (error.response.status === 429) {
+      toast.error('Too many requests. Please try again later.');
+      return;
+    }
     console.error('Error updating booking:', error.response?.data || error.message);
     const errorMsg = error.response?.data?.errors
       ? Object.values(error.response.data.errors).flat().join(' ')
@@ -394,9 +398,11 @@ onMounted(() => {
                 </div>
                 <p class="mt-2 mb-0">You have selected <span id="selectedRoomsCountSpan">{{ selectedRoomsCount }}</span>
                   room(s).</p>
-                <button type="button" class="btn btn-success mt-3" @click="addSelectedRoomsToBooking">Add Selected Rooms</button>
+                <button type="button" class="btn btn-success mt-3" @click="addSelectedRoomsToBooking">Add Selected
+                  Rooms</button>
               </div>
-              <p v-else-if="!searchCheckInTime || !searchCheckOutTime" class="text-muted">Please select check-in and check-out time.</p>
+              <p v-else-if="!searchCheckInTime || !searchCheckOutTime" class="text-muted">Please select check-in and
+                check-out time.</p>
               <p v-else class="text-muted">No available rooms.</p>
             </div>
 
@@ -480,4 +486,4 @@ body.modal-open-custom {
 .btn-close-white {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
-</style> 
+</style>
