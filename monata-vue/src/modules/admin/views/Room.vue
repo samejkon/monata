@@ -344,7 +344,7 @@ onUnmounted(() => {
         </div>
         <div class="card-body">
           <div class="mb-3 d-flex justify-content-between flex-column flex-md-row">
-            <button class=" btn btn-primary" @click="openCreateRoomModal">New Room</button>
+            <button class=" btn btn-primary text-truncate" @click="openCreateRoomModal">New Room</button>
             <form @submit.prevent="searchRooms"
               class="d-md-inline-block form-inline ml-md-3 my-2 my-md-0 mw-100  navbar-search">
               <div class="input-group d-flex">
@@ -390,7 +390,7 @@ onUnmounted(() => {
                   <div class="col-md-5 p-0">
                     <div class="card-body pl-3">
                       <h5 class="card-title">{{ room.name }}</h5>
-                      <p class="card-text">{{ room.room_type }}</p>
+                      <p class="card-text text-truncate">{{ room.room_type }}</p>
                       <p class="card-text">
                         <span :class="{
                           'status-label badge bg-success text-white': room.status === 1,
