@@ -181,13 +181,9 @@ onUnmounted(() => {
           </div>
           <img v-else-if="roomDetails.thumbnail_path" :src="roomDetails.thumbnail_path" :alt="roomDetails.name"
             class="img-fluid mb-3 rounded shadow-sm room-single-thumbnail">
-
-          <div class="mt-4 room-description">
-            <p v-html="roomDetails.description"></p>
-          </div>
         </div>
         <div class="col-lg-4 room-details-sidebar">
-          <div class="p-4 border rounded shadow-sm bg-white sticky-booking-card" ref="bookingCardRef">
+          <div class="p-4 border rounded shadow-sm bg-white h-100" ref="bookingCardRef">
             <div class="mb-3">
               <h3 class="mb-1 text-dark">{{ roomDetails.name }}</h3>
               <span class="text-muted small">Room type: {{ roomDetails.room_type }}</span>
@@ -206,8 +202,14 @@ onUnmounted(() => {
               </li>
             </ul>
             <div class="d-grid gap-2">
-              <button class="btn btn-primary btn-lg rounded-pill" @click.prevent="handleBookNow(roomDetails.room_type_id)">Book Now</button>
+              <button class="btn btn-primary btn-lg rounded-pill"
+                @click.prevent="handleBookNow(roomDetails.room_type_id)">Book Now</button>
             </div>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="mt-4 room-description">
+            <p v-html="roomDetails.description"></p>
           </div>
         </div>
       </div>
@@ -224,10 +226,7 @@ onUnmounted(() => {
     </button>
   </transition>
 
-  <CheckAvailable 
-    v-model="showCheckAvailable"
-    :initial-room-type="selectedRoomType"
-  />
+  <CheckAvailable v-model="showCheckAvailable" :initial-room-type="selectedRoomType" />
 
   <Footer />
 </template>
@@ -266,7 +265,7 @@ body {
 
 .room-large-image {
   width: 100%;
-  height: 600px;
+  height: 400px;
   /* Adjust height as needed */
   object-fit: cover;
   opacity: 1;
@@ -354,6 +353,10 @@ body {
     max-height: none;
     overflow-y: visible;
   }
+}
+
+.room-details-sidebar {
+  height: 400px;
 }
 
 .room-details-sidebar .text-muted.small {
