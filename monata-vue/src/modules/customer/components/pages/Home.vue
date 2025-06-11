@@ -264,6 +264,11 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
   font-size: 1.5rem;
 }
 
+.offer-img {
+  width: 100%;
+  height: 300px;
+}
+
 @media (min-width: 768px) and (max-width: 1200px) {
   .hero-content h1 {
     font-size: 2.5rem;
@@ -271,6 +276,10 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
 
   .hero-content p {
     font-size: 1.25rem;
+  }
+
+  .offer-img {
+    height: 200px;
   }
 }
 
@@ -308,4 +317,5 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
 .line-button:hover {
   opacity: 0.8;
 }
+
 </style>

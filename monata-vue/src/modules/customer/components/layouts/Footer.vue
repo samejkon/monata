@@ -61,14 +61,6 @@
           <span> by </span>
           <span class="blue"> Colorlib </span>
         </div>
-        <div class="footer-group-icon">
-          <div class="group-icon">
-            <i class="fa fa-facebook"></i>
-            <i class="fa fa-instagram"></i>
-            <i class="fa fa-twitter"></i>
-            <i class="fa fa-youtube-play"></i>
-          </div>
-        </div>
       </div>
     </footer>
 </template>

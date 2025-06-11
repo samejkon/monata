@@ -1,13 +1,12 @@
 footer {
   height: 856.78px;
-  padding: 145px 39px 0px 39px;
+  padding: 100px 39px 0px 39px;
   display: grid;
   grid-template-rows: 85% 15%;
   background-color: $color-black;
 
   @include responsive(tablet) {
     height: 450px;
-    padding-top: 145px;
     grid-template-rows: 4fr 1fr;
     justify-content: center;
     background-color: $color-black;
@@ -15,7 +14,6 @@ footer {
 
   @include responsive(pc) {
     height: 450px;
-    padding-top: 145px;
     grid-template-rows: 4fr 1fr;
     justify-content: center;
     background-color: $color-black;
@@ -95,8 +93,8 @@ footer {
 
   .footer-copyright {
     height: 50%;
-    display: grid;
-    grid-template-columns: 3fr 2fr;
+    display: flex;
+    justify-content: center;
     align-items: center;
     border-top: 1px solid $text-color-gray-light;
 
@@ -106,11 +104,6 @@ footer {
 
     @include responsive(pc) {
       height: 100px;
-    }
-
-    .footer-group-icon {
-      display: flex;
-      justify-content: end;
     }
   }
 }
