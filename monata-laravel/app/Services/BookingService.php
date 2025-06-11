@@ -282,6 +282,103 @@ class BookingService
     }
 
     /**
+     * Update a booking.
+     *
+     * @param  array  $data
+     * @param  int  $id
+     * @return \App\Models\Booking
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function updateClient($data, $id)
+    {
+        $booking = $this->model->where('status', BookingStatus::PENDING)->findOrFail($id);
+
+        $this->validateRoomAvailability($data['booking_details'], $booking->id);
+
+        return DB::transaction(function () use ($booking, $data) {
+            // Lấy thông tin user từ bảng users
+            $user = null;
+            if (Arr::get($data, 'user_id')) {
+                $user = $this->user->find(Arr::get($data, 'user_id'));
+            }
+
+            $bookingUpdate = [
+                'user_id'        => Arr::get($data, 'user_id'),
+                'guest_name'     => $user ? $user->name : Arr::get($data, 'guest_name'),
+                'guest_email'    => $user ? $user->email : Arr::get($data, 'guest_email'),
+                'guest_phone'    => $user ? $user->phone : Arr::get($data, 'guest_phone'),
+                'deposit'        => Arr::get($data, 'deposit'),
+                'note'           => Arr::get($data, 'note'),
+            ];
+
+            $idBookingDetails = collect($data['booking_details'])->pluck('id')->filter()->toArray();
+
+            // Check if any booking detail to be removed is already checked in
+            $detailsToRemoveQuery = BookingDetail::where('booking_id', $booking->id);
+            if (!empty($idBookingDetails)) { // If $idBookingDetails is empty, it means all details are to be removed
+                $detailsToRemoveQuery->whereNotIn('id', $idBookingDetails);
+            }
+
+            $checkedInDetailExistsForRemoval = (clone $detailsToRemoveQuery)
+                ->where('status', BookingDetailStatus::CHECK_IN)
+                ->exists();
+
+            if ($checkedInDetailExistsForRemoval) {
+                throw new \Exception("Not delete room that is checked-in.");
+            }
+
+            // Proceed with deletion if no checked-in rooms are affected
+            $detailsToRemoveQuery->delete();
+
+            $rooms = $this->getRoomsByBookingDetails($data['booking_details']);
+            $booking->load('bookingDetails');
+            $existingDetails = $booking->bookingDetails->keyBy('id');
+
+            $total = 0;
+
+            $bookingDetails = collect($data['booking_details'])->map(function ($item) use (&$total, $rooms, $existingDetails) {
+                $price = $this->getPriceRoomType($rooms, $item['room_id']);
+
+                $duration = config('room.duration');
+                $unitHours = config('room.unit_hours');
+                $cleanRoom = config('room.clean_room');
+
+                $duration = $this->calculateDuration($item['checkin_at'], $item['checkout_at'], $unitHours);
+
+                $itemTotal = $duration * $price;
+                $total += $itemTotal;
+
+                $item['price_per_day'] = $price;
+
+                $item['checkout_at'] = Carbon::parse($item['checkout_at'])->addMinutes($cleanRoom);
+
+                $item['id'] = $item['id'] ?? null;
+
+                if (!$item['id']) {
+                    $item['status'] = BookingDetailStatus::PENDING;
+                    $item['created_at'] = now();
+                } else {
+                    $existingDetail = $existingDetails->get($item['id']);
+                    $item['status'] = $existingDetail->status;
+                    $item['created_at'] = $existingDetail->created_at;
+                }
+
+                $item['updated_at'] = now();
+
+                return $item;
+            })->toArray();
+
+            $bookingUpdate['total_payment'] = $total;
+
+            $booking->update($bookingUpdate);
+            $booking->bookingDetails()->upsert($bookingDetails, ['id']);
+
+            return $booking;
+        });
+    }
+
+    /**
      * Find available rooms for a given date range.
      *
      * This method retrieves all rooms that are not occupied during the specified

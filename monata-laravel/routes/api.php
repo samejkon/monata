@@ -63,15 +63,16 @@ Route::prefix('admin')->group(function () {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+// Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthUserController::class, 'logout']);
     Route::get('/profile', [AuthUserController::class, 'getProfile']);
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
     Route::get('/bookings/{id}', [UserBookingController::class, 'show']);
     Route::post('/bookings', [UserBookingController::class, 'store']);
+    Route::put('/bookings/{id}', [UserBookingController::class, 'update']);
     Route::get('/bookings-user', [UserBookingController::class, 'indexCustomer']);
-});
+// });
 Route::post('/login', [AuthUserController::class, 'login']);
 Route::post('/register', [AuthUserController::class, 'register']);
 Route::post('contacts/send-contact', [ContactController::class, 'sendContact']);

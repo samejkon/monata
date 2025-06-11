@@ -4,6 +4,7 @@ import { ref, onMounted } from 'vue';
 import { api } from '../lib/axios';
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import Footer from '@/modules/customer/components/layouts/Footer.vue'
+import BookingDetailModal from '@/modules/customer/components/modals/BookingDetailModal.vue'
 import { useToast } from 'vue-toastification'
 import { useAuthStore } from '@/stores/auth'
 
@@ -88,6 +89,7 @@ const loadingBookings = ref(false);
 const bookingError = ref<string | null>(null);
 const selectedBooking = ref<Booking | null>(null);
 const showBookingDetail = ref(false);
+const showEditBookingModal = ref(false);
 
 // Utility functions
 const formatDateTime = (dateTimeStr: string): string => {
@@ -206,6 +208,21 @@ const showBookingDetails = (booking: Booking) => {
 const closeBookingDetails = () => {
   selectedBooking.value = null;
   showBookingDetail.value = false;
+};
+
+const openEditBookingModal = () => {
+  showBookingDetail.value = false;
+  showEditBookingModal.value = true;
+};
+
+const closeEditBookingModal = () => {
+  showEditBookingModal.value = false;
+  selectedBooking.value = null;
+};
+
+const handleBookingUpdated = () => {
+  fetchBookings();
+  closeEditBookingModal();
 };
 
 // Profile form handlers
@@ -609,7 +626,7 @@ onMounted(() => {
           <div class="col-md-6">
             <h6 class="mb-3">Booking information</h6>
             <p class="mb-1"><strong>Booking date:</strong> {{ formatDateTime(selectedBooking.created_at) }}</p>
-            <p class="mb-0"><strong>Note:</strong> {{ selectedBooking.note || 'Not available' }}</p>
+            <p class="mb-0"><strong>Note:</strong> {{ selectedBooking.note }}</p>
           </div>
         </div>
 
@@ -641,9 +658,21 @@ onMounted(() => {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" @click="closeBookingDetails">Close</button>
+        <button v-if="selectedBooking?.status === 1" type="button" class="btn btn-primary" @click="openEditBookingModal">
+          Edit
+        </button>
       </div>
     </div>
   </div>
+
+  <!-- Booking Detail Modal -->
+  <BookingDetailModal
+    v-if="showEditBookingModal && selectedBooking"
+    :show="showEditBookingModal"
+    :booking="selectedBooking"
+    @close="closeEditBookingModal"
+    @bookingUpdated="handleBookingUpdated"
+  />
 
   <Footer />
 </template>

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Booking\CheckRoomAvaiableRequest;
 use App\Http\Requests\Booking\CreateBookingRequest;
 use App\Http\Requests\Booking\IdsRequest;
-use App\Http\Requests\Booking\UpdateBookingRequest;
+use App\Http\Requests\Booking\UpdateBookingClientRequest;
 use App\Http\Resources\BookingResource;
 use App\Http\Resources\RoomResource;
 use App\Services\BookingService;
@@ -66,6 +66,19 @@ class UserBookingController extends Controller
     public function show($id): BookingResource
     {
         $data = $this->service->findById($id);
+
+        return new BookingResource($data);
+    }
+
+    /**
+     * Summary of update
+     * @param \App\Http\Requests\Booking\UpdateBookingRequest $request
+     * @param mixed $id
+     * @return BookingResource
+     */
+    public function update(UpdateBookingClientRequest $request, $id): BookingResource
+    {
+        $data = $this->service->updateClient($request->validated(), $id);
 
         return new BookingResource($data);
     }
