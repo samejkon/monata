@@ -54,6 +54,10 @@ Route::prefix('admin')->group(function () {
         Route::post('users/{id}/restore', [UserController::class, 'restore']);
 
         Route::get('/revenue', [DashboardController::class, 'revenue']);
+        Route::get('/get-today-checkout-rooms', [DashboardController::class, 'getTodayCheckoutRooms']);
+        Route::get('/count-contacts', [DashboardController::class, 'countContacts']);
+        Route::get('/count-users', [DashboardController::class, 'countUsers']);
+        Route::get('/count-bookings', [DashboardController::class, 'countBookings']);
     });
 });
 

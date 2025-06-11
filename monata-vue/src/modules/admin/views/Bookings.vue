@@ -179,14 +179,14 @@ const nextMonth = () => {
 
 const getStatusText = (status) => {
   switch (status) {
-    case 1: return 'PENDING';
-    case 2: return 'CONFIRMED';
-    case 3: return 'CHECKED IN';
-    case 4: return 'CHECKED OUT';
-    case 5: return 'CANCELLED';
-    case 6: return 'NO SHOW';
-    case 7: return 'EXPIRED';
-    case 8: return 'COMPLETED';
+    case 1: return 'Pending';
+    case 2: return 'Confirmed';
+    case 3: return 'Checked In';
+    case 4: return 'Checked Out';
+    case 5: return 'Cancelled';
+    case 6: return 'No Show';
+    case 7: return 'Expired';
+    case 8: return 'Completed';
   }
 };
 const getBadgeClass = (status) => {
@@ -374,9 +374,9 @@ const cancelBooking = async (bookingId) => {
                     Phone: <strong>{{ booking.guest_phone }}</strong>
                   </p>
                   <p class="card-text">
-                    Status: <span :class="['badge', getBadgeClass(booking.status)]">{{
+                    Status: <span :class="['badge', getBadgeClass(booking.status), 'badge-custom-size']">{{
                       getStatusText(booking.status)
-                      }}</span>
+                    }}</span>
                   </p>
                   <button v-if="booking.status === 1" class="btn btn-primary btn-sm mr-2"
                     @click="confirmBooking(booking.id)">Confirm</button>
@@ -385,8 +385,8 @@ const cancelBooking = async (bookingId) => {
                   <button class="btn btn-primary btn-sm" @click="openBookingDetailModal(booking)">Detail</button>
                   <button v-if="booking.status === 4 || booking.status === 8" type=" button"
                     class="btn btn-success btn-sm ms-2" @click="openViewInvoiceModal(booking)">Invoice</button>
-                  <button v-if="booking.status === 2" type=" button" class="btn btn-info btn-sm ms-2"
-                    @click="guestNoShow(booking.id)">No Show</button>
+                  <!-- <button v-if="booking.status === 2" type=" button" class="btn btn-info btn-sm ms-2"
+                    @click="guestNoShow(booking.id)">No Show</button> -->
                   <button v-if="booking.status === 1" type=" button" class="btn btn-danger btn-sm ms-2"
                     @click="cancelBooking(booking.id)">Cancel</button>
                 </div>
@@ -490,5 +490,13 @@ const cancelBooking = async (bookingId) => {
 
 .card-header h3 {
   margin: 0;
+}
+
+.badge-custom-size {
+  padding: 0.5em 0.8em;
+  min-width: 100px;
+  text-align: center;
+  display: inline-block;
+  border-radius: .35rem;
 }
 </style>

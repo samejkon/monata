@@ -35,7 +35,7 @@ class BookingService
 
         $query = $this->model->newQuery();
 
-        $query = $this->filter($query, $payload);
+        $query = $this->filter($payload);
 
         $month = Arr::get($payload, 'month');
         $year = Arr::get($payload, 'year');
@@ -68,13 +68,7 @@ class BookingService
 
         $query->with('bookingDetails');
 
-        if ($per_page === null || $per_page == 0) {
-            $bookings = $query->get();
-        } else {
-            $bookings = $query->paginate($per_page);
-        }
-
-        return $bookings;
+        return $query->paginate($per_page);
     }
 
     /**

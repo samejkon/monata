@@ -229,25 +229,12 @@ watch(() => route.path, () => {
                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                   @click.prevent="toggleUserDropdown" :aria-expanded="isUserDropdownOpen">
                   <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ authStore.user.name }}</span>
-                  <img class="img-profile rounded-circle" src="@/modules/admin/assets/img/undraw_profile.svg">
-                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>
+                  <i class="fas fa-caret-down dropdown-arrow-user ml-1"></i>  
                 </a>
                 <div class="dropdown-menu dropdown-menu-right shadow"
                   :class="{ 'animated--grow-in': isUserDropdownOpen, 'show': isUserDropdownOpen }"
                   aria-labelledby="userDropdown">
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Profile
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                  </a>
-                  <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
-                  </a>
-                  <div class="dropdown-divider"></div>
+
                   <router-link to="/admin/login" class="dropdown-item" @click="logout">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Logout
