@@ -240,6 +240,12 @@ const bookSelectedRooms = async () => {
 
     toast.success('Booking successful!')
     closeModal()
+    
+    localStorage.setItem('newBooking', JSON.stringify({
+      timestamp: new Date().getTime(),
+      bookingId: response.data.data.id
+    }))
+    
     router.push('/profile')
   } catch (error: any) {
     console.error('Booking error:', error.response?.data)

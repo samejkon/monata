@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import '../assets/scss/main.scss';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { api } from '../lib/axios';
 import Header from '@/modules/customer/components/layouts/Header.vue'
 import Footer from '@/modules/customer/components/layouts/Footer.vue'
@@ -90,6 +90,10 @@ const bookingError = ref<string | null>(null);
 const selectedBooking = ref<Booking | null>(null);
 const showBookingDetail = ref(false);
 const showEditBookingModal = ref(false);
+
+// Polling state
+const pollingInterval = ref<number | null>(null);
+const lastBookingUpdate = ref<number>(0);
 
 // Utility functions
 const formatDateTime = (dateTimeStr: string): string => {
@@ -380,10 +384,75 @@ const handleChangePassword = async (): Promise<void> => {
   }
 };
 
+// Function to check for booking updates
+const checkBookingUpdates = async () => {
+  try {
+    const response = await api.get('/bookings-user');
+    const currentBookings = response.data.data;
+    
+    // Kiểm tra xem có booking nào được cập nhật không
+    const hasUpdates = currentBookings.some((booking: Booking) => {
+      const existingBooking = bookings.value.find(b => b.id === booking.id);
+      if (!existingBooking) return true; // Booking mới
+      if (existingBooking.status !== booking.status) return true; // Status thay đổi
+      if (existingBooking.updated_at !== booking.updated_at) return true; // Có cập nhật khác
+      return false;
+    });
+
+    if (hasUpdates) {
+      bookings.value = currentBookings;
+      lastBookingUpdate.value = Date.now();
+      
+      // Thông báo cho user nếu có booking status thay đổi
+      currentBookings.forEach((booking: Booking) => {
+        const existingBooking = bookings.value.find(b => b.id === booking.id);
+        if (existingBooking && existingBooking.status !== booking.status) {
+          const statusText = getStatusText(booking.status);
+          toast.info(`Booking #${booking.id} status changed to: ${statusText}`);
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error checking booking updates:', error);
+  }
+};
+
+// Start polling
+const startPolling = () => {
+  // Polling mỗi 10 giây
+  pollingInterval.value = window.setInterval(checkBookingUpdates, 10000);
+};
+
+// Stop polling
+const stopPolling = () => {
+  if (pollingInterval.value) {
+    clearInterval(pollingInterval.value);
+    pollingInterval.value = null;
+  }
+};
+
 // Lifecycle hooks
-onMounted(() => {
-  fetchUserData();
-  fetchBookings();
+onMounted(async () => {
+  await fetchUserData();
+  await fetchBookings();
+
+  const newBooking = localStorage.getItem('newBooking');
+  if (newBooking) {
+    const bookingData = JSON.parse(newBooking);
+    const now = new Date().getTime();
+    if (now - bookingData.timestamp < 5000) {
+      await fetchBookings();
+      localStorage.removeItem('newBooking');
+    }
+  }
+
+  // Bắt đầu polling khi component được mount
+  startPolling();
+});
+
+// Cleanup khi component unmount
+onUnmounted(() => {
+  stopPolling();
 });
 </script>
 
