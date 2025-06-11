@@ -62,7 +62,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthUserController::class, 'getProfile']);
     Route::put('/profile', [AuthUserController::class, 'updateProfile']);
     Route::post('/change-password', [AuthUserController::class, 'changePassword']);
-    Route::apiResource('bookings', UserBookingController::class);
+    Route::get('/bookings/{id}', [UserBookingController::class, 'show']);
+    Route::post('/bookings', [UserBookingController::class, 'store']);
     Route::get('/bookings-user', [UserBookingController::class, 'indexCustomer']);
 });
 Route::post('/login', [AuthUserController::class, 'login']);
@@ -72,4 +73,4 @@ Route::get('/user-home', [UserHomeController::class, 'index']);
 Route::get('/rooms/{id}', [RoomClientController::class, 'show']);
 Route::get('/rooms', [RoomClientController::class, 'index']);
 
-Route::post('/bookings/check-room-availability', [AdminBookingController::class, 'checkRoomAvailability']);
+Route::post('/bookings/check-room-availability', [UserBookingController::class, 'checkRoomAvailability']);
