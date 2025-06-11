@@ -106,6 +106,7 @@ class RoomService
     {
         if (isset($data['thumbnail'])) {
             $thumbnailPath = $this->fileService->store($data['thumbnail'], 'room/thumbnails');
+            $this->fileService->delete($room->thumbnail_path);
             $room->thumbnail_path = $thumbnailPath;
         }
 
@@ -121,6 +122,7 @@ class RoomService
             $room->room_type_id = $data['room_type_id'];
             $room->description = $data['description'];
             $room->status = $data['status'];
+
             $room->save();
 
             if (!empty($data['images_to_remove']) && is_array($data['images_to_remove'])) {
@@ -132,9 +134,9 @@ class RoomService
                 }
             }
 
-            foreach ($newImagePaths as $imagePath) {
-                $room->images()->create(['image_path' => $imagePath]);
-            }
+            $room->images()->createMany(
+                collect($newImagePaths)->map(fn($path) => ['image_path' => $path])->toArray()
+            );
 
             return $room;
         });
@@ -152,7 +154,7 @@ class RoomService
         $room = Room::findOrFail($id);
 
         if ($room->bookingDetails()->exists()) {
-            throw new \Exception('Room is exists Image.');
+            throw new \Exception('Room is exists Booking.');
         }
 
         return $room->delete();
