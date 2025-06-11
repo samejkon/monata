@@ -147,6 +147,7 @@ class BookingService
                 $total += $itemTotal;
 
                 $item['price_per_day'] = $price;
+                $item['status'] = BookingDetailStatus::PENDING;
                 $item['checkout_at'] = Carbon::parse($item['checkout_at'])->addMinutes($cleanRoom);
                 $item['id'] = Arr::get($item, 'id');
 
