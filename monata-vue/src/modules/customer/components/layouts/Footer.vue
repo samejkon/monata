@@ -17,10 +17,26 @@
         <div>
           <h3 class="footer-heading white">Navigation</h3>
           <ul class="footer-list">
-            <li class="footer-list-item">Home</li>
-            <li class="footer-list-item">Rooms</li>
-            <li class="footer-list-item">About</li>
-            <li class="footer-list-item">News</li>
+            <li class="footer-list-item">
+              <a class="nav-link">
+                <router-link to="/" class="text-light">Home</router-link>
+              </a>
+            </li>
+            <li class="footer-list-item">
+              <a class="nav-link">
+                <router-link to="/rooms" class="text-light">Rooms</router-link>
+              </a>
+            </li>
+            <li class="footer-list-item">
+              <a class="nav-link">
+                <router-link to="/about" class="text-light">About</router-link>
+              </a>
+            </li>
+            <li class="footer-list-item">
+              <a class="nav-link">
+                <router-link to="/contact" class="text-light">Contact</router-link>
+              </a>
+            </li>
           </ul>
         </div>
         <div>

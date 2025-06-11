@@ -264,6 +264,26 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
   font-size: 1.5rem;
 }
 
+@media (min-width: 768px) and (max-width: 1200px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+}
+
 /* Các kiểu dáng khác */
 .nav-booking {
   cursor: pointer;

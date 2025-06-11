@@ -1,4 +1,10 @@
 <template>
+    <header class="hero" :style="{ backgroundImage: `url(${heroImage})` }">
+    <div class="hero-content">
+      <h3>{{ title }}</h3>
+      <p>{{ description }}</p>
+    </div>
+  </header>
     <section class="contact-section">
         <div class="container">
             <div class="d-none d-sm-block mb-5 pb-4">
@@ -256,9 +262,68 @@ const submitForm = async () => {
         isSubmitting.value = false
     }
 }
+
+const props = defineProps({
+  bgClass: {
+    type: String,
+    default: '1'
+  },
+  title: {
+    type: String,
+    default: 'Get in Touch'
+  },
+  description: {
+    type: String,
+    default: ''
+  }
+})
+
+const heroImage = new URL('@/modules/customer/assets/img/slide/contact.png', import.meta.url).href
 </script>
 
 <style scoped>
+.hero {
+  background-size: cover;
+  background-position: center;
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  text-align: center;
+}
+
+.hero-content {
+  z-index: 5;
+}
+
+.hero-content h3 {
+  font-size: 60px;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 767px) {
+  .hero-content h3 {
+    font-size: 40px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .hero-content h3 {
+    font-size: 40px;
+  }
+}
+
+.hero-content p {
+  font-size: 1.5rem;
+}
+
+/* Các kiểu dáng khác */
+.nav-booking {
+  cursor: pointer;
+}
+
 .is-invalid {
     border-color: #dc3545;
 }
