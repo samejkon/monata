@@ -10,7 +10,7 @@ import 'vue-select/dist/vue-select.css';
 const toast = useToast()
 const roomTypes = ref([]);
 const isEditing = ref(false);
-
+const isTransitioning = ref(true);
 const currentRoomType = ref({
   id: null,
   name: '',
@@ -29,6 +29,8 @@ const fetchProperties = async () => {
     propertiesList.value = response.data?.data || [];
   } catch (error) {
     propertiesList.value = [];
+  } finally {
+    isTransitioning.value = false;
   }
 };
 
@@ -210,6 +212,12 @@ const closeModal = () => {
             </tr>
           </tbody>
         </table>
+        <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+          style="min-height: 500px;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden"></span>
+          </div>
+        </div>
       </div>
     </div>
 

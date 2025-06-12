@@ -11,7 +11,7 @@ const records = ref([])
 const roomDetails = ref<any | null>(null)
 const currentLargeImage = ref<string | null>(null)
 const currentImageIndex = ref(0)
-const isTransitioning = ref(false)
+const isTransitioning = ref(true)
 const roomDetailsModalInstance = ref<Modal | null>(null)
 const createRoomModal = ref(null)
 const editRoomModal = ref(null)
@@ -44,6 +44,8 @@ const fetchRooms = async () => {
     console.error('Error fetching rooms:', error)
     records.value = []
     meta.value = null
+  } finally {
+    isTransitioning.value = false
   }
 }
 
@@ -378,6 +380,12 @@ onUnmounted(() => {
           <create-room-modal modalId="createRoomModal" modalTitle="New Room" @room-created="handleRoomCreated" />
           <edit-room-modal v-if="roomToEdit" :modalId="'editRoomModal'" :modalTitle="'Edit Room'"
             :initialRoomData="roomToEdit" @room-updated="handleRoomUpdated" :roomTypesApiUrl="'/room-types'" />
+          <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+            style="min-height: 500px;">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden"></span>
+            </div>
+          </div>
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             <div v-for="room in records" :key="room.id" class="col mb-4 room-card" @click="openRoomDetailsModal(room)">
               <div class="card shadow-sm">

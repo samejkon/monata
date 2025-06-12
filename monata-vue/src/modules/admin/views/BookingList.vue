@@ -61,9 +61,6 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="bookings.length === 0">
-                <td colspan="8" class="text-center">No bookings found.</td>
-              </tr>
               <tr v-for="(booking, index) in bookings" :key="booking.id">
                 <td>{{ index + 1 }}</td>
                 <td>{{ booking.guest_name }}</td>
@@ -87,6 +84,12 @@
               </tr>
             </tbody>
           </table>
+          <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+            style="min-height: 500px;">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden"></span>
+            </div>
+          </div>
         </div>
         <div class="row align-items-center pb-4" v-if="bookings.length > 0">
           <div class="col-md-4">
@@ -119,7 +122,6 @@
 import { reactive, onMounted, ref } from 'vue';
 import { useToast } from 'vue-toastification';
 import { api } from '../lib/axios';
-import { X } from 'lucide-vue-next';
 import BookingDetailModal from '../components/modals/Booking/BookingDetailModal.vue';
 import EditBookingModal from '../components/modals/Booking/EditBookingModal.vue';
 
@@ -131,7 +133,7 @@ const showBookingDetailModal = ref(false);
 const selectedBookingDetail = ref(null);
 const showEditBookingModal = ref(false);
 const bookingToEdit = ref(null);
-
+const isTransitioning = ref(true)
 const filters = reactive({
   guest_name: '',
   guest_email: '',
@@ -152,6 +154,8 @@ const fetchBookings = async (page = 1) => {
   } catch (error) {
     console.error('Error fetching bookings:', error);
     toast.error('Failed to fetch bookings.');
+  } finally {
+    isTransitioning.value = false
   }
 };
 

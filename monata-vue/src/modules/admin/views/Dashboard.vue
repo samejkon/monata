@@ -7,7 +7,7 @@ import { api } from '@/modules/admin/lib/axios';
 
 const revenueType = ref('day');
 const rawData = ref<any[]>([]);
-
+const isTransitioning = ref(true);
 const getRevenue = async (type: string) => {
   try {
     const response = await api.get('/revenue', { params: { type } });
@@ -15,6 +15,8 @@ const getRevenue = async (type: string) => {
   } catch (error) {
     console.error('Error fetching revenue data:', error);
     rawData.value = [];
+  } finally {
+    isTransitioning.value = false;
   }
 };
 
@@ -91,6 +93,8 @@ const fetchBookings = async () => {
     bookings.value = response.data;
   } catch (error) {
     console.error('Error fetching count users:', error);
+  } finally {
+    isTransitioning.value = false;
   }
 };
 
@@ -143,8 +147,13 @@ onMounted(() => {
         </div>
         <div class="card-body">
           <div class="chart-area" style="height: 320px;">
+            <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+              style="min-height: 500px;">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden"></span>
+              </div>
+            </div>
             <RevenueChart v-if="chartData.datasets.length" :chart-data="chartData" />
-            <div v-else class="text-center p-5">No revenue data available.</div>
           </div>
         </div>
       </div>
@@ -223,9 +232,6 @@ onMounted(() => {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="roomCheckouts.length === 0">
-              <td colspan="6" class="text-center">No rooms checking out today.</td>
-            </tr>
             <tr v-for="(roomCheckout, index) in roomCheckouts" :key="roomCheckout.id">
               <td>{{ index + 1 }}</td>
               <td>{{ roomCheckout.guest_name }}</td>

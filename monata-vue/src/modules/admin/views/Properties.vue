@@ -12,7 +12,7 @@ const errorMessages = ref({})
 const newInputRef = ref(null)
 const pagination = ref({})
 const toast = useToast()
-
+const isTransitioning = ref(true)
 const queryParams = reactive({
   page: 1,
   per_page: 10,
@@ -33,6 +33,8 @@ const fetchData = async (page = 1) => {
     console.error('Error fetching data', error)
     errorMessages.value = { global: 'Failed to fetch properties. Please try again later.' }
     records.value = []
+  } finally {
+    isTransitioning.value = false
   }
 }
 
@@ -229,6 +231,12 @@ onMounted(() => {
             </tr>
           </tbody>
         </table>
+        <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+          style="min-height: 500px;">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden"></span>
+          </div>
+        </div>
       </div>
       <div class="row align-items-center pt-3 pb-3" v-if="pagination.total > 0">
         <div class="col-md-4">

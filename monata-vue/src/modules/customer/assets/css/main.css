@@ -7,3 +7,18 @@
 @import 'magnific-popup/dist/magnific-popup.css';
 @import 'slicknav/dist/slicknav.min.css';
 @import './style.css';
+
+#printable-invoice-area,
+#printable-invoice-area * {
+  visibility: visible;
+}
+
+#printable-invoice-area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+}

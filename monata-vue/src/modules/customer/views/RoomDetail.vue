@@ -22,6 +22,7 @@ const formatCurrency = (value) => {
 }
 
 const fetchRoomDetails = async (roomId) => {
+  isTransitioning.value = true
   try {
     const response = await api.get(`/rooms/${roomId}`)
     const fetchedData = response.data.data
@@ -67,6 +68,8 @@ const fetchRoomDetails = async (roomId) => {
     roomDetails.value = null
     currentLargeImage.value = null
     stopImageSlider()
+  } finally {
+    isTransitioning.value = false
   }
 }
 
@@ -165,6 +168,12 @@ onUnmounted(() => {
   <Header />
   <div class="hero"></div>
   <main class="container mt-5 mb-5">
+    <div v-if="isTransitioning" class="d-flex justify-content-center align-items-center w-100"
+      style="min-height: 500px;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden"></span>
+      </div>
+    </div>
     <div v-if="roomDetails">
       <div class="row">
         <div class="col-lg-8">
@@ -212,9 +221,6 @@ onUnmounted(() => {
           </div>
         </div>
       </div>
-    </div>
-    <div v-else class="text-center py-5">
-      <p class="lead">Loading room details or room not found...</p>
     </div>
   </main>
 
