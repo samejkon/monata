@@ -26,7 +26,7 @@ class UpdateUserRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,' . $userId],
             'phone' => ['required', 'string', 'regex:/^0[0-9]{9,}$/', 'unique:users,phone,' . $userId],
-            'status' => ['required', 'integer', 'in:0,1']
+            'status' => ['required', 'integer', 'in:1,2']
         ];
     }
 

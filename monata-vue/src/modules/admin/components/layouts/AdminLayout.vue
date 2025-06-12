@@ -235,6 +235,10 @@ watch(() => route.path, () => {
                   :class="{ 'animated--grow-in': isUserDropdownOpen, 'show': isUserDropdownOpen }"
                   aria-labelledby="userDropdown">
 
+                  <router-link to="/admins/profile" class="dropdown-item">
+                    <i class="fa-regular fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Info
+                  </router-link>
                   <router-link to="/admins/login" class="dropdown-item" @click="logout">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                     Logout
