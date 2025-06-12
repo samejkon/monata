@@ -318,6 +318,19 @@ const cancelBooking = async (bookingId) => {
     }
   }
 };
+
+const deleteBooking = async (bookingId) => {
+  if (confirm('Are you sure want to delete this booking?')) {
+    try {
+      await api.delete(`/bookings/${bookingId}`);
+      toast.success('Booking deleted successfully!');
+      await fetchBookings();
+    } catch (error) {
+      console.error('Error deleted booking:', error.response?.data || error.message);
+      toast.error('Failed to deleted booking: ' + (error.response?.data?.message || 'Unknown error.'));
+    }
+  }
+};
 </script>
 
 <template>
@@ -389,6 +402,8 @@ const cancelBooking = async (bookingId) => {
                     @click="guestNoShow(booking.id)">No Show</button> -->
                   <button v-if="booking.status === 1" type=" button" class="btn btn-danger btn-sm ms-2"
                     @click="cancelBooking(booking.id)">Cancel</button>
+                  <button v-if="booking.status === 5" type=" button" class="btn btn-danger btn-sm ms-2"
+                    @click="deleteBooking(booking.id)">Detele</button>
                 </div>
               </div>
             </div>

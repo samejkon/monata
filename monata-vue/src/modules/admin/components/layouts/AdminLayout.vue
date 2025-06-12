@@ -151,8 +151,7 @@ watch(() => route.path, () => {
 
         <hr class="sidebar-divider">
 
-        <li v-if="authStore.user.role === USER_ROLES.SUPERADMIN" class="nav-item"
-          :class="{ 'active': isActiveRoute('/admins/dashboard') }">
+        <li class="nav-item" :class="{ 'active': isActiveRoute('/admins/dashboard') }">
           <router-link class="nav-link" to="/admins/dashboard">
             <span>Dashboard</span>
           </router-link>
