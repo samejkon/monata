@@ -150,8 +150,6 @@ main {
   line-height: 1;
 }
 
-.pagination .page-item.active .page-link {}
-
 .pagination .page-item.disabled .page-link {
   pointer-events: none;
 }
