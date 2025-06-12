@@ -57,7 +57,7 @@ const adminRoutes: Array<RouteRecordRaw> = [
       },
       {
         path: '', // Default child route for /admin
-        redirect: '/admin/dashboard',
+        redirect: '/admins/dashboard',
       },
       {
         path: 'services',
