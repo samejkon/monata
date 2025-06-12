@@ -1,8 +1,8 @@
 <template>
   <header class="hero" :style="{ backgroundImage: `url(${heroImage})` }">
     <div class="hero-content">
-      <h1 class = "animate__animated animate__fadeInLeft">{{ title }}</h1>
-      <p class = "animate__animated animate__fadeInRight">{{ description }}</p>
+      <h1 class="animate__animated animate__fadeInLeft">{{ title }}</h1>
+      <p class="animate__animated animate__fadeInRight">{{ description }}</p>
     </div>
   </header>
   <section class="section-about container mt-5">
@@ -84,7 +84,7 @@
       <a href="#" class="gray active-under text-decor-none">Learn More</a>
     </div>
   </section>
-  <section class="section-featured mt-5">
+  <section class="section-featured">
     <div class="section-featured-head">
       <p class="section-featured-title blue">Featured Rooms</p>
       <h3 class="section-featured-heading">Choose a Better Room</h3>
@@ -129,10 +129,7 @@
     <img class="section-other-img" src="@/modules/customer/assets/img/instagram/4.png" alt="other" />
     <img class="section-other-img" src="@/modules/customer/assets/img/instagram/5.png" alt="other" />
   </section>
-  <CheckAvailable 
-    v-model="showCheckAvailable"
-    :initial-room-type="selectedRoomType"
-  />
+  <CheckAvailable v-model="showCheckAvailable" :initial-room-type="selectedRoomType" />
 </template>
 
 <script setup lang="ts">
@@ -318,4 +315,7 @@ const heroImage = new URL('@/modules/customer/assets/img/slide/slide1.png', impo
   opacity: 0.8;
 }
 
+.room_thumb {
+  width: 110%;
+}
 </style>
