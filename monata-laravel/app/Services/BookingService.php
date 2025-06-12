@@ -565,20 +565,21 @@ class BookingService
      */
     public function delete($id): bool
     {
-        $booking = $this->model->where('id', $id)
-            ->whereIn('status', [
-                BookingStatus::CHECK_OUT,
-                BookingStatus::CANCELLED,
-                BookingStatus::NO_SHOW,
-                BookingStatus::EXPIRED
-            ])
-            ->first();
+        return DB::transaction(function () use ($id) {
+            $booking = $this->model->where('id', $id)
+                ->whereIn('status', [
+                    BookingStatus::CANCELLED,
+                ])
+                ->first();
 
-        if (!$booking) {
-            throw new \Exception("Booking can't delete.");
-        }
+            if (!$booking) {
+                throw new \Exception("Booking can't delete.");
+            }
 
-        return $booking->delete();
+            $this->bookingDetail->where('booking_id', $id)->delete();
+
+            return $booking->delete();
+        });
     }
 
     /**

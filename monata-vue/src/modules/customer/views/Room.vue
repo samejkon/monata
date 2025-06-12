@@ -40,7 +40,7 @@ const fetchRooms = async () => {
 
   } catch (err) {
     console.error('Error fetching rooms:', err);
-    error.value = 'Không thể tải danh sách phòng. Vui lòng thử lại sau!';
+    error.value = 'Unable to load rooms. Please try again later!';
     rooms.value = [];
     totalRooms.value = 0;
     totalPages.value = 0;
@@ -73,8 +73,14 @@ watch(
     <Header />
   </div>
   <div class="hero bg-black"> </div>
-  <main class="">
-    <div class="container my-3">
+  <main>
+    <div class="container my-3 mt-5">
+      <div v-if="isLoading" class="d-flex justify-content-center align-items-center w-100" style="min-height: 500px;">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Loading...</p>
+      </div>
       <div class="row">
         <div v-for="room in rooms" @click="$router.push({ name: 'roomDetail', params: { id: room.id } })"
           class="col-md-4 mb-5">
@@ -110,13 +116,16 @@ watch(
       </nav>
     </div>
   </main>
-
   <Footer />
 </template>
 
 <style scoped>
 .hero {
   height: 150px;
+}
+
+main {
+  min-height: 1000px;
 }
 
 .rom-thumbnail {
@@ -141,10 +150,23 @@ watch(
   line-height: 1;
 }
 
-.pagination .page-item.active .page-link {}
-
 .pagination .page-item.disabled .page-link {
   pointer-events: none;
+}
+
+#printable-invoice-area,
+#printable-invoice-area * {
+  visibility: visible;
+}
+
+#printable-invoice-area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .pagination .page-item:first-child .page-link,
