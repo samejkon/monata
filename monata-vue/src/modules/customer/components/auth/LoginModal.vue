@@ -52,6 +52,9 @@ async function login() {
     } else if (error.response?.status === 401) {
       errors.value = { form: ['Email or password is not valid.'] }
       toast.error('Email or password is not valid.')
+    } else if (error.response?.status === 423) {
+      errors.value = { form: ['Account is locked.'] }
+      toast.error('Account is locked.')
     } else {
       console.error('Login failed:', error.message)
       toast.error('Login failed!')

@@ -12,6 +12,7 @@ use App\Services\AuthUserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class AuthUserController extends Controller
 {
@@ -47,6 +48,12 @@ class AuthUserController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         $result = $this->authUserService->login($request->validated());
+
+        if (Auth::user()->status === 2) {
+            $this->authUserService->logout();
+
+            return response()->json('Account is locked')->setStatusCode(423);
+        }
 
         if (!$result) {
             return response()->json('Invalid credentials')->setStatusCode(401);
@@ -109,5 +116,4 @@ class AuthUserController extends Controller
 
         return new UserResource($user);
     }
-
 }
